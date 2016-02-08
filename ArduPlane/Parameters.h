@@ -290,6 +290,7 @@ public:
         k_param_flight_mode4,
         k_param_flight_mode5,
         k_param_flight_mode6,
+        k_param_flight_mode7,
         k_param_initial_mode,
 
         //
@@ -330,6 +331,10 @@ public:
         k_param_pidWheelSteer, // unused
 
         k_param_DataFlash = 253, // Logging Group
+        k_param_JU_Pq,
+        k_param_JU_Ptheta,
+        k_param_JU_Pclimbrate,
+        k_param_JU_Iclimbrate,
 
         // 254,255: reserved
     };
@@ -429,6 +434,7 @@ public:
     AP_Int8 flight_mode4;
     AP_Int8 flight_mode5;
     AP_Int8 flight_mode6;
+    AP_Int8 flight_mode7;
     AP_Int8 initial_mode;
 
     // Navigational maneuvering limits
@@ -463,6 +469,11 @@ public:
     AP_Int16 pitch_trim_cd;
     AP_Int16 FBWB_min_altitude_cm;
     AP_Int8  hil_servos;
+    AP_Int16 JU_Pq;
+    AP_Int16 JU_Ptheta;
+    AP_Int16 JU_Pclimbrate;
+    AP_Int16 JU_Iclimbrate;
+
 #if HIL_SUPPORT
     AP_Int8  hil_mode;
 #endif

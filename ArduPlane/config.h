@@ -430,3 +430,19 @@
 #else
 #define FIRMWARE_STRING THISFIRMWARE " (" GIT_VERSION ")"
 #endif
+
+#ifndef JU_Pq_DEFAULT
+#define JU_Pq_DEFAULT 0.1
+#endif
+
+#ifndef JU_Ptheta_DEFAULT
+#define JU_Ptheta_DEFAULT 0.1
+#endif
+
+#ifndef JU_Pclimbrate_DEFAULT
+#define JU_Pclimbrate_DEFAULT 0.1
+#endif
+
+#ifndef JU_Iclimbrate_DEFAULT
+#define JU_Iclimbrate_DEFAULT 0.01
+#endif

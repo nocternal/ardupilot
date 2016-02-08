@@ -994,6 +994,34 @@ const AP_Param::Info Plane::var_info[] = {
     // compatibility with previous releases of ArduPlane
     // @Group: GND_
     // @Path: ../libraries/AP_Baro/AP_Baro.cpp
+
+
+
+    GSCALAR(JU_Pq,         "JU_Pq",   JU_Pq_DEFAULT),
+    // @Param: JU_Pq
+    // @DisplayName: JU_Pq
+    // @Description: pitch rate's P   
+    // @Values: 0.001 100
+    // @User: Advanced
+    GSCALAR(JU_Ptheta,         "JU_Ptheta",   JU_Ptheta_DEFAULT),
+    // @Param: JU_Ptheta
+    // @DisplayName: JU_Ptheta
+    // @Description: theta's P   
+    // @Values: 0.001 100
+    // @User: Advanced
+    GSCALAR(JU_Pclimbrate,         "JU_Pclimbrate",   JU_Pclimbrate_DEFAULT),
+    // @Param: JU_Pclimbrate
+    // @DisplayName: JU_Pclimbrate
+    // @Description: climbrate's P   
+    // @Values: 0.001 100
+    // @User: Advanced
+    GSCALAR(JU_Iclimbrate,         "JU_Iclimbrate",   JU_Iclimbrate_DEFAULT),
+    // @Param: JU_Iclimbrate
+    // @DisplayName: JU_Iclimbrate
+    // @Description: climbrate's I   
+    // @Values: 0.001 100
+    // @User: Advanced
+
     GOBJECT(barometer, "GND_", AP_Baro),
 
     // GPS driver
