@@ -686,6 +686,9 @@ void Plane::print_flight_mode(AP_HAL::BetterStream *port, uint8_t mode)
     case GUIDED:
         port->print("Guided");
         break;
+    case JULAND:
+        port->print("JULAND");
+        break;
     default:
         port->printf("Mode(%u)", (unsigned)mode);
         break;
