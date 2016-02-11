@@ -713,6 +713,12 @@ void Plane::update_flight_mode(void)
         break;
         //roll: -13788.000,  pitch: -13698.000,   thr: 0.000, rud: -13742.000
 
+    case JULAND:
+        nav_roll_cd        = 0;
+        nav_pitch_cd       = 0;
+        // throttle is passthrough
+        break;
+
 
     case QSTABILIZE:
     case QHOVER:
@@ -803,6 +809,7 @@ void Plane::update_navigation()
     case AUTOTUNE:
     case FLY_BY_WIRE_B:
     case CIRCLE:
+    case JULAND:
     case QSTABILIZE:
     case QHOVER:
     case QLOITER:

@@ -452,7 +452,7 @@ void Plane::set_mode(enum FlightMode mode)
         guided_WP_loc = current_loc;
         set_guided_WP();
         break;
-
+    case JULAND:
     case QSTABILIZE:
     case QHOVER:
     case QLOITER:
@@ -497,6 +497,7 @@ bool Plane::mavlink_set_mode(uint8_t mode)
     case AUTO:
     case RTL:
     case LOITER:
+    case JULAND:
     case QSTABILIZE:
     case QHOVER:
     case QLOITER:
