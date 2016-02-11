@@ -49,6 +49,7 @@ void Plane::send_heartbeat(mavlink_channel_t chan)
     case RTL:
     case LOITER:
     case GUIDED:
+    case JULAND:
     case CIRCLE:
         base_mode = MAV_MODE_FLAG_GUIDED_ENABLED |
                     MAV_MODE_FLAG_STABILIZE_ENABLED;
