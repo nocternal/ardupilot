@@ -730,10 +730,10 @@ void Plane::update_flight_mode(void)
         nav_roll_cd = channel_roll->norm_input() * roll_limit_cd;
         nav_roll_cd = constrain_int32(nav_roll_cd, -roll_limit_cd, roll_limit_cd);
 
-       // get real sink_rate vel.z is a positive number
-        
+        float JU_climb_rate_err = g.JU_climbrate1 - (-sink_rate); //JU_climbrate is a negative number,sink_rate is positive
+              
         // get pitch commend centidegree
-        nav_pitch_cd = g.JU_Pclimbrate;// + g.pitch_trim_cd ;//this is added in attitude.cpp//not put in I yet
+        nav_pitch_cd = (-JU_climb_rate_err) * g.JU_Pclimbrate;// + g.pitch_trim_cd ;//this is added in attitude.cpp//not put in I yet
         
         // it seems that JULAND's stick mixing needn't write by myself. it's already added in attitude.cpp 
         
