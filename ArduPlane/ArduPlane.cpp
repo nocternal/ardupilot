@@ -560,6 +560,18 @@ void Plane::update_flight_mode(void)
         ahrs.set_fly_forward(true);
     }
 
+
+    float sink_rate;
+    Vector3f vel;
+    if (ahrs.get_velocity_NED(vel)) {
+        sink_rate = vel.z;
+    } else if (gps.status() >= AP_GPS::GPS_OK_FIX_3D && gps.have_vertical_velocity()) {
+        sink_rate = gps.velocity().z;
+    } else {
+        sink_rate = -barometer.get_climb_rate();        
+    }
+
+    
     switch (effective_mode) 
     {
     case AUTO:
