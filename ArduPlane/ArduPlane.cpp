@@ -713,34 +713,22 @@ void Plane::update_flight_mode(void)
         break;
         //roll: -13788.000,  pitch: -13698.000,   thr: 0.000, rud: -13742.000
 
-    case JULAND:
+    case JULAND:{
        // take roll control same with FBWB
         nav_roll_cd = channel_roll->norm_input() * roll_limit_cd;
         nav_roll_cd = constrain_int32(nav_roll_cd, -roll_limit_cd, roll_limit_cd);
 
        // get real sink_rate vel.z is a positive number
-        float sink_rate;
-        Vector3f vel;
-        if (ahrs.get_velocity_NED(vel)) {
-        sink_rate = vel.z;
-        } else if (gps.status() >= AP_GPS::GPS_OK_FIX_3D && gps.have_vertical_velocity()) {
-        sink_rate = gps.velocity().z;
-        } else {
-        sink_rate = -barometer.get_climb_rate();        
-        }
-
-        // get sink rate error
-        float JU_climb_rate_err = g.JU_climbrate1 - (-sink_rate); //JU_climbrate is a negative number
-              
+        
         // get pitch commend centidegree
-        nav_pitch_cd = (-JU_climb_rate_err) * g.JU_Pclimbrate;// + g.pitch_trim_cd ;//this is added in attitude.cpp//not put in I yet
+        nav_pitch_cd = g.JU_Pclimbrate;// + g.pitch_trim_cd ;//this is added in attitude.cpp//not put in I yet
         
         // it seems that JULAND's stick mixing needn't write by myself. it's already added in attitude.cpp 
         
         channel_throttle->radio_out = channel_throttle->radio_in;
         // throttle is not auto controlled now
         break;
-
+        } 
 
     case QSTABILIZE:
     case QHOVER:
@@ -831,11 +819,11 @@ void Plane::update_navigation()
     case AUTOTUNE:
     case FLY_BY_WIRE_B:
     case CIRCLE:
-    case JULAND:
     case QSTABILIZE:
     case QHOVER:
     case QLOITER:
         // nothing to do
+    case JULAND:
         break;
     }
 }
