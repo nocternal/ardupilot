@@ -173,6 +173,7 @@ void Plane::send_extended_status1(mavlink_channel_t chan)
     case STABILIZE:
     case FLY_BY_WIRE_A:
     case AUTOTUNE:
+    case JULAND:
     case QSTABILIZE:
     case QHOVER:
     case QLOITER:
