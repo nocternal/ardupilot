@@ -1021,6 +1021,32 @@ const AP_Param::Info Plane::var_info[] = {
     // @Description: climbrate's I   
     // @Values: 0.001 100
     // @User: Advanced
+    GSCALAR(JU_climbrate1,         "JU_climbrate1",   JU_climbrate1_DEFAULT),
+    // @Param: JU_climbrate1
+    // @DisplayName: JU_climbrate1
+    // @Description: desire climbrate at steep sescend stage. should be negative number   
+    // @Values: -5 5
+    // @User: Advanced
+    GSCALAR(JU_climbrate2,         "JU_climbrate2",   JU_climbrate2_DEFAULT),
+    // @Param: JU_climbrate2
+    // @DisplayName: JU_climbrate2
+    // @Description: desire climbrate at shalow sescend stage. should be negative number   
+    // @Values: -5 5
+    // @User: Advanced
+
+    GSCALAR(JU_speed1,         "JU_speed1",   JU_speed1_DEFAULT),
+    // @Param: JU_speed1
+    // @DisplayName: JU_speed1
+    // @Description: desire velocity when descend  
+    // @Values: 5 30
+    // @User: Advanced
+
+    GSCALAR(JU_speedprotect,         "JU_speedprotect",   JU_speedprotect_DEFAULT),
+    // @Param: JU_speedprotect
+    // @DisplayName: JU_speedprotect
+    // @Description: lowest permit speed when descend to land 
+    // @Values: 5 30
+    // @User: Advanced
 
     GOBJECT(barometer, "GND_", AP_Baro),
 

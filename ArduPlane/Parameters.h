@@ -335,6 +335,12 @@ public:
         k_param_JU_Ptheta,
         k_param_JU_Pclimbrate,
         k_param_JU_Iclimbrate,
+        k_param_JU_climbrate1,// first steep descend rate
+        k_param_JU_climbrate2,// shalow descend rate
+        k_param_JU_speed1, //first steep descend speed
+        k_param_JU_speedprotect,// can't lower than that
+
+
 
         // 254,255: reserved
     };
@@ -473,6 +479,10 @@ public:
     AP_Int16 JU_Ptheta;
     AP_Int16 JU_Pclimbrate;
     AP_Int16 JU_Iclimbrate;
+    AP_Int16 JU_climbrate1;//should be a negative number such as -2
+    AP_Int16 JU_climbrate2;//should be a negative number such as -0.5
+    AP_Int16 JU_speed1;
+    AP_Int16 JU_speedprotect;
 
 #if HIL_SUPPORT
     AP_Int8  hil_mode;

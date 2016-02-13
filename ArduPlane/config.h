@@ -446,3 +446,19 @@
 #ifndef JU_Iclimbrate_DEFAULT
 #define JU_Iclimbrate_DEFAULT 0.01
 #endif
+
+#ifndef JU_climbrate1_DEFAULT
+#define JU_climbrate1_DEFAULT -2
+#endif
+
+#ifndef JU_climbrate2_DEFAULT
+#define JU_climbrate2_DEFAULT -0.5
+#endif
+
+#ifndef JU_speed1_DEFAULT
+#define JU_speed1_DEFAULT 15
+#endif
+
+#ifndef JU_speedprotect_DEFAULT
+#define JU_speedprotect_DEFAULT 9
+#endif
