@@ -1,0 +1,7 @@
+Exception: STATUS_ACCESS_VIOLATION at eip=00000000
+eax=00000000 ebx=0050B300 ecx=004E04D0 edx=00507A4C esi=0050CB94 edi=00507640
+ebp=00000000 esp=0028CBCC program=C:\cygwin\home\Administrator\ardupilot\arduplane\arduplane.elf, pid 1344, thread main
+cs=0023 ds=002B es=002B fs=0053 gs=002B ss=002B
+Stack trace:
+Frame     Function  Args
+End of stack trace

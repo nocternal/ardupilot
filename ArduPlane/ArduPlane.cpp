@@ -725,22 +725,40 @@ void Plane::update_flight_mode(void)
         break;
         //roll: -13788.000,  pitch: -13698.000,   thr: 0.000, rud: -13742.000
 
-    case JULAND:{
-       // take roll control same with FBWB
-        nav_roll_cd = channel_roll->norm_input() * roll_limit_cd;
-        nav_roll_cd = constrain_int32(nav_roll_cd, -roll_limit_cd, roll_limit_cd);
+    case JULAND:
+		if ((channel_roll->control_in != 0 ||
+             rudder_input != 0)) {                
+            cruise_state.locked_heading = false;
+            cruise_state.lock_timer_ms = 0;
+        }                 
+        
+        if (!cruise_state.locked_heading) {
+            nav_roll_cd = channel_roll->norm_input() * roll_limit_cd;
+            nav_roll_cd = constrain_int32(nav_roll_cd, -roll_limit_cd, roll_limit_cd);
+            update_load_factor();
+        } else {
+            calc_nav_roll();
+        }
+        update_fbwb_speed_height();
+        break;
 
-        float JU_climb_rate_err = g.JU_climbrate1 - (-sink_rate); //JU_climbrate is a negative number,sink_rate is positive
+
+    	//{   
+       	// take roll control same with FBWB
+        //nav_roll_cd = 0;// channel_roll->norm_input() * roll_limit_cd;
+        //nav_roll_cd = constrain_int32(nav_roll_cd, -roll_limit_cd, roll_limit_cd);
+
+        //float JU_climb_rate_err = g.JU_climbrate1 - (-sink_rate); //JU_climbrate is a negative number,sink_rate is positive
               
         // get pitch commend centidegree
-        nav_pitch_cd = (-JU_climb_rate_err) * g.JU_Pclimbrate;// + g.pitch_trim_cd ;//this is added in attitude.cpp//not put in I yet
+        //nav_pitch_cd = (-JU_climb_rate_err) * g.JU_Pclimbrate;// + g.pitch_trim_cd ;//this is added in attitude.cpp//not put in I yet
         
         // it seems that JULAND's stick mixing needn't write by myself. it's already added in attitude.cpp 
         
-        channel_throttle->radio_out = channel_throttle->radio_in;
+        //channel_throttle->radio_out = channel_throttle->radio_in;
         // throttle is not auto controlled now
-        break;
-        } 
+        //break;
+        //} 
 
     case QSTABILIZE:
     case QHOVER:
