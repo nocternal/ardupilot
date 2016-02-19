@@ -47,7 +47,7 @@ FLTMODE1        10
 FLTMODE2        11
 FLTMODE3        12
 FLTMODE4        5
-FLTMODE5        2
+FLTMODE5        20
 FLTMODE6        0
 FLTMODE_CH      8
 WP_LOITER_RAD   80
