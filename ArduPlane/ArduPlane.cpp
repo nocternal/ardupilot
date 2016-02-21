@@ -726,22 +726,11 @@ void Plane::update_flight_mode(void)
         //roll: -13788.000,  pitch: -13698.000,   thr: 0.000, rud: -13742.000
 
     case JULAND:
-		if ((channel_roll->control_in != 0 ||
-             rudder_input != 0)) {                
-            cruise_state.locked_heading = false;
-            cruise_state.lock_timer_ms = 0;
-        }                 
-        
-        if (!cruise_state.locked_heading) {
-            nav_roll_cd = channel_roll->norm_input() * roll_limit_cd;
-            nav_roll_cd = constrain_int32(nav_roll_cd, -roll_limit_cd, roll_limit_cd);
-            update_load_factor();
-        } else {
-            calc_nav_roll();
-        }
-        update_fbwb_speed_height();
+        nav_roll_cd  = roll_limit_cd / 3;
+        update_load_factor();
+        calc_nav_pitch();
+        calc_throttle();
         break;
-
 
     	//{   
        	// take roll control same with FBWB
