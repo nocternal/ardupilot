@@ -140,6 +140,7 @@ void Plane::stabilize_stick_mixing_direct()
         control_mode == AUTOTUNE ||
         control_mode == FLY_BY_WIRE_B ||
         control_mode == CRUISE ||
+        control_mode == JULAND ||
         control_mode == QSTABILIZE ||
         control_mode == QHOVER ||
         control_mode == QLOITER ||
@@ -162,6 +163,7 @@ void Plane::stabilize_stick_mixing_fbw()
         control_mode == AUTOTUNE ||
         control_mode == FLY_BY_WIRE_B ||
         control_mode == CRUISE ||
+        control_mode == JULAND ||
         control_mode == QSTABILIZE ||
         control_mode == QHOVER ||
         control_mode == QLOITER ||
@@ -350,7 +352,8 @@ void Plane::stabilize_acro(float speed_scaler)
  */
 void Plane::stabilize()
 {
-    if (control_mode == MANUAL) {
+    if (control_mode == MANUAL ||
+        control_mode == JULAND) {
         // nothing to do
         return;
     }
@@ -806,7 +809,8 @@ void Plane::set_servos(void)
     RC_Channel_aux::set_servo_out(RC_Channel_aux::k_rudder, steering_control.rudder);
     RC_Channel_aux::set_servo_out(RC_Channel_aux::k_steering, steering_control.steering);
 
-    if (control_mode == MANUAL) {
+    if (control_mode == MANUAL ||
+        control_mode == JULAND) {
         // do a direct pass through of radio values
         if (g.mix_mode == 0 || g.elevon_output != MIXING_DISABLED) {
             channel_roll->radio_out                = channel_roll->radio_in;

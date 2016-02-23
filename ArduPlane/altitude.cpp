@@ -27,7 +27,8 @@
 void Plane::adjust_altitude_target()
 {
     if (control_mode == FLY_BY_WIRE_B ||
-        control_mode == CRUISE) {
+        control_mode == CRUISE ||
+        control_mode == JULAND) {
         return;
     }
     if (flight_stage == AP_SpdHgtControl::FLIGHT_LAND_FINAL) {

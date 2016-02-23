@@ -306,12 +306,13 @@ bool Plane::verify_command(const AP_Mission::Mission_Command& cmd)        // Ret
         return true;
 
     default:
+    gcs_send_text_fmt(MAV_SEVERITY_INFO, "Flight mode = %u", (unsigned)control_mode);
         // error message
         if (AP_Mission::is_nav_cmd(cmd)) {
             gcs_send_text(MAV_SEVERITY_WARNING,"Verify nav. Invalid or no current nav cmd");
         }else{
         gcs_send_text(MAV_SEVERITY_WARNING,"Verify conditon. Invalid or no current condition cmd");
-    }
+     }
         // return true so that we do not get stuck at this command
         return true;
     }
