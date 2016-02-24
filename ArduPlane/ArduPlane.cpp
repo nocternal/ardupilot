@@ -717,13 +717,13 @@ void Plane::update_flight_mode(void)
         break;
 
     case MANUAL:
-        // servo_out is for Sim control only
-        // ---------------------------------
-        channel_roll->servo_out = channel_roll->pwm_to_angle();
-        channel_pitch->servo_out = channel_pitch->pwm_to_angle();//centidegree
-        steering_control.steering = steering_control.rudder = channel_rudder->pwm_to_angle();
-        break;
-        //roll: -13788.000,  pitch: -13698.000,   thr: 0.000, rud: -13742.000
+     //servo_out is for Sim control only
+        // //---------------------------------
+    channel_roll->servo_out = channel_roll->pwm_to_angle();
+    channel_pitch->servo_out = channel_pitch->pwm_to_angle();//centidegree
+    steering_control.steering = steering_control.rudder = channel_rudder->pwm_to_angle();
+    break;
+        // //roll: -13788.000,  pitch: -13698.000,   thr: 0.000, rud: -13742.000
 
     case JULAND:
         //channel_roll->servo_out = 2000;
