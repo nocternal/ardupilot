@@ -726,15 +726,12 @@ void Plane::update_flight_mode(void)
         // //roll: -13788.000,  pitch: -13698.000,   thr: 0.000, rud: -13742.000
 
     case JULAND:
-        //channel_roll->servo_out = 2000;
-        //channel_pitch->servo_out = 1100;
-        //steering_control.steering = steering_control.rudder = channel_rudder->pwm_to_angle();
-        //channel_throttle->servo_out = 1000;
-        //break;
-        channel_roll->servo_out = channel_roll->pwm_to_angle();
-        channel_pitch->servo_out = channel_pitch->pwm_to_angle();//centidegree
+        channel_roll->servo_out = 2000;
+        channel_pitch->servo_out = 1100;
         steering_control.steering = steering_control.rudder = channel_rudder->pwm_to_angle();
-        break;
+        channel_throttle->servo_out = 100;
+       break;
+
 
         //float JU_climb_rate_err = g.JU_climbrate1 - (-sink_rate); //JU_climbrate is a negative number,sink_rate is positive
               
