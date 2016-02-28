@@ -67,7 +67,7 @@ enum FlightMode {
     QSTABILIZE    = 17,
     QHOVER        = 18,
     QLOITER       = 19,
-    JULAND        = 20,
+    JULAND        = 20
 };
 
 // type of stick mixing enabled
