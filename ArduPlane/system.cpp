@@ -453,6 +453,8 @@ void Plane::set_mode(enum FlightMode mode)
         set_guided_WP();
         break;
     case JULAND:
+        auto_throttle_mode = false;
+        break;
     case QSTABILIZE:
     case QHOVER:
     case QLOITER:
