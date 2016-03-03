@@ -140,7 +140,6 @@ void Plane::stabilize_stick_mixing_direct()
         control_mode == AUTOTUNE ||
         control_mode == FLY_BY_WIRE_B ||
         control_mode == CRUISE ||
-        control_mode == JULAND ||
         control_mode == QSTABILIZE ||
         control_mode == QHOVER ||
         control_mode == QLOITER ||
