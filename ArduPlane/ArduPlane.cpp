@@ -570,12 +570,22 @@ void Plane::update_flight_mode(void)
     } else {
         sink_rate = -barometer.get_climb_rate();        
     }
-
+    
+    /*float height_from_home;
+    Vector3f posned;
+    if (ahrs.get_relative_position_NED(posned)){
+        height_from_home = -posned.z;
+    }*/
+    
     
     switch (effective_mode) 
     {
     case AUTO:
         handle_auto_mode();
+        //if (height_from_home<50) {
+        //channel_throttle->servo_out = 89;
+        //}
+
         break;
 
     case RTL:
