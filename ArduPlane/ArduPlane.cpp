@@ -700,8 +700,14 @@ void Plane::update_flight_mode(void)
         break;
         
     case STABILIZE:
+        //nav_roll_cd        = 0;
+        //nav_pitch_cd       = 0;
+
         nav_roll_cd        = 0;
-        nav_pitch_cd       = 0;
+        float JU_climb_rate_err;
+        JU_climb_rate_err = g.JU_climbrate1 - (-sink_rate);
+        nav_pitch_cd =  JU_climb_rate_err * g.JU_Pclimbrate;
+        channel_throttle->servo_out = 30;
         // throttle is passthrough
         break;
         
@@ -717,8 +723,6 @@ void Plane::update_flight_mode(void)
         break;
 
     case MANUAL:
-     //servo_out is for Sim control only
-        // //---------------------------------
     channel_roll->servo_out = channel_roll->pwm_to_angle();
     channel_pitch->servo_out = channel_pitch->pwm_to_angle();//centidegree
     steering_control.steering = steering_control.rudder = channel_rudder->pwm_to_angle();
@@ -726,10 +730,10 @@ void Plane::update_flight_mode(void)
         // //roll: -13788.000,  pitch: -13698.000,   thr: 0.000, rud: -13742.000
 
     case JULAND:
-        channel_roll->servo_out = 2000;
-        channel_pitch->servo_out = 1100;
+        channel_roll->servo_out = 0;
+        channel_pitch->servo_out = 0;
         steering_control.steering = steering_control.rudder = channel_rudder->pwm_to_angle();
-        channel_throttle->servo_out = 100;
+        channel_throttle->servo_out = 30;
        break;
 
 
