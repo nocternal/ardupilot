@@ -475,14 +475,14 @@ public:
     AP_Int16 pitch_trim_cd;
     AP_Int16 FBWB_min_altitude_cm;
     AP_Int8  hil_servos;
-    AP_Int16 JU_Pq;
-    AP_Int16 JU_Ptheta;
-    AP_Int16 JU_Pclimbrate;
-    AP_Int16 JU_Iclimbrate;
-    AP_Int16 JU_climbrate1;//should be a negative number such as -2
-    AP_Int16 JU_climbrate2;//should be a negative number such as -0.5
-    AP_Int16 JU_speed1;
-    AP_Int16 JU_speedprotect;
+    AP_Float JU_Pq;
+    AP_Float JU_Ptheta;
+    AP_Float JU_Pclimbrate;
+    AP_Float JU_Iclimbrate;
+    AP_Float JU_climbrate1;//should be a negative number such as -2
+    AP_Float JU_climbrate2;//should be a negative number such as -0.5
+    AP_Float JU_speed1;
+    AP_Float JU_speedprotect;
 
 #if HIL_SUPPORT
     AP_Int8  hil_mode;
