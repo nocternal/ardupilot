@@ -280,11 +280,11 @@ INS_USE          1.000000
 INS_USE2         1.000000
 INS_USE3         0.000000
 INVERTEDFLT_CH   0.000000
-JU_Iclimbrate    0.000000
-JU_Pclimbrate    150.000000
+JU_Iclimbrate    0.100000
+JU_Pclimbrate    0.100000
 JU_Pq            0.000000
 JU_Ptheta        0.000000
-JU_climbrate1    -5.000000
+JU_climbrate1    5.000000
 JU_climbrate2    0.000000
 JU_speed1        15.000000
 JU_speedprotect  9.000000

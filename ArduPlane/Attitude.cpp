@@ -105,7 +105,8 @@ void Plane::stabilize_pitch(float speed_scaler)
     bool disable_integrator = false;
     if (control_mode == STABILIZE && channel_pitch->control_in != 0) {
         disable_integrator = true;
-    }
+    }  
+  //original file STABILIAZE's I doesn't work,I comment it to let it also integrate
     channel_pitch->servo_out = pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, 
                                                              speed_scaler, 
                                                              disable_integrator);
