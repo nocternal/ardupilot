@@ -103,9 +103,9 @@ void Plane::stabilize_pitch(float speed_scaler)
     }
     int32_t demanded_pitch = nav_pitch_cd + g.pitch_trim_cd + channel_throttle->servo_out * g.kff_throttle_to_pitch;
     bool disable_integrator = false;
-    if (control_mode == STABILIZE && channel_pitch->control_in != 0) {
-        disable_integrator = true;
-    }  
+ //   if (control_mode == STABILIZE && channel_pitch->control_in != 0) {
+ //       disable_integrator = true;
+ //   }  
   //original file STABILIAZE's I doesn't work,I comment it to let it also integrate
     channel_pitch->servo_out = pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, 
                                                              speed_scaler, 

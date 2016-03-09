@@ -717,7 +717,7 @@ void Plane::update_flight_mode(void)
         JU_climb_rate_err = g.JU_climbrate1 - (-sink_rate);
 
 
-/*        uint32_t tnow;
+        uint32_t tnow;
         tnow= AP_HAL::millis();
         uint32_t dt;
         uint32_t last_t;
@@ -746,11 +746,11 @@ void Plane::update_flight_mode(void)
 
     climb_pid_info_I = constrain_float(climb_pid_info_I, -2000, 2000);
 
-*/
+
         
 
-        nav_pitch_cd =  JU_climb_rate_err * g.JU_Pclimbrate * 5729;// + climb_pid_info_I * 5729; // rad to centidegree
-        channel_throttle->servo_out = 30;
+        nav_pitch_cd =  JU_climb_rate_err * g.JU_Pclimbrate * 5729.0 + climb_pid_info_I * 5729.0; // rad to centidegree
+        channel_throttle->servo_out = 30.0;
         // throttle is passthrough,in stabilize mode ,throttle radio out = radio in .this property can be found in attitude.cpp
         break;
         
