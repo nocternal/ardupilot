@@ -715,41 +715,33 @@ void Plane::update_flight_mode(void)
         nav_roll_cd        = 0;
         float JU_climb_rate_err;
         JU_climb_rate_err = g.JU_climbrate1 - (-sink_rate);
-
+        nav_pitch_cd = JU_climb_rate_err * g.JU_Pclimbrate * 5729.0 ;
 
         uint32_t tnow;
-        tnow= AP_HAL::millis();
+        tnow= AP_HAL::micros();
         uint32_t dt;
         uint32_t last_t;
         float climb_pid_info_I;
+        float climb_integrator_delta; 
+
         dt = tnow - last_t;
-        if (last_t == 0 || dt > 1000) {
+        if (last_t == 0 || dt > 1.0e6f) {
         dt = 0;
         }
         last_t = tnow;
         float delta_time;   
-        delta_time = (float)dt * 0.001f;
-        if (dt > 0 ) {
-        float climb_integrator_delta; 
-        climb_integrator_delta = JU_climb_rate_err * delta_time * g.JU_Iclimbrate;
-            if ( nav_pitch_cd < -4500) {
-                // prevent the integrator from increasing if surface defln demand is above the upper limit
-                climb_integrator_delta = MAX(climb_integrator_delta , 0);
-            } else if (nav_pitch_cd > 4500) {
-                // prevent the integrator from decreasing if surface defln demand  is below the lower limit
-                climb_integrator_delta = MIN(climb_integrator_delta , 0);
-            }
-            climb_pid_info_I += climb_integrator_delta; 
-    } else {
-        climb_pid_info_I = 0;
-    }
+        delta_time = (float)dt * 1.0e-6f;
 
-    climb_pid_info_I = constrain_float(climb_pid_info_I, -2000, 2000);
+
+        
+        climb_integrator_delta = JU_climb_rate_err * delta_time * g.JU_Iclimbrate * 5729.0;    //5729 means rad to degree       
+        climb_pid_info_I += climb_integrator_delta; 
+        climb_pid_info_I = constrain_float(climb_pid_info_I, -2000, 2000);
 
 
         
 
-        nav_pitch_cd =  JU_climb_rate_err * g.JU_Pclimbrate * 5729.0 + climb_pid_info_I * 5729.0; // rad to centidegree
+        nav_pitch_cd  += climb_pid_info_I;//JU_climb_rate_err * g.JU_Pclimbrate * 5729.0 ; // rad to centidegree
         channel_throttle->servo_out = 30.0;
         // throttle is passthrough,in stabilize mode ,throttle radio out = radio in .this property can be found in attitude.cpp
         break;
