@@ -571,11 +571,11 @@ void Plane::update_flight_mode(void)
         sink_rate = -barometer.get_climb_rate();        
     }
     
-    /*float height_from_home;
+    float height_from_home;
     Vector3f posned;
     if (ahrs.get_relative_position_NED(posned)){
         height_from_home = -posned.z;
-    }*/
+    }
     
     
     switch (effective_mode) 
@@ -715,6 +715,32 @@ void Plane::update_flight_mode(void)
         nav_roll_cd        = 0;
         
         JU_climb_rate_err = g.JU_climbrate1 - (-sink_rate);
+
+        channel_throttle->servo_out = 40.0;
+
+        if (height_from_home>=150) {
+            if(jflare_counter == 0) {
+            JU_climb_rate_err = g.JU_climbrate1 - (-sink_rate);
+
+            channel_throttle->servo_out = 40.0;
+            }
+
+            if(jflare_counter< (jflare_transition_time * 400)) {
+            JU_climb_rate_err = g.JU_climbrate1 +  (g.JU_climbrate2 - g.JU_climbrate1) *  jflare_counter /(400.0 * jflare_transition_time) - (-sink_rate);
+            
+            channel_throttle->servo_out = 40.0 + 2 * jflare_counter/400;
+            jflare_counter++;}
+            else {
+            JU_climb_rate_err = g.JU_climbrate2 - (-sink_rate);  
+            channel_throttle->servo_out = 50;  
+            }
+        }// update 400Hz need counter jflare_transition_time * 400 times
+
+        else {
+            jflare_counter = 0;
+        }
+        
+
         nav_pitch_cd = JU_climb_rate_err * g.JU_Pclimbrate * 5729.0 ; 
 
 
@@ -733,12 +759,11 @@ void Plane::update_flight_mode(void)
             climb_pid_info_I = 0;
         }
 
+
         climb_pid_info_I = constrain_float(climb_pid_info_I, -2000, 2000);
 
-
-
         nav_pitch_cd  += climb_pid_info_I;//JU_climb_rate_err * g.JU_Pclimbrate * 5729.0 ; // rad to centidegree
-        channel_throttle->servo_out = 30.0;
+
         // throttle is passthrough,in stabilize mode ,throttle radio out = radio in .this property can be found in attitude.cpp
         break;
         
