@@ -284,7 +284,7 @@ JU_Iclimbrate    0.100000
 JU_Pclimbrate    0.100000
 JU_Pq            0.000000
 JU_Ptheta        0.000000
-JU_climbrate1    4.000000
+JU_climbrate1    3.000000
 JU_climbrate2    0.000000
 JU_speed1        15.000000
 JU_speedprotect  9.000000

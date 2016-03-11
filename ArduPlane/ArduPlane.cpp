@@ -713,33 +713,29 @@ void Plane::update_flight_mode(void)
         //nav_roll_cd        = 0;
 //       nav_pitch_cd       = 0;
         nav_roll_cd        = 0;
-        float JU_climb_rate_err;
-        JU_climb_rate_err = g.JU_climbrate1 - (-sink_rate);
-        nav_pitch_cd = JU_climb_rate_err * g.JU_Pclimbrate * 5729.0 ;
-
-        uint32_t tnow;
-        tnow= AP_HAL::micros();
-        uint32_t dt;
-        uint32_t last_t;
-        float climb_pid_info_I;
-        float climb_integrator_delta; 
-
-        dt = tnow - last_t;
-        if (last_t == 0 || dt > 1.0e6f) {
-        dt = 0;
-        }
-        last_t = tnow;
-        float delta_time;   
-        delta_time = (float)dt * 1.0e-6f;
-
-
         
-        climb_integrator_delta = JU_climb_rate_err * delta_time * g.JU_Iclimbrate * 5729.0;    //5729 means rad to degree       
-        climb_pid_info_I += climb_integrator_delta; 
+        JU_climb_rate_err = g.JU_climbrate1 - (-sink_rate);
+        nav_pitch_cd = JU_climb_rate_err * g.JU_Pclimbrate * 5729.0 ; 
+
+
+        jtnow= AP_HAL::millis();
+        jdt = jtnow - jlast_t;
+        if (jlast_t == 0 || jdt > 1000) {
+        jdt = 0;
+        }
+        jlast_t = jtnow;  
+        jdelta_time = (float)jdt * 0.001f;
+        if (jdt>0) {
+        climb_integrator_delta = JU_climb_rate_err * jdelta_time * g.JU_Iclimbrate * 5729.0;    //5729 means rad to degree       
+        climb_pid_info_I += climb_integrator_delta;
+        }
+        else  {
+            climb_pid_info_I = 0;
+        }
+
         climb_pid_info_I = constrain_float(climb_pid_info_I, -2000, 2000);
 
 
-        
 
         nav_pitch_cd  += climb_pid_info_I;//JU_climb_rate_err * g.JU_Pclimbrate * 5729.0 ; // rad to centidegree
         channel_throttle->servo_out = 30.0;

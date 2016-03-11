@@ -477,7 +477,9 @@ void Plane::set_mode(enum FlightMode mode)
     rollController.reset_I();
     pitchController.reset_I();
     yawController.reset_I();    
-    steerController.reset_I();    
+    steerController.reset_I();
+    climb_pid_info_I = 0; // ju's climb I parameter
+
 }
 
 /*

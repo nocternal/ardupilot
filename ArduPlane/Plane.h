@@ -553,6 +553,14 @@ private:
     // a smoothed airspeed estimate, used for limiting roll angle
     float smoothed_airspeed;
 
+    float JU_climb_rate_err;
+    uint32_t jtnow;
+    uint32_t jdt;
+    uint32_t jlast_t;
+    float climb_pid_info_I;
+    float climb_integrator_delta; 
+    float jdelta_time; 
+
     // Mission library
     AP_Mission mission {ahrs, 
             FUNCTOR_BIND_MEMBER(&Plane::start_command_callback, bool, const AP_Mission::Mission_Command &),
