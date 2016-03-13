@@ -716,33 +716,7 @@ void Plane::update_flight_mode(void)
         
         JU_climb_rate_err = g.JU_climbrate1 - (-sink_rate);
 
-        channel_throttle->servo_out = 40.0;
-
-        if (height_from_home>=150) {
-            if(jflare_counter == 0) {
-            JU_climb_rate_err = g.JU_climbrate1 - (-sink_rate);
-
-            channel_throttle->servo_out = 40.0;
-            }
-
-            if(jflare_counter< (jflare_transition_time * 400)) {
-            JU_climb_rate_err = g.JU_climbrate1 +  (g.JU_climbrate2 - g.JU_climbrate1) *  jflare_counter /(400.0 * jflare_transition_time) - (-sink_rate);
-            
-            channel_throttle->servo_out = 40.0 + 2 * jflare_counter/400;
-            jflare_counter++;}
-            else {
-            JU_climb_rate_err = g.JU_climbrate2 - (-sink_rate);  
-            channel_throttle->servo_out = 50;  
-            }
-        }// update 400Hz need counter jflare_transition_time * 400 times
-
-        else {
-            jflare_counter = 0;
-        }
-        
-
-        nav_pitch_cd = JU_climb_rate_err * g.JU_Pclimbrate * 5729.0 ; 
-
+        channel_throttle->servo_out = 30.0;
 
         jtnow= AP_HAL::millis();
         jdt = jtnow - jlast_t;
@@ -751,6 +725,32 @@ void Plane::update_flight_mode(void)
         }
         jlast_t = jtnow;  
         jdelta_time = (float)jdt * 0.001f;
+
+        if (height_from_home <= jflare_alt) {
+            if(jflare_counter == 0) {
+            JU_climb_rate_err = g.JU_climbrate1 - (-sink_rate);
+            channel_throttle->servo_out = 30.0;
+            }
+            if(jflare_counter <= jflare_transition_time) {
+            JU_climb_rate_err = g.JU_climbrate1 +  (g.JU_climbrate2 - g.JU_climbrate1) *  jflare_counter /(jflare_transition_time) - (-sink_rate);
+            channel_throttle->servo_out = 30.0 + 1.0 * jflare_counter;
+            jflare_counter += jdelta_time;
+            }
+            else {
+            JU_climb_rate_err = g.JU_climbrate2 - (-sink_rate);  
+            channel_throttle->servo_out = 40;  
+            }
+        }
+
+        else {
+            jflare_counter = 0;
+        }
+
+
+        nav_pitch_cd = JU_climb_rate_err * g.JU_Pclimbrate * 5729.0 ; 
+
+
+
         if (jdt>0) {
         climb_integrator_delta = JU_climb_rate_err * jdelta_time * g.JU_Iclimbrate * 5729.0;    //5729 means rad to degree       
         climb_pid_info_I += climb_integrator_delta;

@@ -284,8 +284,8 @@ JU_Iclimbrate    0.100000
 JU_Pclimbrate    0.100000
 JU_Pq            0.000000
 JU_Ptheta        0.000000
-JU_climbrate1    1.000000
-JU_climbrate2    2.500000
+JU_climbrate1    -2.00000
+JU_climbrate2    -1.00000
 JU_speed1        15.000000
 JU_speedprotect  9.000000
 KFF_RDDRMIX      0.500000
