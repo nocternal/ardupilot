@@ -561,8 +561,7 @@ private:
     float climb_integrator_delta; 
     float jdelta_time; 
     float jflare_counter;
-    float jflare_transition_time = 10.0;
-    float jflare_alt = 80.0; // high descend rate transit to low rate's time,wait to be added as juparameter.
+    
 
     // Mission library
     AP_Mission mission {ahrs, 

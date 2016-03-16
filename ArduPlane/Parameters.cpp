@@ -1001,25 +1001,25 @@ const AP_Param::Info Plane::var_info[] = {
     // @Param: JU_Pq
     // @DisplayName: JU_Pq
     // @Description: pitch rate's P   
-    // @Values: 0.001 100
+    // @Values: 0.001 1000
     // @User: Advanced
     GSCALAR(JU_Ptheta,         "JU_Ptheta",   JU_Ptheta_DEFAULT),
     // @Param: JU_Ptheta
     // @DisplayName: JU_Ptheta
     // @Description: theta's P   
-    // @Values: 0.001 100
+    // @Values: 0.001 1000
     // @User: Advanced
     GSCALAR(JU_Pclimbrate,         "JU_Pclimbrate",   JU_Pclimbrate_DEFAULT),
     // @Param: JU_Pclimbrate
     // @DisplayName: JU_Pclimbrate
     // @Description: climbrate's P   
-    // @Values: 0.001 100
+    // @Values: 0.001 1000
     // @User: Advanced
     GSCALAR(JU_Iclimbrate,         "JU_Iclimbrate",   JU_Iclimbrate_DEFAULT),
     // @Param: JU_Iclimbrate
     // @DisplayName: JU_Iclimbrate
     // @Description: climbrate's I   
-    // @Values: 0.001 100
+    // @Values: 0.001 1000
     // @User: Advanced
     GSCALAR(JU_climbrate1,         "JU_climbrate1",   JU_climbrate1_DEFAULT),
     // @Param: JU_climbrate1
@@ -1047,6 +1047,36 @@ const AP_Param::Info Plane::var_info[] = {
     // @Description: lowest permit speed when descend to land 
     // @Values: 5 30
     // @User: Advanced
+
+    GSCALAR(JU_Pthrottle,         "JU_Pthrottle",   0),
+    // @Param: JU_Pthrottle
+    // @DisplayName: JU_Pthrottle
+    // @Description: throttle propotion
+    // @Values: 0 1000
+    // @User: Advanced
+
+    GSCALAR(JU_Ithrottle,         "JU_Ithrottle",   0),
+    // @Param: JU_Ithrottle
+    // @DisplayName: JU_Ithrottle
+    // @Description: throttle intergrete
+    // @Values: 0 1000
+    // @User: Advanced
+
+    GSCALAR(JU_flare_alt,         "JU_flare_alt",   6.75f),
+    // @Param: JU_flare_alt
+    // @DisplayName: JU_flare_alt
+    // @Description: flare alt
+    // @Values: 0 1000
+    // @User: Advanced
+
+    GSCALAR(JU_flare_transition_time,         "Jflaretranstime",   5.0f),
+    // @Param: JU_flare_transition_time
+    // @DisplayName: JU_flare_transition_time
+    // @Description: how long from climbrate1 to climbrate2
+    // @Values: 0 1000
+    // @User: Advanced
+    
+
 
     GOBJECT(barometer, "GND_", AP_Baro),
 

@@ -352,8 +352,7 @@ void Plane::stabilize_acro(float speed_scaler)
  */
 void Plane::stabilize()
 {
-    if (control_mode == MANUAL ||
-        control_mode == JULAND) {
+    if (control_mode == MANUAL) {
         // nothing to do
         return;
     }
@@ -373,7 +372,9 @@ void Plane::stabilize()
         }
         stabilize_roll(speed_scaler);
         stabilize_pitch(speed_scaler);
-        if (g.stick_mixing == STICK_MIXING_DIRECT || control_mode == STABILIZE) {
+        if (g.stick_mixing == STICK_MIXING_DIRECT || 
+            control_mode == STABILIZE ||
+            control_mode == JULAND) {
             stabilize_stick_mixing_direct();
         }
         stabilize_yaw(speed_scaler);
@@ -809,8 +810,7 @@ void Plane::set_servos(void)
     RC_Channel_aux::set_servo_out(RC_Channel_aux::k_rudder, steering_control.rudder);
     RC_Channel_aux::set_servo_out(RC_Channel_aux::k_steering, steering_control.steering);
 
-    if (control_mode == MANUAL ||
-        control_mode == JULAND) {
+    if (control_mode == MANUAL) {
         // do a direct pass through of radio values
         if (g.mix_mode == 0 || g.elevon_output != MIXING_DISABLED) {
             channel_roll->radio_out                = channel_roll->radio_in;
@@ -929,7 +929,8 @@ void Plane::set_servos(void)
                     control_mode == TRAINING ||
                     control_mode == ACRO ||
                     control_mode == FLY_BY_WIRE_A ||
-                    control_mode == AUTOTUNE)) {
+                    control_mode == AUTOTUNE ||
+                    control_mode == JULAND)) {
             // manual pass through of throttle while in FBWA or
             // STABILIZE mode with THR_PASS_STAB set
             channel_throttle->radio_out = channel_throttle->radio_in;

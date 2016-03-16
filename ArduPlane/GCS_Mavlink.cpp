@@ -174,7 +174,6 @@ void Plane::send_extended_status1(mavlink_channel_t chan)
     case FLY_BY_WIRE_A:
     case AUTOTUNE:
     case JULAND:
-        break;
     case QSTABILIZE:
     case QHOVER:
     case QLOITER:
@@ -653,8 +652,7 @@ bool GCS_MAVLINK::try_send_message(enum ap_message id)
         break;
 
     case MSG_NAV_CONTROLLER_OUTPUT:
-        if (plane.control_mode != MANUAL &&
-            plane.control_mode != JULAND) {
+        if (plane.control_mode != MANUAL) {
             CHECK_PAYLOAD_SIZE(NAV_CONTROLLER_OUTPUT);
             plane.send_nav_controller_output(chan);
         }
@@ -1056,8 +1054,7 @@ GCS_MAVLINK::data_stream_send(void)
         send_message(MSG_ATTITUDE);
         send_message(MSG_SIMSTATE);
         send_message(MSG_RPM);
-        if (plane.control_mode != MANUAL &&
-            plane.control_mode != JULAND) {
+        if (plane.control_mode != MANUAL) {
             send_message(MSG_PID_TUNING);
         }
     }
@@ -1330,7 +1327,6 @@ void GCS_MAVLINK::handleMessage(mavlink_message_t* msg)
             case MAV_MODE_MANUAL_DISARMED:
 
                 plane.set_mode(MANUAL);
-                plane.set_mode(JULAND);
                 result = MAV_RESULT_ACCEPTED;
 
                 break;
