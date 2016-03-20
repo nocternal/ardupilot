@@ -561,6 +561,7 @@ private:
     float climb_integrator_delta; 
     float jdelta_time; 
     float jflare_counter;
+    float height_from_home;
     
 
     // Mission library

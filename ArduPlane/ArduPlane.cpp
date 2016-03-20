@@ -571,7 +571,7 @@ void Plane::update_flight_mode(void)
         sink_rate = -barometer.get_climb_rate();        
     }
     
-    float height_from_home;
+    
     Vector3f posned;
     if (ahrs.get_relative_position_NED(posned)){
         height_from_home = -posned.z;
