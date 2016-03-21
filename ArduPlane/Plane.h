@@ -561,6 +561,7 @@ private:
     float climb_integrator_delta; 
     float jdelta_time; 
     float jflare_counter;
+    float jclimbrate_temp; 
     float height_from_home;
     
 

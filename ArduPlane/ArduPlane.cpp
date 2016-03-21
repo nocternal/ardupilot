@@ -728,11 +728,13 @@ void Plane::update_flight_mode(void)
 
         if (height_from_home <= g.JU_flare_alt) {
             if(jflare_counter == 0) {
-            JU_climb_rate_err = g.JU_climbrate1 - (-sink_rate);
+               jclimbrate_temp = -sink_rate;
+            JU_climb_rate_err = jclimbrate_temp- (-sink_rate);  //change desend rate commad as flare alt's descend rate
+               climb_pid_info_I = 0;      //clear integrater
             //channel_throttle->servo_out = 30.0;
             }
             if(jflare_counter <= g.JU_flare_transition_time) {
-            JU_climb_rate_err = g.JU_climbrate1 +  (g.JU_climbrate2 - g.JU_climbrate1) *  jflare_counter /(g.JU_flare_transition_time) - (-sink_rate);
+            JU_climb_rate_err = jclimbrate_temp +  (g.JU_climbrate2 - jclimbrate_temp) *  jflare_counter /(g.JU_flare_transition_time) - (-sink_rate);
             //channel_throttle->servo_out = 30.0 + 1.0 * jflare_counter;
             jflare_counter += jdelta_time;
             }
