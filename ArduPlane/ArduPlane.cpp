@@ -37,6 +37,7 @@ const AP_Scheduler::Task Plane::scheduler_tasks[] = {
     SCHED_TASK(check_short_failsafe,   50,   1000),
     SCHED_TASK(ahrs_update,           400,   6400),
     SCHED_TASK(update_speed_height,    50,   1600),
+    SCHED_TASK(update_julandcontrol,   50,   1600),
     SCHED_TASK(update_flight_mode,    400,   1400),
     SCHED_TASK(stabilize,             400,   3500),
     SCHED_TASK(set_servos,            400,   1600),
@@ -190,6 +191,17 @@ void Plane::update_speed_height(void)
         SpdHgt_Controller->update_50hz(tecs_hgt_afe());
     }
 }
+
+void Plane::update_julandcontrol(void)
+{
+    if (control_mode == STABILIZE ||
+        control_mode == JULAND ) {
+
+        calc_juland_nav_pitch();//50Hz
+    }
+}
+
+
 
 
 /*
@@ -561,23 +573,7 @@ void Plane::update_flight_mode(void)
     }
 
 
-    float sink_rate;
-    Vector3f vel;
-    if (ahrs.get_velocity_NED(vel)) {
-        sink_rate = vel.z;
-    } else if (gps.status() >= AP_GPS::GPS_OK_FIX_3D && gps.have_vertical_velocity()) {
-        sink_rate = gps.velocity().z;
-    } else {
-        sink_rate = -barometer.get_climb_rate();        
-    }
-    
-    
-    Vector3f posned;
-    if (ahrs.get_relative_position_NED(posned)){
-        height_from_home = -posned.z;
-    }
-    
-    
+
     switch (effective_mode) 
     {
     case AUTO:
@@ -713,60 +709,8 @@ void Plane::update_flight_mode(void)
         //nav_roll_cd        = 0;
 //       nav_pitch_cd       = 0;
         nav_roll_cd        = 0;
-        
-        JU_climb_rate_err = g.JU_climbrate1 - (-sink_rate);
-
-        //channel_throttle->servo_out = 30.0;
-
-        jtnow= AP_HAL::millis();
-        jdt = jtnow - jlast_t;
-        if (jlast_t == 0 || jdt > 1000) {
-        jdt = 0;
-        }
-        jlast_t = jtnow;  
-        jdelta_time = (float)jdt * 0.001f;
-
-        if (height_from_home <= g.JU_flare_alt) {
-            if(jflare_counter == 0) {
-               jclimbrate_temp = -sink_rate;
-            JU_climb_rate_err = jclimbrate_temp- (-sink_rate);  //change desend rate commad as flare alt's descend rate
-               climb_pid_info_I = 0;      //clear integrater
-            //channel_throttle->servo_out = 30.0;
-            }
-            if(jflare_counter <= g.JU_flare_transition_time) {
-            JU_climb_rate_err = jclimbrate_temp +  (g.JU_climbrate2 - jclimbrate_temp) *  jflare_counter /(g.JU_flare_transition_time) - (-sink_rate);
-            //channel_throttle->servo_out = 30.0 + 1.0 * jflare_counter;
-            jflare_counter += jdelta_time;
-            }
-            else {
-            JU_climb_rate_err = g.JU_climbrate2 - (-sink_rate);  
-            //channel_throttle->servo_out = 34;  
-            }
-        }
-
-        else {
-            jflare_counter = 0;
-        }
-
-
-        nav_pitch_cd = JU_climb_rate_err * g.JU_Pclimbrate * 5729.0 ; 
-
-
-
-        if (jdt>0) {
-        climb_integrator_delta = JU_climb_rate_err * jdelta_time * g.JU_Iclimbrate * 5729.0;    //5729 means rad to degree       
-        climb_pid_info_I += climb_integrator_delta;
-        }
-        else  {
-            climb_pid_info_I = 0;
-        }
-
-
-        climb_pid_info_I = constrain_float(climb_pid_info_I, -350, 350);
-
-        nav_pitch_cd  += climb_pid_info_I;//JU_climb_rate_err * g.JU_Pclimbrate * 5729.0 ; // rad to centidegree
-
-        // throttle is passthrough,in stabilize mode ,throttle radio out = radio in .this property can be found in attitude.cpp
+        update_julandcontrol();
+        //in the attutude.cpp        
         break;
         
     case CIRCLE:
@@ -788,62 +732,8 @@ void Plane::update_flight_mode(void)
         // //roll: -13788.000,  pitch: -13698.000,   thr: 0.000, rud: -13742.000
 
     case JULAND:
-        
         nav_roll_cd        = 0;
-        
-        JU_climb_rate_err = g.JU_climbrate1 - (-sink_rate);
-
-        //channel_throttle->servo_out = 30.0;
-
-        jtnow= AP_HAL::millis();
-        jdt = jtnow - jlast_t;
-        if (jlast_t == 0 || jdt > 1000) {
-        jdt = 0;
-        }
-        jlast_t = jtnow;  
-        jdelta_time = (float)jdt * 0.001f;
-
-        if (height_from_home <= g.JU_flare_alt) {
-            if(jflare_counter == 0) {
-            JU_climb_rate_err = g.JU_climbrate1 - (-sink_rate);
-            //channel_throttle->servo_out = 30.0;
-            }
-            if(jflare_counter <= g.JU_flare_transition_time) {
-            JU_climb_rate_err = g.JU_climbrate1 +  (g.JU_climbrate2 - g.JU_climbrate1) *  jflare_counter /(g.JU_flare_transition_time) - (-sink_rate);
-            //channel_throttle->servo_out = 30.0 + 1.0 * jflare_counter;
-            jflare_counter += jdelta_time;
-            }
-            else {
-            JU_climb_rate_err = g.JU_climbrate2 - (-sink_rate);  
-            //channel_throttle->servo_out = 34;  
-            }
-        }
-
-        else {
-            jflare_counter = 0;
-        }
-
-
-        nav_pitch_cd = JU_climb_rate_err * g.JU_Pclimbrate * 5729.0 ; 
-
-
-
-        if (jdt>0) {
-        climb_integrator_delta = JU_climb_rate_err * jdelta_time * g.JU_Iclimbrate * 5729.0;    //5729 means rad to degree       
-        climb_pid_info_I += climb_integrator_delta;
-        }
-        else  {
-            climb_pid_info_I = 0;
-        }
-
-
-        climb_pid_info_I = constrain_float(climb_pid_info_I, -2000, 2000);
-
-        nav_pitch_cd  += climb_pid_info_I;//JU_climb_rate_err * g.JU_Pclimbrate * 5729.0 ; // rad to centidegree
-        //channel_roll->servo_out = 0;
-        //channel_pitch->servo_out = 0;
-        //steering_control.steering = steering_control.rudder = channel_rudder->pwm_to_angle();
-        //channel_throttle->servo_out = 30;
+        update_julandcontrol();
        break;
 
 

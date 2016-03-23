@@ -506,6 +506,88 @@ void Plane::calc_nav_pitch()
     nav_pitch_cd = constrain_int32(nav_pitch_cd, pitch_limit_min_cd, aparm.pitch_limit_max_cd.get());
 }
 
+void Plane::calc_juland_nav_pitch()
+{   float sink_rate;
+    Vector3f vel;
+    if (ahrs.get_velocity_NED(vel)) {
+        sink_rate = vel.z;
+    } else if (gps.status() >= AP_GPS::GPS_OK_FIX_3D && gps.have_vertical_velocity()) {
+        sink_rate = gps.velocity().z;
+    } else {
+        sink_rate = -barometer.get_climb_rate();        
+    }
+    
+    
+    Vector3f posned;
+    if (ahrs.get_relative_position_NED(posned)){
+        height_from_home = -posned.z;
+    }
+    else {
+        height_from_home = ahrs.get_baro().get_altitude();
+    }
+
+
+
+        JU_climb_rate_err = g.JU_climbrate1 - (-sink_rate);
+
+        //channel_throttle->servo_out = 30.0;
+
+        jtnow= AP_HAL::millis();
+        jdt = jtnow - jlast_t;
+        if (jlast_t == 0 || jdt > 1000) {
+        jdt = 0;
+        }
+        jlast_t = jtnow;  
+        jdelta_time = (float)jdt * 0.001f;
+
+        if (height_from_home <= g.JU_flare_alt) {
+            if(jflare_counter == 0) {
+               jclimbrate_temp = -sink_rate;
+            JU_climb_rate_err = jclimbrate_temp- (-sink_rate);  //change desend rate commad as flare alt's descend rate
+               climb_pid_info_I = 0;      //clear integrater
+            //channel_throttle->servo_out = 30.0;
+            }
+            if(jflare_counter <= g.JU_flare_transition_time) {
+            JU_climb_rate_err = jclimbrate_temp +  (g.JU_climbrate2 - jclimbrate_temp) *  jflare_counter /(g.JU_flare_transition_time) - (-sink_rate);
+            //channel_throttle->servo_out = 30.0 + 1.0 * jflare_counter;
+            jflare_counter += jdelta_time;
+            }
+            else {
+            JU_climb_rate_err = g.JU_climbrate2 - (-sink_rate);  
+            //channel_throttle->servo_out = 34;  
+            }
+        }
+
+        else {
+            jflare_counter = 0;
+        }
+
+
+        nav_pitch_cd = JU_climb_rate_err * g.JU_Pclimbrate * 5729.0 ; 
+
+
+
+        if (jdt>0) {
+        climb_integrator_delta = JU_climb_rate_err * jdelta_time * g.JU_Iclimbrate * 5729.0;    //5729 means rad to degree       
+        climb_pid_info_I += climb_integrator_delta;
+        }
+        else  {
+            climb_pid_info_I = 0;
+        }
+
+
+        climb_pid_info_I = constrain_float(climb_pid_info_I, -350, 350);
+
+        nav_pitch_cd  += climb_pid_info_I;//JU_climb_rate_err * g.JU_Pclimbrate * 5729.0 ; // rad to centidegree
+
+        // throttle is passthrough,in stabilize mode ,throttle radio out = radio in .this property can be found in attitude.cpp
+}
+
+
+
+
+
+
 
 /*
   calculate a new nav_roll_cd from the navigation controller
