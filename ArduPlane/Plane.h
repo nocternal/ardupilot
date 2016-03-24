@@ -563,6 +563,7 @@ private:
     float jflare_counter;
     float jclimbrate_temp; 
     float height_from_home;
+    float nav_pitch_cd_old; 
     
 
     // Mission library

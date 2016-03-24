@@ -580,6 +580,8 @@ void Plane::calc_juland_nav_pitch()
 
         nav_pitch_cd  += climb_pid_info_I;//JU_climb_rate_err * g.JU_Pclimbrate * 5729.0 ; // rad to centidegree
 
+        nav_pitch_cd = 0.3 * nav_pitch_cd + 0.7 * nav_pitch_cd_old;  //Apply first order lag 
+        nav_pitch_cd_old = nav_pitch_cd; 
         // throttle is passthrough,in stabilize mode ,throttle radio out = radio in .this property can be found in attitude.cpp
 }
 
