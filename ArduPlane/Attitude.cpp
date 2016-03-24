@@ -507,16 +507,76 @@ void Plane::calc_nav_pitch()
 }
 
 void Plane::calc_juland_nav_pitch()
-{   float sink_rate;
+{   
+        jtnow= AP_HAL::millis();
+        jdt = jtnow - jlast_t;
+        if (jlast_t == 0 || jdt > 1000) {
+        jdt = 0;
+        }
+        jlast_t = jtnow;  
+        jdelta_time = (float)jdt * 0.001f;
+
+
+    struct {
+        // height filter second derivative
+        float dd_height;
+
+        // height integration
+        float height;
+    } _height_filter;
+
+    
+	float sink_rate;
     Vector3f vel;
     if (ahrs.get_velocity_NED(vel)) {
         sink_rate = vel.z;
     } else if (gps.status() >= AP_GPS::GPS_OK_FIX_3D && gps.have_vertical_velocity()) {
         sink_rate = gps.velocity().z;
     } else {
-        sink_rate = -barometer.get_climb_rate();        
-    }
+       // sink_rate = -barometer.get_climb_rate();        
     
+    
+        /*
+          use a complimentary filter to calculate climb_rate. This is
+          designed to minimise lag
+         */
+        float _climb_rate;
+        float baro_alt = ahrs.get_baro().get_altitude();
+        // Get height acceleration
+        float hgt_ddot_mea = -(ahrs.get_accel_ef().z + GRAVITY_MSS);
+        // Perform filter calculation using backwards Euler integration
+        // Coefficients selected to place all three filter poles at omega
+        float _hgtCompFiltOmega = 3;
+        float omega2 = _hgtCompFiltOmega*_hgtCompFiltOmega;
+        float hgt_err = baro_alt - _height_filter.height;
+        float integ1_input = hgt_err * omega2 * _hgtCompFiltOmega;
+
+        _height_filter.dd_height += integ1_input * jdelta_time ;
+
+        float integ2_input = _height_filter.dd_height + hgt_ddot_mea + hgt_err * omega2 * 3.0f;
+
+        _climb_rate += integ2_input * jdelta_time ;
+
+        sink_rate = - _climb_rate;
+
+        float integ3_input = _climb_rate + hgt_err * _hgtCompFiltOmega * 3.0f;
+        // If more than 1 second has elapsed since last update then reset the integrator state
+        // to the measured height
+        if (jdelta_time > 1.0f) {
+            _height_filter.height = _height;
+        } else {
+            _height_filter.height += integ3_input*jdelta_time ;
+        }
+    }
+
+
+
+
+
+
+
+
+
     
     Vector3f posned;
     if (ahrs.get_relative_position_NED(posned)){
@@ -532,13 +592,6 @@ void Plane::calc_juland_nav_pitch()
 
         //channel_throttle->servo_out = 30.0;
 
-        jtnow= AP_HAL::millis();
-        jdt = jtnow - jlast_t;
-        if (jlast_t == 0 || jdt > 1000) {
-        jdt = 0;
-        }
-        jlast_t = jtnow;  
-        jdelta_time = (float)jdt * 0.001f;
 
         if (height_from_home <= g.JU_flare_alt) {
             if(jflare_counter == 0) {
