@@ -517,15 +517,16 @@ void Plane::calc_juland_nav_pitch()
         jdelta_time = (float)jdt * 0.001f;
 
 
-    struct {
-        // height filter second derivative
-        float dd_height;
-
-        // height integration
-        float height;
-    } _height_filter;
-
     
+
+    Vector3f posned;
+    if (ahrs.get_relative_position_NED(posned)){
+        height_from_home = -posned.z;
+    }
+    else {
+        height_from_home = ahrs.get_baro().get_altitude();
+    }
+
 	float sink_rate;
     Vector3f vel;
     if (ahrs.get_velocity_NED(vel)) {
@@ -540,7 +541,6 @@ void Plane::calc_juland_nav_pitch()
           use a complimentary filter to calculate climb_rate. This is
           designed to minimise lag
          */
-        float _climb_rate;
         float baro_alt = ahrs.get_baro().get_altitude();
         // Get height acceleration
         float hgt_ddot_mea = -(ahrs.get_accel_ef().z + GRAVITY_MSS);
@@ -548,24 +548,24 @@ void Plane::calc_juland_nav_pitch()
         // Coefficients selected to place all three filter poles at omega
         float _hgtCompFiltOmega = 3;
         float omega2 = _hgtCompFiltOmega*_hgtCompFiltOmega;
-        float hgt_err = baro_alt - _height_filter.height;
+        float hgt_err = baro_alt - _height_filter_height;
         float integ1_input = hgt_err * omega2 * _hgtCompFiltOmega;
 
-        _height_filter.dd_height += integ1_input * jdelta_time ;
+        _height_filter_dd_height += integ1_input * jdelta_time ;
 
-        float integ2_input = _height_filter.dd_height + hgt_ddot_mea + hgt_err * omega2 * 3.0f;
+        float integ2_input = _height_filter_dd_height + hgt_ddot_mea + hgt_err * omega2 * 3.0f;
 
-        _climb_rate += integ2_input * jdelta_time ;
+        _jclimb_rate += integ2_input * jdelta_time ;
 
-        sink_rate = - _climb_rate;
+        sink_rate = - _jclimb_rate;
 
-        float integ3_input = _climb_rate + hgt_err * _hgtCompFiltOmega * 3.0f;
+        float integ3_input = _jclimb_rate + hgt_err * _hgtCompFiltOmega * 3.0f;
         // If more than 1 second has elapsed since last update then reset the integrator state
         // to the measured height
         if (jdelta_time > 1.0f) {
-            _height_filter.height = _height;
+            _height_filter_height = height_from_home;
         } else {
-            _height_filter.height += integ3_input*jdelta_time ;
+            _height_filter_height += integ3_input*jdelta_time ;
         }
     }
 
@@ -578,13 +578,7 @@ void Plane::calc_juland_nav_pitch()
 
 
     
-    Vector3f posned;
-    if (ahrs.get_relative_position_NED(posned)){
-        height_from_home = -posned.z;
-    }
-    else {
-        height_from_home = ahrs.get_baro().get_altitude();
-    }
+
 
 
 

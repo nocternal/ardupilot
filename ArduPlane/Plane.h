@@ -564,7 +564,11 @@ private:
     float jclimbrate_temp; 
     float height_from_home;
     float nav_pitch_cd_old; 
-    
+    // height filter second derivative
+    float _height_filter_dd_height;
+    // height integration
+    float _height_filter_height;
+    float _jclimb_rate;
 
     // Mission library
     AP_Mission mission {ahrs, 
