@@ -1031,7 +1031,7 @@ const AP_Param::Info Plane::var_info[] = {
     // @Param: JU_climbrate2
     // @DisplayName: JU_climbrate2
     // @Description: desire climbrate at shalow sescend stage. should be negative number   
-    // @Values: -5 5
+    // @Values: -5 20
     // @User: Advanced
 
     GSCALAR(JU_speed1,         "JU_speed1",   JU_speed1_DEFAULT),

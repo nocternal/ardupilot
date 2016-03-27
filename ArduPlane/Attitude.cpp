@@ -589,18 +589,18 @@ void Plane::calc_juland_nav_pitch()
 
         if (height_from_home <= g.JU_flare_alt) {
             if(jflare_counter == 0) {
-               jclimbrate_temp = -sink_rate;
-            JU_climb_rate_err = jclimbrate_temp- (-sink_rate);  //change desend rate commad as flare alt's descend rate
+               jclimbrate_temp = ahrs.pitch_sensor;  //this temp means theta command temp
+               JU_climb_rate_err = jclimbrate_temp;  //climb_rate_err means theta commad
                climb_pid_info_I = 0;      //clear integrater
             //channel_throttle->servo_out = 30.0;
             }
             if(jflare_counter <= g.JU_flare_transition_time) {
-            JU_climb_rate_err = jclimbrate_temp +  (g.JU_climbrate2 - jclimbrate_temp) *  jflare_counter /(g.JU_flare_transition_time) - (-sink_rate);
+            JU_climb_rate_err = jclimbrate_temp +  (g.JU_climbrate2 *100 - jclimbrate_temp) *  jflare_counter /(g.JU_flare_transition_time);
             //channel_throttle->servo_out = 30.0 + 1.0 * jflare_counter;
             jflare_counter += jdelta_time;
             }
             else {
-            JU_climb_rate_err = g.JU_climbrate2 - (-sink_rate);  
+            JU_climb_rate_err = g.JU_climbrate2 * 100 ;  
             //channel_throttle->servo_out = 34;  
             }
         }
@@ -629,6 +629,10 @@ void Plane::calc_juland_nav_pitch()
 
         nav_pitch_cd = 0.3 * nav_pitch_cd + 0.7 * nav_pitch_cd_old;  //Apply first order lag 
         nav_pitch_cd_old = nav_pitch_cd; 
+
+        if (height_from_home <= g.JU_flare_alt) {
+            nav_pitch_cd = JU_climb_rate_err;
+        }
         // throttle is passthrough,in stabilize mode ,throttle radio out = radio in .this property can be found in attitude.cpp
 }
 
