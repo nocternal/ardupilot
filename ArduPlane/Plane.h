@@ -561,6 +561,7 @@ private:
     float climb_integrator_delta; 
     float jdelta_time; 
     float jflare_counter;
+    float jinit_counter;
     float jclimbrate_temp; 
     float height_from_home;
     float nav_pitch_cd_old; 
@@ -569,7 +570,10 @@ private:
     // height integration
     float _height_filter_height;
     float _jclimb_rate;
-
+    float jclimbrate_temp1;
+    float jtheta0;
+    float jtheta_init;
+    int8_t ju_flarestage; //to judge whether in final flare stage
     // Mission library
     AP_Mission mission {ahrs, 
             FUNCTOR_BIND_MEMBER(&Plane::start_command_callback, bool, const AP_Mission::Mission_Command &),

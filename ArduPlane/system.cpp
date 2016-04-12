@@ -477,7 +477,9 @@ void Plane::set_mode(enum FlightMode mode)
     yawController.reset_I();    
     steerController.reset_I();
     climb_pid_info_I = 0; // ju's climb I parameter
-
+    jflare_counter = 0;
+    jinit_counter = 0;
+    ju_flarestage = 0;
 }
 
 /*

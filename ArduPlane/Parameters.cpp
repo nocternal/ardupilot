@@ -990,94 +990,136 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(crash_detection_enable,         "CRASH_DETECT",   0),
 
-    // barometer ground calibration. The GND_ prefix is chosen for
-    // compatibility with previous releases of ArduPlane
-    // @Group: GND_
-    // @Path: ../libraries/AP_Baro/AP_Baro.cpp
-
-
-
-    GSCALAR(JU_Pq,         "JU_Pq",   JU_Pq_DEFAULT),
     // @Param: JU_Pq
     // @DisplayName: JU_Pq
     // @Description: pitch rate's P   
     // @Values: 0.001 1000
     // @User: Advanced
-    GSCALAR(JU_Ptheta,         "JU_Ptheta",   JU_Ptheta_DEFAULT),
+    GSCALAR(JU_Pq,         "JU_Pq",   JU_Pq_DEFAULT),
+
     // @Param: JU_Ptheta
     // @DisplayName: JU_Ptheta
     // @Description: theta's P   
     // @Values: 0.001 1000
     // @User: Advanced
-    GSCALAR(JU_Pclimbrate,         "JU_Pclimbrate",   JU_Pclimbrate_DEFAULT),
+    GSCALAR(JU_Ptheta,         "JU_Ptheta",   JU_Ptheta_DEFAULT),
+
     // @Param: JU_Pclimbrate
     // @DisplayName: JU_Pclimbrate
     // @Description: climbrate's P   
     // @Values: 0.001 1000
     // @User: Advanced
-    GSCALAR(JU_Iclimbrate,         "JU_Iclimbrate",   JU_Iclimbrate_DEFAULT),
+    GSCALAR(JU_Pclimbrate,         "JU_Pclimbrate",   JU_Pclimbrate_DEFAULT),
+
     // @Param: JU_Iclimbrate
     // @DisplayName: JU_Iclimbrate
     // @Description: climbrate's I   
     // @Values: 0.001 1000
     // @User: Advanced
-    GSCALAR(JU_climbrate1,         "JU_climbrate1",   JU_climbrate1_DEFAULT),
+    GSCALAR(JU_Iclimbrate,         "JU_Iclimbrate",   JU_Iclimbrate_DEFAULT),
+
     // @Param: JU_climbrate1
     // @DisplayName: JU_climbrate1
     // @Description: desire climbrate at steep sescend stage. should be negative number   
     // @Values: -5 5
     // @User: Advanced
-    GSCALAR(JU_climbrate2,         "JU_climbrate2",   JU_climbrate2_DEFAULT),
+    GSCALAR(JU_climbrate1,         "JU_climbrate1",   JU_climbrate1_DEFAULT),
+
     // @Param: JU_climbrate2
     // @DisplayName: JU_climbrate2
     // @Description: desire climbrate at shalow sescend stage. should be negative number   
     // @Values: -5 5
     // @User: Advanced
+    GSCALAR(JU_climbrate2,         "JU_climbrate2",   JU_climbrate2_DEFAULT),
 
-    GSCALAR(JU_speed1,         "JU_speed1",   JU_speed1_DEFAULT),
     // @Param: JU_speed1
     // @DisplayName: JU_speed1
     // @Description: desire velocity when descend  
     // @Values: 5 30
     // @User: Advanced
+    GSCALAR(JU_speed1,         "JU_speed1",   JU_speed1_DEFAULT),
 
-    GSCALAR(JU_speedprotect,         "JU_speedprotect",   JU_speedprotect_DEFAULT),
     // @Param: JU_speedprotect
     // @DisplayName: JU_speedprotect
     // @Description: lowest permit speed when descend to land 
     // @Values: 5 30
     // @User: Advanced
+    GSCALAR(JU_speedprotect,         "JU_speedprotect",   JU_speedprotect_DEFAULT),
 
-    GSCALAR(JU_Pthrottle,         "JU_Pthrottle",   0),
     // @Param: JU_Pthrottle
     // @DisplayName: JU_Pthrottle
     // @Description: throttle propotion
     // @Values: 0 1000
     // @User: Advanced
+    GSCALAR(JU_Pthrottle,         "JU_Pthrottle",   0),
 
-    GSCALAR(JU_Ithrottle,         "JU_Ithrottle",   0),
     // @Param: JU_Ithrottle
     // @DisplayName: JU_Ithrottle
     // @Description: throttle intergrete
     // @Values: 0 1000
     // @User: Advanced
+    GSCALAR(JU_Ithrottle,         "JU_Ithrottle",   0),
 
-    GSCALAR(JU_flare_alt,         "JU_flare_alt",   6.75f),
     // @Param: JU_flare_alt
     // @DisplayName: JU_flare_alt
     // @Description: flare alt
     // @Values: 0 1000
     // @User: Advanced
+    GSCALAR(JU_flare_alt,         "JU_flare_alt",   6.75f),
 
-    GSCALAR(JU_flare_transition_time,         "Jflaretranstime",   5.0f),
     // @Param: JU_flare_transition_time
     // @DisplayName: JU_flare_transition_time
     // @Description: how long from climbrate1 to climbrate2
+    // @Values: 0 100
+    // @User: Advanced
+    GSCALAR(JU_flare_transition_time,         "Jflaretranstime",   5.0f), // ""'s string is limited to 16 characters
+
+    // @Param: JU_init_transtime
+    // @DisplayName: JU_init_transtime
+    // @Description: how long from old mode's command to this mode's command
+    // @Values: 0 10
+    // @User: Advanced
+    GSCALAR(JU_init_transtime,         "Jinittranstime",   2.0f), 
+    
+    // @Param: JU_theta01
+    // @DisplayName: JU_theta01
+    // @Description: first steep descend section's theta0 command,degree
+    // @Values: -45 45
+    // @User: Advanced
+    GSCALAR(JU_theta01,         "JU_theta01",   -5.0f), 
+
+    // @Param: JU_theta02
+    // @DisplayName: JU_theta02
+    // @Description: flare section's theta0 command,degree
+    // @Values: -45 45
+    // @User: Advanced
+    GSCALAR(JU_theta02,         "JU_theta02",   5.0f), 
+
+    // @Param: JU_flare_theta_enable
+    // @DisplayName: JU_flare_theta_enable
+    // @Description: whether only control theta during flare period,enable will only control theta
+    // @Values: 0:Disabled,1:enabled
+    // @User: Advanced
+    GSCALAR(JU_flare_theta_enable,         "Jflarethetaable",   0), 
+
+    // @Param: JU_Ioutmax 
+    // @DisplayName: JU_Ioutmax 
+    // @Description: the max Iclimbrate output ,degree
     // @Values: 0 1000
     // @User: Advanced
-    
+    GSCALAR(JU_Ioutmax,         "JU_Ioutmax",   4.0f), 
 
+    // @Param: JU_thetaoutmax  
+    // @DisplayName: JU_thetaoutmax 
+    // @Description: the max nav_pitch output in climbrate feedback section,degree
+    // @Values: 0 60
+    // @User: Advanced
+    GSCALAR(JU_thetaoutmax,         "JU_thetaoutmax",   20.0f), 
 
+    // barometer ground calibration. The GND_ prefix is chosen for
+    // compatibility with previous releases of ArduPlane
+    // @Group: GND_
+    // @Path: ../libraries/AP_Baro/AP_Baro.cpp
     GOBJECT(barometer, "GND_", AP_Baro),
 
     // GPS driver

@@ -37,7 +37,7 @@ const AP_Scheduler::Task Plane::scheduler_tasks[] = {
     SCHED_TASK(check_short_failsafe,   50,   1000),
     SCHED_TASK(ahrs_update,           400,   6400),
     SCHED_TASK(update_speed_height,    50,   1600),
-    SCHED_TASK(update_julandcontrol,   50,   1600),
+    SCHED_TASK(update_julandcontrol,   50,   2500),
     SCHED_TASK(update_flight_mode,    400,   1400),
     SCHED_TASK(stabilize,             400,   3500),
     SCHED_TASK(set_servos,            400,   1600),
@@ -709,8 +709,7 @@ void Plane::update_flight_mode(void)
         //nav_roll_cd        = 0;
 //       nav_pitch_cd       = 0;
         nav_roll_cd        = 0;
-        update_julandcontrol();
-        //in the attutude.cpp        
+        update_julandcontrol();//in the attutude.cpp        
         break;
         
     case CIRCLE:

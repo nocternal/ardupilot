@@ -335,15 +335,20 @@ public:
         k_param_JU_Ptheta,
         k_param_JU_Pclimbrate,
         k_param_JU_Iclimbrate,
+        k_param_JU_Ioutmax,//it's a theta command max for Iclimbrate output,degree
+        k_param_JU_thetaoutmax,//it's a theta command max for navpitch output from autolandmode
         k_param_JU_climbrate1,// first steep descend rate
+        k_param_JU_theta01,//first theta0
         k_param_JU_climbrate2,// shalow descend rate
+        k_param_JU_theta02,//final theta0
         k_param_JU_speed1, //first steep descend speed
         k_param_JU_speedprotect,// can't lower than that
-
         k_param_JU_Pthrottle,
         k_param_JU_Ithrottle,
         k_param_JU_flare_alt,
         k_param_JU_flare_transition_time,
+        k_param_JU_init_transtime,//from other modes to this mode need a demand transition,
+        k_param_JU_flare_theta_enable,//if it's value=1 ,only control theta in flare section
         // 254,255: reserved
     };
 
@@ -487,8 +492,15 @@ public:
     AP_Float JU_speedprotect;
     AP_Float JU_Pthrottle;
     AP_Float JU_Ithrottle;
-    AP_Float JU_flare_alt;
-    AP_Float JU_flare_transition_time;
+    AP_Float JU_flare_alt;//m
+    AP_Float JU_flare_transition_time;//s
+    AP_Float JU_init_transtime;//s
+    AP_Float JU_theta01;//degree
+    AP_Float JU_theta02;//degree
+    AP_Int8 JU_flare_theta_enable; //0=disabled, 1=enabled to only control theta during flare section
+    AP_Float JU_Ioutmax;//degree
+    AP_Float JU_thetaoutmax;//degree
+
 
 
 

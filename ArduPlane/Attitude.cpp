@@ -144,7 +144,8 @@ void Plane::stabilize_stick_mixing_direct()
         control_mode == QSTABILIZE ||
         control_mode == QHOVER ||
         control_mode == QLOITER ||
-        control_mode == TRAINING) {
+        control_mode == TRAINING ||
+        control_mode == STABILIZE) {
         return;
     }
     stick_mix_channel(channel_roll, channel_roll->servo_out);
@@ -163,7 +164,6 @@ void Plane::stabilize_stick_mixing_fbw()
         control_mode == AUTOTUNE ||
         control_mode == FLY_BY_WIRE_B ||
         control_mode == CRUISE ||
-        control_mode == JULAND ||
         control_mode == QSTABILIZE ||
         control_mode == QHOVER ||
         control_mode == QLOITER ||
@@ -367,14 +367,12 @@ void Plane::stabilize()
                control_mode == QLOITER) {
         quadplane.control_run();
     } else {
-        if (g.stick_mixing == STICK_MIXING_FBW && control_mode != STABILIZE) {
+        if (g.stick_mixing == STICK_MIXING_FBW) {
             stabilize_stick_mixing_fbw();
         }
         stabilize_roll(speed_scaler);
         stabilize_pitch(speed_scaler);
-        if (g.stick_mixing == STICK_MIXING_DIRECT || 
-            control_mode == STABILIZE ||
-            control_mode == JULAND) {
+        if (g.stick_mixing == STICK_MIXING_DIRECT) {
             stabilize_stick_mixing_direct();
         }
         stabilize_yaw(speed_scaler);
@@ -508,16 +506,13 @@ void Plane::calc_nav_pitch()
 
 void Plane::calc_juland_nav_pitch()
 {   
-        jtnow= AP_HAL::millis();
-        jdt = jtnow - jlast_t;
-        if (jlast_t == 0 || jdt > 1000) {
-        jdt = 0;
-        }
-        jlast_t = jtnow;  
-        jdelta_time = (float)jdt * 0.001f;
-
-
-    
+    jtnow= AP_HAL::millis();
+    jdt = jtnow - jlast_t;
+    if (jlast_t == 0 || jdt > 1000) {
+    jdt = 0;
+    }
+    jlast_t = jtnow;  
+    jdelta_time = (float)jdt * 0.001f;
 
     Vector3f posned;
     if (ahrs.get_relative_position_NED(posned)){
@@ -568,76 +563,89 @@ void Plane::calc_juland_nav_pitch()
             _height_filter_height += integ3_input*jdelta_time ;
         }
     }
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-        JU_climb_rate_err = g.JU_climbrate1 - (-sink_rate);
-
-        //channel_throttle->servo_out = 30.0;
-
-
-        if (height_from_home <= g.JU_flare_alt) {
-            if(jflare_counter == 0) {
-               jclimbrate_temp = -sink_rate;
-            JU_climb_rate_err = jclimbrate_temp- (-sink_rate);  //change desend rate commad as flare alt's descend rate
-               climb_pid_info_I = 0;      //clear integrater
+        /*
+          when come into this mode ,command change gently
+         */
+        if(jinit_counter == 0) {
+            jclimbrate_temp1 = -sink_rate;
+            jtheta_init = ahrs.pitch_sensor; 
+            jtheta0 = jtheta_init;
+            JU_climb_rate_err = 0;  
+            climb_pid_info_I = 0;
+            nav_pitch_cd_old = ahrs.pitch_sensor;
             //channel_throttle->servo_out = 30.0;
-            }
-            if(jflare_counter <= g.JU_flare_transition_time) {
-            JU_climb_rate_err = jclimbrate_temp +  (g.JU_climbrate2 - jclimbrate_temp) *  jflare_counter /(g.JU_flare_transition_time) - (-sink_rate);
+        }
+        if(jinit_counter <= g.JU_init_transtime) {
+            JU_climb_rate_err = jclimbrate_temp1 +  (g.JU_climbrate1 - jclimbrate_temp1) *  jinit_counter /(g.JU_init_transtime) - (-sink_rate);
             //channel_throttle->servo_out = 30.0 + 1.0 * jflare_counter;
-            jflare_counter += jdelta_time;
+            jtheta0 = jtheta_init + (g.JU_theta01*100.0f - jtheta_init) *  jinit_counter /(g.JU_init_transtime);
+            jinit_counter += jdelta_time;
             }
-            else {
-            JU_climb_rate_err = g.JU_climbrate2 - (-sink_rate);  
-            //channel_throttle->servo_out = 34;  
-            }
-        }
-
         else {
+            JU_climb_rate_err = g.JU_climbrate1 - (-sink_rate); 
+            jtheta0 = g.JU_theta01*100.0f;
+            //channel_throttle->servo_out = 34;  
+             }
+        /*
+          when come into flare stage,just stimulate it once
+         */
+         if (height_from_home <= g.JU_flare_alt) {
+            ju_flarestage = 1;
+         }
+        /*
+          flare transition period
+        */ 
+         if (ju_flarestage == 1) {
+               if(jflare_counter == 0) {
+               jclimbrate_temp = -sink_rate;
+               jtheta_init = ahrs.pitch_sensor;
+               jtheta0 = jtheta_init;
+               JU_climb_rate_err = 0;  //change desend rate commad as flare alt's descend rate
+               climb_pid_info_I = 0;      //clear integrater
+               nav_pitch_cd_old = ahrs.pitch_sensor;
+               }
+               if(jflare_counter <= g.JU_flare_transition_time) {
+               JU_climb_rate_err = jclimbrate_temp +  (g.JU_climbrate2 - jclimbrate_temp) *  jflare_counter /(g.JU_flare_transition_time) - (-sink_rate);
+               jflare_counter += jdelta_time;
+               jtheta0 = jtheta_init + (g.JU_theta02*100.0f - jtheta_init) *  jflare_counter /(g.JU_flare_transition_time);
+               }
+               else {
+               JU_climb_rate_err = g.JU_climbrate2 - (-sink_rate);
+               jtheta0 = g.JU_theta02*100.0f;  
+               }  
+         }
+         else {
             jflare_counter = 0;
-        }
-
-
-        nav_pitch_cd = JU_climb_rate_err * g.JU_Pclimbrate * 5729.0 ; 
-
+         }
 
 
         if (jdt>0) {
-        climb_integrator_delta = JU_climb_rate_err * jdelta_time * g.JU_Iclimbrate * 5729.0;    //5729 means rad to degree       
+        climb_integrator_delta = JU_climb_rate_err * jdelta_time * g.JU_Iclimbrate * 5729.0f;    //5729 means rad to degree       
+        if(nav_pitch_cd>g.JU_thetaoutmax*100.0f) {
+        climb_integrator_delta = MIN(climb_integrator_delta,0);    
+        } else if (nav_pitch_cd<-g.JU_thetaoutmax*100.0f) {
+        climb_integrator_delta = MAX(climb_integrator_delta,0);
+        }
         climb_pid_info_I += climb_integrator_delta;
         }
         else  {
             climb_pid_info_I = 0;
         }
+        climb_pid_info_I = constrain_float(climb_pid_info_I, -g.JU_Ioutmax*100.0f, g.JU_Ioutmax*100.0f);
 
-
-        climb_pid_info_I = constrain_float(climb_pid_info_I, -350, 350);
-
-        nav_pitch_cd  += climb_pid_info_I;//JU_climb_rate_err * g.JU_Pclimbrate * 5729.0 ; // rad to centidegree
-
-        nav_pitch_cd = 0.3 * nav_pitch_cd + 0.7 * nav_pitch_cd_old;  //Apply first order lag 
+        //channel_throttle->servo_out = 30.0;
+        float pout = JU_climb_rate_err * g.JU_Pclimbrate * 5729.0f ; //P's centidegree
+        float iout = climb_pid_info_I ;
+        nav_pitch_cd = pout + iout + jtheta0;
+        if (ju_flarestage == 1) {
+            if (g.JU_flare_theta_enable == 1) {
+                nav_pitch_cd = jtheta0;
+            }
+        }
+        nav_pitch_cd = 0.3f * nav_pitch_cd + 0.7f * nav_pitch_cd_old;  //Apply first order lag 
+        nav_pitch_cd = constrain_float(nav_pitch_cd, -g.JU_thetaoutmax*100.0f, g.JU_thetaoutmax*100.0f);
         nav_pitch_cd_old = nav_pitch_cd; 
-        // throttle is passthrough,in stabilize mode ,throttle radio out = radio in .this property can be found in attitude.cpp
 }
-
-
-
-
-
-
-
 /*
   calculate a new nav_roll_cd from the navigation controller
  */
