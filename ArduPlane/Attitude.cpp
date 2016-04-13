@@ -568,7 +568,7 @@ void Plane::calc_juland_nav_pitch()
          */
         if(jinit_counter == 0) {
             jclimbrate_temp1 = -sink_rate;
-            jtheta_init = ahrs.pitch_sensor; 
+            jtheta_init = ahrs.pitch_sensor - g.pitch_trim_cd - channel_throttle->servo_out * g.kff_throttle_to_pitch; 
             jtheta0 = jtheta_init;
             JU_climb_rate_err = 0;  
             climb_pid_info_I = 0;
@@ -598,7 +598,7 @@ void Plane::calc_juland_nav_pitch()
          if (ju_flarestage == 1) {
                if(jflare_counter == 0) {
                jclimbrate_temp = -sink_rate;
-               jtheta_init = ahrs.pitch_sensor;
+               jtheta_init = ahrs.pitch_sensor - g.pitch_trim_cd - channel_throttle->servo_out * g.kff_throttle_to_pitch;
                jtheta0 = jtheta_init;
                JU_climb_rate_err = 0;  //change desend rate commad as flare alt's descend rate
                climb_pid_info_I = 0;      //clear integrater
