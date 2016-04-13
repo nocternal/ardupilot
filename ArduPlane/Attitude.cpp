@@ -621,15 +621,15 @@ void Plane::calc_juland_nav_pitch()
 
         if (jdt>0) {
         climb_integrator_delta = JU_climb_rate_err * jdelta_time * g.JU_Iclimbrate * 5729.0f;    //5729 means rad to centidegree       
-        if(nav_pitch_cd>g.JU_thetaoutmax*100.0f) {
-        climb_integrator_delta = MIN(climb_integrator_delta,0);    
-        } else if (nav_pitch_cd<-g.JU_thetaoutmax*100.0f) {
-        climb_integrator_delta = MAX(climb_integrator_delta,0);
-        }
-        climb_pid_info_I += climb_integrator_delta;
-        }
-        else  {
-            climb_pid_info_I = 0;
+          if(nav_pitch_cd>g.JU_thetaoutmax*100.0f) {
+          climb_integrator_delta = MIN(climb_integrator_delta,0);    
+          } else if (nav_pitch_cd<-g.JU_thetaoutmax*100.0f) {
+          climb_integrator_delta = MAX(climb_integrator_delta,0);
+          }
+          climb_pid_info_I += climb_integrator_delta;
+          }
+        else {
+           climb_pid_info_I = 0;
         }
         climb_pid_info_I = constrain_float(climb_pid_info_I, -g.JU_Ioutmax*100.0f, g.JU_Ioutmax*100.0f);
 

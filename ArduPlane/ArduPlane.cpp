@@ -709,7 +709,7 @@ void Plane::update_flight_mode(void)
         //nav_roll_cd        = 0;
 //       nav_pitch_cd       = 0;
         nav_roll_cd        = 0;
-        update_julandcontrol();//in the attutude.cpp        
+        //update_julandcontrol();//in the attutude.cpp     in fact we shouldn't put it here. if so it willmake  update_julandcontrol become 400hz?  
         break;
         
     case CIRCLE:
@@ -732,7 +732,7 @@ void Plane::update_flight_mode(void)
 
     case JULAND:
         nav_roll_cd        = 0;
-        update_julandcontrol();
+        //update_julandcontrol(); shouldn't list it here
        break;
 
 
