@@ -280,8 +280,8 @@ INS_USE          1.000000
 INS_USE2         1.000000
 INS_USE3         0.000000
 INVERTEDFLT_CH   0.000000
-JU_Iclimbrate    0.000000
-JU_Ioutmax       4.000000
+JU_Iclimbrate    0.100000
+JU_Ioutmax       20.000000
 JU_Ithrottle     0.000000
 JU_Pclimbrate    0.000000
 JU_Pq            0.000000
@@ -292,10 +292,10 @@ JU_climbrate2    -0.500000
 JU_flare_alt     30.0000
 JU_speed1        20.750000
 JU_speedprotect  4.000000
-JU_theta01       -20.000000
-JU_theta02       20.000000
+JU_theta01       0.000000
+JU_theta02       5.000000
 JU_thetaoutmax   35.000000
-Jflarethetaable  1.000000
+Jflarethetaable  0.000000
 Jflaretranstime  5.000000
 Jinittranstime   2.000000
 KFF_RDDRMIX      0.500000

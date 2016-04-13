@@ -606,8 +606,8 @@ void Plane::calc_juland_nav_pitch()
                }
                if(jflare_counter <= g.JU_flare_transition_time) {
                JU_climb_rate_err = jclimbrate_temp +  (g.JU_climbrate2 - jclimbrate_temp) *  jflare_counter /(g.JU_flare_transition_time) - (-sink_rate);
-               jflare_counter += jdelta_time;
                jtheta0 = jtheta_init + (g.JU_theta02*100.0f - jtheta_init) *  jflare_counter /(g.JU_flare_transition_time);
+               jflare_counter += jdelta_time;
                }
                else {
                JU_climb_rate_err = g.JU_climbrate2 - (-sink_rate);
@@ -620,7 +620,7 @@ void Plane::calc_juland_nav_pitch()
 
 
         if (jdt>0) {
-        climb_integrator_delta = JU_climb_rate_err * jdelta_time * g.JU_Iclimbrate * 5729.0f;    //5729 means rad to degree       
+        climb_integrator_delta = JU_climb_rate_err * jdelta_time * g.JU_Iclimbrate * 5729.0f;    //5729 means rad to centidegree       
         if(nav_pitch_cd>g.JU_thetaoutmax*100.0f) {
         climb_integrator_delta = MIN(climb_integrator_delta,0);    
         } else if (nav_pitch_cd<-g.JU_thetaoutmax*100.0f) {
