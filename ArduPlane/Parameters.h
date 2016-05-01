@@ -343,8 +343,10 @@ public:
         k_param_JU_theta02,//final theta0
         k_param_JU_speed1, //first steep descend speed
         k_param_JU_speedprotect,// can't lower than that
-        k_param_JU_Pthrottle,
-        k_param_JU_Ithrottle,
+        k_param_JU_tho_P,
+        k_param_JU_tho_10,//first descend tho0
+        k_param_JU_tho_20,//flare tho0
+        k_param_JU_tho_flaret,//how long to close throttle
         k_param_JU_flare_alt,
         k_param_JU_flare_transition_time,
         k_param_JU_init_transtime,//from other modes to this mode need a demand transition,
@@ -490,8 +492,10 @@ public:
     AP_Float JU_climbrate2;//should be a negative number such as -0.5
     AP_Float JU_speed1;
     AP_Float JU_speedprotect;
-    AP_Float JU_Pthrottle;
-    AP_Float JU_Ithrottle;
+    AP_Float JU_tho_P;
+    AP_Int32 JU_tho_10;//it represent percent
+    AP_Int32 JU_tho_20;
+    AP_Float JU_tho_flaret;  
     AP_Float JU_flare_alt;//m
     AP_Float JU_flare_transition_time;//s
     AP_Float JU_init_transtime;//s

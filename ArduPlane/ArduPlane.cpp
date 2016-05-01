@@ -198,6 +198,7 @@ void Plane::update_julandcontrol(void)
         control_mode == JULAND ) {
 
         calc_juland_nav_pitch();//50Hz
+        calc_juland_throttle();
     }
 }
 

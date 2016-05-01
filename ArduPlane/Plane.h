@@ -561,6 +561,7 @@ private:
     float climb_integrator_delta; 
     float jdelta_time; 
     float jflare_counter;
+    float jthoflare_counter;
     float jinit_counter;
     float jclimbrate_temp; 
     float height_from_home;
@@ -573,7 +574,13 @@ private:
     float jclimbrate_temp1;
     float jtheta0;
     float jtheta_init;
+    float JU_tho_pout;
     int8_t ju_flarestage; //to judge whether in final flare stage
+    float jEAS; //estimated airspeed;
+    float jTAS_dem;
+    float jTAS_err;
+    int32_t throttle_servo_out_init1;
+    int32_t throttle_servo_out_init2;
     // Mission library
     AP_Mission mission {ahrs, 
             FUNCTOR_BIND_MEMBER(&Plane::start_command_callback, bool, const AP_Mission::Mission_Command &),
@@ -984,6 +991,7 @@ private:
     void calc_nav_roll();
     void calc_nav_pitch();
     void calc_juland_nav_pitch();
+    void calc_juland_throttle();
     void update_flight_stage();
     void update_navigation();
     void set_flight_stage(AP_SpdHgtControl::FlightStage fs);

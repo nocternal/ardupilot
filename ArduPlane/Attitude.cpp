@@ -177,7 +177,7 @@ void Plane::stabilize_stick_mixing_fbw()
     // non-linear and ends up as 2x the maximum, to ensure that
     // the user can direct the plane in any direction with stick
     // mixing.
-    float roll_input = channel_roll->norm_input();
+    float roll_input = channel_roll->norm_input_dz();
     if (roll_input > 0.5f) {
         roll_input = (3*roll_input - 1);
     } else if (roll_input < -0.5f) {
@@ -186,7 +186,7 @@ void Plane::stabilize_stick_mixing_fbw()
     nav_roll_cd += roll_input * roll_limit_cd;
     nav_roll_cd = constrain_int32(nav_roll_cd, -roll_limit_cd, roll_limit_cd);
     
-    float pitch_input = channel_pitch->norm_input();
+    float pitch_input = channel_pitch->norm_input_dz();  // change norm_input() to norm_input_dz() to avoid trim change 
     if (fabsf(pitch_input) > 0.5f) {
         pitch_input = (3*pitch_input - 1);
     }
@@ -646,6 +646,58 @@ void Plane::calc_juland_nav_pitch()
         nav_pitch_cd = constrain_float(nav_pitch_cd, -g.JU_thetaoutmax*100.0f, g.JU_thetaoutmax*100.0f);
         nav_pitch_cd_old = nav_pitch_cd; 
 }
+
+void Plane::calc_juland_throttle()
+{
+    float EAS2TAS = ahrs.get_EAS2TAS();
+    float EAS_dem = g.JU_speed1;
+    jTAS_dem  = EAS_dem * EAS2TAS;
+    float TASmax   = aparm.airspeed_max * EAS2TAS;
+    float TASmin   = aparm.airspeed_min * EAS2TAS;
+    if (!ahrs.airspeed_sensor_enabled() || !ahrs.airspeed_estimate(&jEAS)) {
+        // If no airspeed available use average of min and max
+        jEAS = 0.5f * (aparm.airspeed_min.get() + (float)aparm.airspeed_max.get());
+    }
+    float jTAS = jEAS * EAS2TAS;
+    jTAS_err = jTAS_dem - jTAS;
+    JU_tho_pout = g.JU_tho_P * jTAS_err;
+
+    int32_t last_throttle_servo_out = channel_throttle->servo_out;
+
+        if(jinit_counter == 0) {
+          throttle_servo_out_init1 = last_throttle_servo_out ;
+          channel_throttle->servo_out = throttle_servo_out_init1;
+        }
+        if(jinit_counter <= g.JU_init_transtime) {
+              channel_throttle->servo_out = (1-jinit_counter/g.JU_init_transtime) * throttle_servo_out_init1 + g.JU_tho_10 * (jinit_counter/g.JU_init_transtime) + JU_tho_pout * (jinit_counter/g.JU_init_transtime);
+              //jinit_counter += jdelta_time; needn't plus counter again,already added in calc_juland_nav_pitch
+            }
+        else {
+              channel_throttle->servo_out = g.JU_tho_10 + JU_tho_pout;
+             }
+
+
+
+        if (ju_flarestage == 1) {
+               if(jthoflare_counter == 0) {
+               throttle_servo_out_init2 = channel_throttle->servo_out;
+               channel_throttle->servo_out = throttle_servo_out_init2;
+               }
+               if(jthoflare_counter <= g.JU_tho_flaret) {
+               channel_throttle->servo_out = (1-jthoflare_counter/g.JU_tho_flaret) * throttle_servo_out_init2 +  g.JU_tho_20 * (jthoflare_counter/g.JU_tho_flaret);
+               jthoflare_counter += jdelta_time;
+               }
+               else {
+               channel_throttle->servo_out = g.JU_tho_20;
+               }  
+         }
+         else {
+            jthoflare_counter = 0;
+         }
+
+         channel_throttle->servo_out = constrain_int32(channel_throttle->servo_out, 0, 100);
+}
+
 /*
   calculate a new nav_roll_cd from the navigation controller
  */

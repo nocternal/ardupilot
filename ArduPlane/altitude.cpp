@@ -535,9 +535,13 @@ float Plane::rangefinder_correction(void)
 
     // for now we only support the rangefinder for landing 
     bool using_rangefinder = (g.rangefinder_landing &&
-                              control_mode == AUTO && 
+                              (control_mode == AUTO ||
+                               control_mode == STABILIZE ||
+                               control_mode == JULAND)&& 
                               (flight_stage == AP_SpdHgtControl::FLIGHT_LAND_APPROACH ||
-                               flight_stage == AP_SpdHgtControl::FLIGHT_LAND_FINAL));
+                               flight_stage == AP_SpdHgtControl::FLIGHT_LAND_FINAL ||
+                               control_mode == JULAND ||
+                               control_mode == STABILIZE));
     if (!using_rangefinder) {
         return 0;
     }
@@ -577,8 +581,9 @@ void Plane::rangefinder_height_update(void)
         } else {
             rangefinder_state.in_range = true;
             if (!rangefinder_state.in_use &&
-                flight_stage == AP_SpdHgtControl::FLIGHT_LAND_APPROACH &&
-                g.rangefinder_landing) {
+                (flight_stage == AP_SpdHgtControl::FLIGHT_LAND_APPROACH ||
+                               control_mode == STABILIZE ||
+                               control_mode == JULAND )&&g.rangefinder_landing) {
                 rangefinder_state.in_use = true;
                 gcs_send_text_fmt(MAV_SEVERITY_INFO, "Rangefinder engaged at %.2fm", (double)height_estimate);
             }

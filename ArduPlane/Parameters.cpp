@@ -1046,19 +1046,33 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(JU_speedprotect,         "JU_speedprotect",   JU_speedprotect_DEFAULT),
 
-    // @Param: JU_Pthrottle
-    // @DisplayName: JU_Pthrottle
+    // @Param: JU_tho_P
+    // @DisplayName: JU_tho_P
     // @Description: throttle propotion
     // @Values: 0 1000
     // @User: Advanced
-    GSCALAR(JU_Pthrottle,         "JU_Pthrottle",   0),
+    GSCALAR(JU_tho_P,         "JU_tho_P",   30),
 
-    // @Param: JU_Ithrottle
-    // @DisplayName: JU_Ithrottle
-    // @Description: throttle intergrete
-    // @Values: 0 1000
+    // @Param: JU_tho_10
+    // @DisplayName: JU_tho_10
+    // @Description: tho0 in first descend section
+    // @Values: 0 100
     // @User: Advanced
-    GSCALAR(JU_Ithrottle,         "JU_Ithrottle",   0),
+    GSCALAR(JU_tho_10,         "JU_tho_10",   10),
+
+    // @Param: JU_tho_20
+    // @DisplayName: JU_tho_20
+    // @Description: tho0 in flare section,percentage, set to 10 means 10%
+    // @Values: 0 100
+    // @User: Advanced
+    GSCALAR(JU_tho_20,         "JU_tho_20",   0),
+
+    // @Param: JU_tho_flaret
+    // @DisplayName: JU_tho_flaret
+    // @Description: time for flare throttle change
+    // @Values: 0 100
+    // @User: Advanced
+    GSCALAR(JU_tho_flaret,         "JU_tho_flaret",   1),
 
     // @Param: JU_flare_alt
     // @DisplayName: JU_flare_alt
