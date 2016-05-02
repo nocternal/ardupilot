@@ -634,9 +634,9 @@ void Plane::calc_juland_nav_pitch()
         climb_pid_info_I = constrain_float(climb_pid_info_I, -g.JU_Ioutmax*100.0f, g.JU_Ioutmax*100.0f);
 
         //channel_throttle->servo_out = 30.0;
-        float pout = JU_climb_rate_err * g.JU_Pclimbrate * 5729.0f ; //P's centidegree
-        float iout = climb_pid_info_I ;
-        nav_pitch_cd = pout + iout + jtheta0;
+        climbpout = JU_climb_rate_err * g.JU_Pclimbrate * 5729.0f ; //P's centidegree
+        climbiout = climb_pid_info_I ;
+        nav_pitch_cd = climbpout + climbiout + jtheta0;
         if (ju_flarestage == 1) {
             if (g.JU_flare_theta_enable == 1) {
                 nav_pitch_cd = jtheta0;
@@ -652,8 +652,6 @@ void Plane::calc_juland_throttle()
     float EAS2TAS = ahrs.get_EAS2TAS();
     float EAS_dem = g.JU_speed1;
     jTAS_dem  = EAS_dem * EAS2TAS;
-    float TASmax   = aparm.airspeed_max * EAS2TAS;
-    float TASmin   = aparm.airspeed_min * EAS2TAS;
     if (!ahrs.airspeed_sensor_enabled() || !ahrs.airspeed_estimate(&jEAS)) {
         // If no airspeed available use average of min and max
         jEAS = 0.5f * (aparm.airspeed_min.get() + (float)aparm.airspeed_max.get());

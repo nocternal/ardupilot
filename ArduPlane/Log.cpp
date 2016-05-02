@@ -243,6 +243,10 @@ struct PACKED log_Control_Tuning {
     int16_t throttle_out;
     int16_t rudder_out;
     float   accel_y;
+ //   float hdotpout;
+ //   float hdoti;
+ //   int16_t jutheta0;
+ //   float thop;
 };
 
 // Write a control tuning packet. Total length : 22 bytes
@@ -258,7 +262,9 @@ void Plane::Log_Write_Control_Tuning()
         pitch           : (int16_t)ahrs.pitch_sensor,
         throttle_out    : (int16_t)channel_throttle->servo_out,
         rudder_out      : (int16_t)channel_rudder->servo_out,
-        accel_y         : accel.y
+        accel_y         : accel.y,
+    //    hdoti           : climbiout,
+    //    thop            : JU_tho_pout
     };
     DataFlash.WriteBlock(&pkt, sizeof(pkt));
 }
@@ -278,7 +284,7 @@ struct PACKED log_Nav_Tuning {
     int16_t nav_bearing_cd;
     int16_t altitude_error_cm;
     int16_t airspeed_cm;
-    float   altitude;
+    float   HdotErr;
     uint32_t groundspeed_cm;
     float   xtrack_error;
 };
@@ -295,7 +301,7 @@ void Plane::Log_Write_Nav_Tuning()
         nav_bearing_cd      : (int16_t)nav_controller->nav_bearing_cd(),
         altitude_error_cm   : (int16_t)altitude_error_cm,
         airspeed_cm         : (int16_t)airspeed.get_airspeed_cm(),
-        altitude            : barometer.get_altitude(),
+        HdotErr             : JU_climb_rate_err,
         groundspeed_cm      : (uint32_t)(gps.ground_speed()*100),
         xtrack_error        : nav_controller->crosstrack_error()
     };
@@ -483,9 +489,9 @@ static const struct LogStructure log_structure[] = {
     { LOG_STARTUP_MSG, sizeof(log_Startup),         
       "STRT", "QBH",         "TimeUS,SType,CTot" },
     { LOG_CTUN_MSG, sizeof(log_Control_Tuning),     
-      "CTUN", "Qcccchhf",    "TimeUS,NavRoll,Roll,NavPitch,Pitch,ThrOut,RdrOut,AccY" },
+      "CTUN", "Qcccchhfff",    "TimeUS,NavRoll,Roll,NavPitch,Pitch,ThrOut,RdrOut,AccY" },
     { LOG_NTUN_MSG, sizeof(log_Nav_Tuning),         
-      "NTUN", "QCfccccfIf",  "TimeUS,Yaw,WpDist,TargBrg,NavBrg,AltErr,Arspd,Alt,GSpdCM,XT" },
+      "NTUN", "QCfccccfIf",  "TimeUS,Yaw,WpDist,TargBrg,NavBrg,AltErr,Arspd,HdotErr,GSpdCM,XT" },
     { LOG_SONAR_MSG, sizeof(log_Sonar),             
       "SONR", "QHfffBBf",   "TimeUS,DistCM,Volt,BaroAlt,GSpd,Thr,Cnt,Corr" },
     { LOG_ARM_DISARM_MSG, sizeof(log_Arm_Disarm),

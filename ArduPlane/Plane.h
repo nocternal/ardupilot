@@ -557,6 +557,8 @@ private:
     uint32_t jtnow;
     uint32_t jdt;
     uint32_t jlast_t;
+    float climbpout;
+    float climbiout;
     float climb_pid_info_I;
     float climb_integrator_delta; 
     float jdelta_time; 
