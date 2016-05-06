@@ -1130,6 +1130,13 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(JU_thetaoutmax,         "JU_thetaoutmax",   20.0f), 
 
+    // @Param: JU_tho_Verr  
+    // @DisplayName: JU_tho_Verr
+    // @Description: the max V err which throttle control law can get
+    // @Values: 0 60
+    // @User: Advanced
+    GSCALAR(JU_tho_Verr,         "JU_tho_Verr",   1.0f),
+
     // barometer ground calibration. The GND_ prefix is chosen for
     // compatibility with previous releases of ArduPlane
     // @Group: GND_

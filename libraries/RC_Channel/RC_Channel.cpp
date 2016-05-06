@@ -242,10 +242,11 @@ RC_Channel::calc_pwm(void)
 
     }else{     // RC_CHANNEL_TYPE_ANGLE
         pwm_out         = angle_to_pwm();
-        radio_out       = pwm_out + radio_trim;
+        radio_out       = pwm_out + 1500;
+        //radio_out       = pwm_out + radio_trim;
     }
-
-    radio_out = constrain_int16(radio_out, radio_min.get(), radio_max.get());
+      radio_out = constrain_int16(radio_out, 900, 2100);
+    //radio_out = constrain_int16(radio_out, radio_min.get(), radio_max.get());
 }
 
 
@@ -355,12 +356,18 @@ int16_t
 RC_Channel::angle_to_pwm()
 {
     int16_t reverse_mul = (_reverse==-1?-1:1);
-    if((servo_out * reverse_mul) > 0) {
-        return reverse_mul * ((int32_t)servo_out * (int32_t)(radio_max - radio_trim)) / (int32_t)_high_out;
+        if((servo_out * reverse_mul) > 0) {
+        return reverse_mul * ((int32_t)servo_out * (int32_t)(2100 - 1500)) / (int32_t)_high_out;
     } else {
-        return reverse_mul * ((int32_t)servo_out * (int32_t)(radio_trim - radio_min)) / (int32_t)_high_out;
+        return reverse_mul * ((int32_t)servo_out * (int32_t)(1500 - 900)) / (int32_t)_high_out;
     }
 }
+//    if((servo_out * reverse_mul) > 0) {
+//        return reverse_mul * ((int32_t)servo_out * (int32_t)(radio_max - radio_trim)) / (int32_t)_high_out;
+//    } else {
+//        return reverse_mul * ((int32_t)servo_out * (int32_t)(radio_trim - radio_min)) / (int32_t)_high_out;
+//    }
+//}
 
 /*
   convert a pulse width modulation value to a value in the configured

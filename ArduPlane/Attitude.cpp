@@ -658,6 +658,7 @@ void Plane::calc_juland_throttle()
     }
     float jTAS = jEAS * EAS2TAS;
     jTAS_err = jTAS_dem - jTAS;
+    jTAS_err = constrain_float(jTAS_err, -g.JU_tho_Verr, g.JU_tho_Verr);
     JU_tho_pout = g.JU_tho_P * jTAS_err;
 
     int32_t last_throttle_servo_out = channel_throttle->servo_out;

@@ -351,6 +351,7 @@ public:
         k_param_JU_flare_transition_time,
         k_param_JU_init_transtime,//from other modes to this mode need a demand transition,
         k_param_JU_flare_theta_enable,//if it's value=1 ,only control theta in flare section
+        k_param_JU_tho_Verr,
         // 254,255: reserved
     };
 
@@ -504,6 +505,7 @@ public:
     AP_Int8 JU_flare_theta_enable; //0=disabled, 1=enabled to only control theta during flare section
     AP_Float JU_Ioutmax;//degree
     AP_Float JU_thetaoutmax;//degree
+    AP_Float JU_tho_Verr;
 
 
 
