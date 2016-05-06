@@ -850,8 +850,8 @@ void Plane::channel_output_mixer(uint8_t mixing_type, int16_t &chan1_out, int16_
     int16_t v1, v2;
 
     // first get desired elevator and rudder as -500..500 values
-    c1 = chan1_out - channel_roll->radio_trim;
-    c2 = chan2_out - channel_pitch->radio_trim;
+    c1 = chan1_out - channel_pitch->radio_trim;
+    c2 = chan2_out - channel_roll->radio_trim;
 
     v1 = (c1 - c2) * g.mixing_gain;
     v2 = (c1 + c2) * g.mixing_gain;
