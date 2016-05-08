@@ -515,7 +515,10 @@ void Plane::calc_juland_nav_pitch()
     jdelta_time = (float)jdt * 0.001f;
 
     Vector3f posned;
-    if (ahrs.get_relative_position_NED(posned)){
+    if (rangefinder.has_data()) {
+    	height_from_home = rangefinder.distance_cm()*0.01f ;
+    }
+    if ((!rangefinder.has_data())&&(ahrs.get_relative_position_NED(posned))){
         height_from_home = -posned.z;
     }
     else {
