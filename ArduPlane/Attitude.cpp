@@ -518,7 +518,7 @@ void Plane::calc_juland_nav_pitch()
     if (rangefinder.has_data()) {
     	height_from_home = rangefinder.distance_cm()*0.01f ;
     }
-    if ((!rangefinder.has_data())&&(ahrs.get_relative_position_NED(posned))){
+    else if ((!rangefinder.has_data())&&(ahrs.get_relative_position_NED(posned))){
         height_from_home = -posned.z;
     }
     else {
