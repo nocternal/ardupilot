@@ -1137,6 +1137,35 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(JU_tho_Verr,         "JU_tho_Verr",   1.0f),
 
+    // @Param: JU_pitch_ser01  
+    // @DisplayName: JU_pitch_ser01
+    // @Description: pitch servo_out compensate when at steep descend,
+    // @Values: -4500 4500
+    // @User: Advanced
+    GSCALAR(JU_pitch_ser01,         "JU_pitch_ser01",   0),
+
+    // @Param: JU_pitch_ser02 
+    // @DisplayName: JU_pitch_ser02
+    // @Description: pitch servo_out compensate when at flare
+    // @Values: -4500 4500
+    // @User: Advanced
+    GSCALAR(JU_pitch_ser02,         "JU_pitch_ser02",   0),
+
+    // @Param:JU_phsi_P
+    // @DisplayName: JU_phsi_P
+    // @Description: phsi's P to phi
+    // @Values: 0 10000
+    // @User: Advanced
+    GSCALAR(JU_phsi_P,         "JU_phsi_P",   2.0f),
+
+
+    // @Param:JU_phsi_0
+    // @DisplayName: JU_phsi_0
+    // @Description: base phsi command
+    // @Values: 0 360
+    // @User: Advanced
+    GSCALAR(JU_phsi_0,         "JU_phsi_0",   0.0f),
+
     // barometer ground calibration. The GND_ prefix is chosen for
     // compatibility with previous releases of ArduPlane
     // @Group: GND_

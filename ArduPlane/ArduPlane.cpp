@@ -198,6 +198,7 @@ void Plane::update_julandcontrol(void)
         control_mode == JULAND ) {
 
         calc_juland_nav_pitch();//50Hz
+        calc_juland_nav_roll();
         calc_juland_throttle();
     }
 }
@@ -709,7 +710,6 @@ void Plane::update_flight_mode(void)
     case STABILIZE:
         //nav_roll_cd        = 0;
 //       nav_pitch_cd       = 0;
-        nav_roll_cd        = 0;
         //update_julandcontrol();//in the attutude.cpp     in fact we shouldn't put it here. if so it willmake  update_julandcontrol become 400hz?  
         break;
         
@@ -732,7 +732,7 @@ void Plane::update_flight_mode(void)
         // //roll: -13788.000,  pitch: -13698.000,   thr: 0.000, rud: -13742.000
 
     case JULAND:
-        nav_roll_cd        = 0;
+        //nav_roll_cd        = 0;
         //update_julandcontrol(); shouldn't list it here
        break;
 

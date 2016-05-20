@@ -79,9 +79,9 @@ void Plane::stabilize_roll(float speed_scaler)
     }
 
     bool disable_integrator = false;
-    if (control_mode == STABILIZE && channel_roll->control_in != 0) {
-        disable_integrator = true;
-    }
+  //  if (control_mode == STABILIZE && channel_roll->control_in != 0) {
+  //    disable_integrator = true;
+  //}
     channel_roll->servo_out = rollController.get_servo_out(nav_roll_cd - ahrs.roll_sensor, 
                                                            speed_scaler, 
                                                            disable_integrator);
@@ -110,6 +110,39 @@ void Plane::stabilize_pitch(float speed_scaler)
     channel_pitch->servo_out = pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, 
                                                              speed_scaler, 
                                                              disable_integrator);
+
+    if (control_mode == STABILIZE ||
+    	control_mode == JULAND)
+    {   
+    	if (jinit_counter ==0) {
+           pitch_servo_out_init1 = channel_pitch->servo_out ;
+           channel_pitch->servo_out = pitch_servo_out_init1;
+         }
+        if (jinit_counter <= g.JU_init_transtime) {
+           channel_pitch->servo_out = (1-jinit_counter/g.JU_init_transtime) * pitch_servo_out_init1 + (jinit_counter/g.JU_init_transtime)*g.JU_pitch_ser01 + channel_pitch->servo_out*(jinit_counter/g.JU_init_transtime);
+         }
+        else {
+           channel_pitch->servo_out += g.JU_pitch_ser01;
+         }
+
+
+
+        if (ju_flarestage == 1) {
+           if(jthoflare_counter == 0) {
+              pitch_servo_out_init2 = channel_pitch->servo_out ;
+           }
+           if(jthoflare_counter<=g.JU_tho_flaret) {
+           	  channel_pitch->servo_out = (1-jthoflare_counter/g.JU_tho_flaret) * pitch_servo_out_init2 + (jthoflare_counter/g.JU_tho_flaret)*g.JU_pitch_ser02 + channel_pitch->servo_out*(jthoflare_counter/g.JU_tho_flaret);
+           }
+           else {
+           channel_pitch->servo_out += g.JU_pitch_ser02;
+           }
+        }
+
+
+
+
+    }
 }
 
 /*
@@ -515,19 +548,30 @@ void Plane::calc_juland_nav_pitch()
     jdelta_time = (float)jdt * 0.001f;
 
     Vector3f posned;
-    if (rangefinder.has_data()&&(rangefinder.status() != RangeFinder::RangeFinder_OutOfRangeHigh)&&(rangefinder.status() != RangeFinder::RangeFinder_OutOfRangeLow)) {
-    	height_from_home = rangefinder.distance_cm()*0.01f ;
-    }
-    else if (ahrs.get_relative_position_NED(posned)){
+
+    if (ahrs.get_relative_position_NED(posned)) {
         height_from_home = -posned.z;
+
+        if (rangefinder.has_data() && 
+        	((-posned.z)<=(rangefinder.max_distance_cm()*0.01f)) &&
+             (rangefinder.status() != RangeFinder::RangeFinder_OutOfRangeHigh) &&
+              (rangefinder.status() != RangeFinder::RangeFinder_OutOfRangeLow) ) {
+                      height_from_home = rangefinder.distance_cm()*0.01f ;
+            }
     }
     else {
         height_from_home = ahrs.get_baro().get_altitude();
+        if ( rangefinder.has_data()   &&
+             (ahrs.get_baro().get_altitude()<=(rangefinder.max_distance_cm()*0.01f))&&
+             (rangefinder.status() != RangeFinder::RangeFinder_OutOfRangeHigh) &&
+              (rangefinder.status() != RangeFinder::RangeFinder_OutOfRangeLow) ) {
+                      height_from_home = rangefinder.distance_cm()*0.01f ;
+            }
     }
 
 	float sink_rate;
     Vector3f vel;
-    if (ahrs.get_velocity_NED(vel)) {
+    if(ahrs.get_velocity_NED(vel)) {
         sink_rate = vel.z;
     } else if (gps.status() >= AP_GPS::GPS_OK_FIX_3D && gps.have_vertical_velocity()) {
         sink_rate = gps.velocity().z;
@@ -710,7 +754,15 @@ void Plane::calc_nav_roll()
     nav_roll_cd = constrain_int32(nav_roll_cd, -roll_limit_cd, roll_limit_cd);
 }
 
-
+void Plane::calc_juland_nav_roll()
+{
+   float bearingtrue = ahrs.yaw_sensor/100.0f/57.3f;
+   float bearing_err = g.JU_phsi_0/57.3f - bearingtrue;
+   nav_roll_cd = bearing_err * g.JU_phsi_P * 57.3f *100.0f;
+   if (ju_flarestage == 1) {
+   nav_roll_cd = 0;
+   }
+}
 /*****************************************
 * Throttle slew limit
 *****************************************/
