@@ -290,8 +290,8 @@ JU_climbrate2    -0.500000
 JU_flare_alt     40.000000
 JU_phsi_0        270.00000
 JU_phsi_P        2.000000
-JU_pitch_ser01   0.000000
-JU_pitch_ser02   0.000000
+JU_pitch_ser01   450.000000
+JU_pitch_ser02   750.000000
 JU_speed1        25.000000
 JU_speedprotect  4.000000
 JU_theta01       -2.000000

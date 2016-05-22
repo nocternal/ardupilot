@@ -768,9 +768,17 @@ void Plane::calc_juland_nav_roll()
    }
 
    JU_bearing_cmd = constrain_float(JU_bearing_cmd ,0,360.0f/57.3f);
-   
+
    float bearing_err = JU_bearing_cmd - bearingtrue;
+   if (bearing_err<-180.0f/57.3f) {
+     bearing_err = 360.0f/57.3f - bearing_err;
+    }  
+   if (bearing_err>180.0f/57.3f) {
+     bearing_err = bearing_err - 360.0f/57.3f;
+    }  
+
    nav_roll_cd = bearing_err * g.JU_phsi_P * 57.3f *100.0f;
+
    if (ju_flarestage == 1) {
    nav_roll_cd = constrain_int32(nav_roll_cd, -1000, 1000);
    }
