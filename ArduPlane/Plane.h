@@ -585,6 +585,7 @@ private:
     int32_t throttle_servo_out_init2;
     int32_t pitch_servo_out_init1;
     int32_t pitch_servo_out_init2;
+    float  JU_bearing_cmd; //rad
     // Mission library
     AP_Mission mission {ahrs, 
             FUNCTOR_BIND_MEMBER(&Plane::start_command_callback, bool, const AP_Mission::Mission_Command &),

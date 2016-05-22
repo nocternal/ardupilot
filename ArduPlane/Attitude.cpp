@@ -122,26 +122,28 @@ void Plane::stabilize_pitch(float speed_scaler)
            channel_pitch->servo_out = (1-jinit_counter/g.JU_init_transtime) * pitch_servo_out_init1 + (jinit_counter/g.JU_init_transtime)*g.JU_pitch_ser01 + channel_pitch->servo_out*(jinit_counter/g.JU_init_transtime);
          }
         else {
-           channel_pitch->servo_out += g.JU_pitch_ser01;
+
+           if (ju_flarestage == 0) {
+              channel_pitch->servo_out += g.JU_pitch_ser01;
+             }
+           else {
+              channel_pitch->servo_out += g.JU_pitch_ser02;
+             }
          }
 
 
 
-        if (ju_flarestage == 1) {
-           if(jthoflare_counter == 0) {
-              pitch_servo_out_init2 = channel_pitch->servo_out ;
-           }
-           if(jthoflare_counter<=g.JU_tho_flaret) {
-           	  channel_pitch->servo_out = (1-jthoflare_counter/g.JU_tho_flaret) * pitch_servo_out_init2 + (jthoflare_counter/g.JU_tho_flaret)*g.JU_pitch_ser02 + channel_pitch->servo_out*(jthoflare_counter/g.JU_tho_flaret);
-           }
-           else {
-           channel_pitch->servo_out += g.JU_pitch_ser02;
-           }
-        }
-
-
-
-
+//        if (ju_flarestage == 1) {
+//           if(jthoflare_counter == 0) {
+//              pitch_servo_out_init2 = channel_pitch->servo_out ;
+//           }
+//           if(jthoflare_counter<=g.JU_tho_flaret) {
+//           	  channel_pitch->servo_out = (1-jthoflare_counter/g.JU_tho_flaret) * pitch_servo_out_init2 + (jthoflare_counter/g.JU_tho_flaret)*g.JU_pitch_ser02 + channel_pitch->servo_out*(jthoflare_counter/g.JU_tho_flaret);
+//           }
+//           else {
+//           channel_pitch->servo_out += g.JU_pitch_ser02;
+//           }
+//        }
     }
 }
 
@@ -757,10 +759,20 @@ void Plane::calc_nav_roll()
 void Plane::calc_juland_nav_roll()
 {
    float bearingtrue = ahrs.yaw_sensor/100.0f/57.3f;
-   float bearing_err = g.JU_phsi_0/57.3f - bearingtrue;
+   JU_bearing_cmd =  g.JU_phsi_0/57.3f + channel_rudder->pwm_to_angle()/100.0f/57.3f;//rad  channel_rudder->pwm_to_angle() is a value from -4500 ~4500
+   if (JU_bearing_cmd>360.0f/57.3f) {
+   	JU_bearing_cmd = JU_bearing_cmd - 360.0f/57.3f;
+   }
+   if (JU_bearing_cmd<0.0f) {
+   	JU_bearing_cmd = 360.0f/57.3f + JU_bearing_cmd;
+   }
+
+   JU_bearing_cmd = constrain_float(JU_bearing_cmd ,0,360.0f/57.3f);
+   
+   float bearing_err = JU_bearing_cmd - bearingtrue;
    nav_roll_cd = bearing_err * g.JU_phsi_P * 57.3f *100.0f;
    if (ju_flarestage == 1) {
-   nav_roll_cd = 0;
+   nav_roll_cd = constrain_int32(nav_roll_cd, -1000, 1000);
    }
 }
 /*****************************************
