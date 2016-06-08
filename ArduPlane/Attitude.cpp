@@ -758,29 +758,33 @@ void Plane::calc_nav_roll()
 
 void Plane::calc_juland_nav_roll()
 {
-   float bearingtrue = ahrs.yaw_sensor/100.0f/57.3f;
-   JU_bearing_cmd =  g.JU_phsi_0/57.3f + channel_rudder->pwm_to_angle()/100.0f/57.3f;//rad  channel_rudder->pwm_to_angle() is a value from -4500 ~4500
-   if (JU_bearing_cmd>360.0f/57.3f) {
-   	JU_bearing_cmd = JU_bearing_cmd - 360.0f/57.3f;
+   float bearingtrue = ahrs.yaw_sensor/100.0f;
+   JU_bearing_cmd =  g.JU_phsi_0 + channel_rudder->pwm_to_angle()/100.0f;//degree channel_rudder->pwm_to_angle() is a value from -4500 ~4500
+   if (JU_bearing_cmd>360.0f) {
+   	JU_bearing_cmd = JU_bearing_cmd - 360.0f;
    }
    if (JU_bearing_cmd<0.0f) {
-   	JU_bearing_cmd = 360.0f/57.3f + JU_bearing_cmd;
+   	JU_bearing_cmd = 360.0f + JU_bearing_cmd;
    }
 
-   JU_bearing_cmd = constrain_float(JU_bearing_cmd ,0,360.0f/57.3f);
+   JU_bearing_cmd = constrain_float(JU_bearing_cmd ,0,360.0f);
 
    float bearing_err = JU_bearing_cmd - bearingtrue;
-   if (bearing_err<-180.0f/57.3f) {
-     bearing_err = 360.0f/57.3f - bearing_err;
+   if (bearing_err<-180.0f) {
+     bearing_err = 360.0f - bearing_err;
     }  
-   if (bearing_err>180.0f/57.3f) {
-     bearing_err = bearing_err - 360.0f/57.3f;
+   if (bearing_err>180.0f) {
+     bearing_err = bearing_err - 360.0f;
     }  
 
-   nav_roll_cd = bearing_err * g.JU_phsi_P * 57.3f *100.0f;
+   nav_roll_cd = bearing_err * g.JU_phsi_P *100.0f;
 
    if (ju_flarestage == 1) {
    nav_roll_cd = constrain_int32(nav_roll_cd, -1000, 1000);
+       if  (height_from_home<=1.0f) {
+          nav_roll_cd = 0 ;
+        }
+
    }
 }
 /*****************************************
