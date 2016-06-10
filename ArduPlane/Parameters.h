@@ -356,6 +356,9 @@ public:
         k_param_JU_pitch_ser02,
         k_param_JU_phsi_P,
         k_param_JU_phsi_0,
+        k_param_Jinityawable,
+        k_param_JU_y_P,
+        K_param_JU_y_I,
 
         // 254,255: reserved
     };
@@ -515,6 +518,9 @@ public:
     AP_Int32 JU_pitch_ser02;
     AP_Float JU_phsi_P;
     AP_Float JU_phsi_0;
+    AP_Int8 Jinityawable;
+    AP_Float JU_y_P;
+    AP_Float JU_y_I;
 
 
 #if HIL_SUPPORT

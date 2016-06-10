@@ -1166,6 +1166,27 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(JU_phsi_0,         "JU_phsi_0",   0.0f),
 
+    // @Param:JU_y_P
+    // @DisplayName: JU_y_P
+    // @Description: delta y's P
+    // @Values: 0 100000
+    // @User: Advanced
+    GSCALAR(JU_y_P,         "JU_y_P",   0.7f),
+
+    // @Param:JU_y_I
+    // @DisplayName: JU_y_I
+    // @Description: delta y's I
+    // @Values: 0 360
+    // @User: Advanced
+    GSCALAR(JU_y_I,         "JU_y_I",   0.0f),
+
+    // @Param:Jinityawable
+    // @DisplayName: Jinityawable
+    // @Description: when Jinityawable= 1 ,control phsi,Jinityawable= 0,control delta y.
+    // @Values: 0 1
+    // @User: Advanced
+    GSCALAR(Jinityawable,         "Jinityawable",   0),
+
     // barometer ground calibration. The GND_ prefix is chosen for
     // compatibility with previous releases of ArduPlane
     // @Group: GND_

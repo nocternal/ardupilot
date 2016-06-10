@@ -759,7 +759,16 @@ void Plane::calc_nav_roll()
 void Plane::calc_juland_nav_roll()
 {
    float bearingtrue = ahrs.yaw_sensor/100.0f;
+
+
+if (g.Jinityawable == 1) {
    JU_bearing_cmd =  g.JU_phsi_0 + channel_rudder->pwm_to_angle()/100.0f;//degree channel_rudder->pwm_to_angle() is a value from -4500 ~4500
+   } // only control phsi. 
+else {
+
+   } //phsi command is given by delta y error.
+
+
    if (JU_bearing_cmd>360.0f) {
    	JU_bearing_cmd = JU_bearing_cmd - 360.0f;
    }
