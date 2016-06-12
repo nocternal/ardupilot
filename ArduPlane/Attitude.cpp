@@ -759,14 +759,38 @@ void Plane::calc_nav_roll()
 void Plane::calc_juland_nav_roll()
 {
    float bearingtrue = ahrs.yaw_sensor/100.0f;
-
+   //AP_Mission::Mission_Command cmd;
 
 if (g.Jinityawable == 1) {
    JU_bearing_cmd =  g.JU_phsi_0 + channel_rudder->pwm_to_angle()/100.0f;//degree channel_rudder->pwm_to_angle() is a value from -4500 ~4500
    } // only control phsi. 
-else {
 
-   } //phsi command is given by delta y error.
+
+else {
+ mission.set_current_cmd(2);
+ ju_next_WP = mission.get_current_nav_cmd().content.location;
+ mission.set_current_cmd(1);
+ ju_prev_WP = mission.get_current_nav_cmd().content.location;
+ jS1 = get_distance(current_loc,ju_next_WP);
+ jbearing1 = get_bearing_cd(current_loc,ju_next_WP)*0.01f; 
+ jbearing2 = get_bearing_cd(ju_prev_WP,ju_next_WP)*0.01f; 
+ float jbearing_err = jbearing1 -jbearing2;
+
+ if (jbearing_err<-180.0f) {
+     jbearing_err = 360.0f + jbearing_err;
+     }  
+ if (jbearing_err>180.0f) {
+     jbearing_err = jbearing_err - 360.0f;
+     }  
+
+ jdeltay_err = jS1 * sinf(jbearing_err/57.3f) + channel_rudder->pwm_to_angle()/300.0f;
+
+ JU_bearing_cmd =  g.JU_phsi_0 + jdeltay_err * g.JU_y_P;
+
+}
+
+
+ //phsi command is given by delta y error.
 
 
    if (JU_bearing_cmd>360.0f) {
@@ -780,7 +804,7 @@ else {
 
    float bearing_err = JU_bearing_cmd - bearingtrue;
    if (bearing_err<-180.0f) {
-     bearing_err = 360.0f - bearing_err;
+     bearing_err = 360.0f + bearing_err;
     }  
    if (bearing_err>180.0f) {
      bearing_err = bearing_err - 360.0f;
@@ -788,8 +812,8 @@ else {
 
    nav_roll_cd = bearing_err * g.JU_phsi_P *100.0f;
 
-   if (ju_flarestage == 1) {
-   nav_roll_cd = constrain_int32(nav_roll_cd, -1000, 1000);
+     if (ju_flarestage == 1) {
+     nav_roll_cd = constrain_int32(nav_roll_cd, -1000, 1000);
        if  (height_from_home<=1.0f) {
           nav_roll_cd = 0 ;
         }

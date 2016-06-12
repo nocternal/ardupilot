@@ -586,6 +586,20 @@ private:
     int32_t pitch_servo_out_init1;
     int32_t pitch_servo_out_init2;
     float  JU_bearing_cmd; //rad
+    struct Location ju_prev_WP;
+    struct Location ju_next_WP;
+    float jS1;
+    float jbearing1;
+    float jbearing2;
+    float jdeltay_err;
+    //struct JUWP  {
+    //uint8_t JUbytes[12];
+    //};
+    //struct JUWP JUWP1;
+    //struct JUWP JUWP2;
+
+
+
     // Mission library
     AP_Mission mission {ahrs, 
             FUNCTOR_BIND_MEMBER(&Plane::start_command_callback, bool, const AP_Mission::Mission_Command &),
