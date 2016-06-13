@@ -771,6 +771,18 @@ else {
  ju_next_WP = mission.get_current_nav_cmd().content.location;
  mission.set_current_cmd(1);
  ju_prev_WP = mission.get_current_nav_cmd().content.location;
+
+
+/*ju_next_WP.lat = (int32_t)(-35.350977 * 1.0e7f);
+ju_next_WP.lng = (int32_t)(149.163869 * 1.0e7f);
+
+
+ju_prev_WP.lat = (int32_t)(-35.366436 * 1.0e7f);
+ju_prev_WP.lng = (int32_t)(149.165482 * 1.0e7f);*/
+
+
+
+
  jS1 = get_distance(current_loc,ju_next_WP);
  jbearing1 = get_bearing_cd(current_loc,ju_next_WP)*0.01f; 
  jbearing2 = get_bearing_cd(ju_prev_WP,ju_next_WP)*0.01f; 
@@ -785,8 +797,18 @@ else {
 
  jdeltay_err = jS1 * sinf(jbearing_err/57.3f) + channel_rudder->pwm_to_angle()/300.0f;
 
- JU_bearing_cmd =  g.JU_phsi_0 + jdeltay_err * g.JU_y_P;
 
+
+ JU_bearing_cmd = jdeltay_err * g.JU_y_P;
+
+
+
+ JU_bearing_cmd = constrain_float(JU_bearing_cmd, -90.0f, 90.0f);
+ JU_bearing_cmd +=g.JU_phsi_0;
+
+/* plane.gcs_send_text_fmt(MAV_SEVERITY_INFO, "jdeltay_er = %.4fm",
+                                        (float)(jdeltay_err));*/
+ 
 }
 
 

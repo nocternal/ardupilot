@@ -586,8 +586,8 @@ private:
     int32_t pitch_servo_out_init1;
     int32_t pitch_servo_out_init2;
     float  JU_bearing_cmd; //rad
-    struct Location ju_prev_WP;
-    struct Location ju_next_WP;
+    struct Location ju_prev_WP {};
+    struct Location ju_next_WP {};
     float jS1;
     float jbearing1;
     float jbearing2;

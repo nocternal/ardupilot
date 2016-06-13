@@ -37,7 +37,7 @@ const AP_Scheduler::Task Plane::scheduler_tasks[] = {
     SCHED_TASK(check_short_failsafe,   50,   1000),
     SCHED_TASK(ahrs_update,           400,   6400),
     SCHED_TASK(update_speed_height,    50,   1600),
-    SCHED_TASK(update_julandcontrol,   50,   2500),
+    SCHED_TASK(update_julandcontrol,   50,   3000),
     SCHED_TASK(update_flight_mode,    400,   1400),
     SCHED_TASK(stabilize,             400,   3500),
     SCHED_TASK(set_servos,            400,   1600),
@@ -355,6 +355,14 @@ void Plane::one_second_loop()
     }
 
     ins.set_raw_logging(should_log(MASK_LOG_IMU_RAW));
+
+/*if (control_mode == STABILIZE) {
+plane.gcs_send_text_fmt(MAV_SEVERITY_INFO, "1lat = %.5fd\n 1lng = %.5fd\n",
+                                        (float)(ju_prev_WP.lat * 1e-7f),
+                                        (float)(ju_prev_WP.lng * 1e-7f));
+ }*/
+
+
 }
 
 void Plane::log_perf_info()
