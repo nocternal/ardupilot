@@ -389,6 +389,19 @@ void Plane::set_mode(enum FlightMode mode)
 
     case MANUAL:
     case STABILIZE:
+    if (g.JU_WP_fromMP == 1) {
+         mission.set_current_cmd(2);
+         ju_next_WP = mission.get_current_nav_cmd().content.location;
+         mission.set_current_cmd(1);
+         ju_prev_WP = mission.get_current_nav_cmd().content.location;
+         } 
+    else {
+         ju_next_WP.lat = (int32_t)(g.JU_WP_2lat);
+         ju_next_WP.lng = (int32_t)(g.JU_WP_2lng);
+         ju_prev_WP.lat = (int32_t)(g.JU_WP_1lat);
+         ju_prev_WP.lng = (int32_t)(g.JU_WP_1lng);
+          }
+        break;
     case TRAINING:
     case FLY_BY_WIRE_A:
         auto_throttle_mode = false;
@@ -453,6 +466,19 @@ void Plane::set_mode(enum FlightMode mode)
         set_guided_WP();
         break;
     case JULAND:
+        if (g.JU_WP_fromMP == 1) {
+         mission.set_current_cmd(2);
+         ju_next_WP = mission.get_current_nav_cmd().content.location;
+         mission.set_current_cmd(1);
+         ju_prev_WP = mission.get_current_nav_cmd().content.location;
+         } 
+        else {
+         ju_next_WP.lat = (int32_t)(g.JU_WP_2lat);
+         ju_next_WP.lng = (int32_t)(g.JU_WP_2lng);
+         ju_prev_WP.lat = (int32_t)(g.JU_WP_1lat);
+         ju_prev_WP.lng = (int32_t)(g.JU_WP_1lng);
+          }
+        break;
     case QSTABILIZE:
     case QHOVER:
     case QLOITER:

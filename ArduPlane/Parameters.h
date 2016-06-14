@@ -331,8 +331,6 @@ public:
         k_param_pidWheelSteer, // unused
 
         k_param_DataFlash = 253, // Logging Group
-        k_param_JU_Pq,
-        k_param_JU_Ptheta,
         k_param_JU_Pclimbrate,
         k_param_JU_Iclimbrate,
         k_param_JU_Ioutmax,//it's a theta command max for Iclimbrate output,degree
@@ -353,14 +351,19 @@ public:
         k_param_JU_flare_theta_enable,//if it's value=1 ,only control theta in flare section
         k_param_JU_tho_Verr,
         k_param_JU_pitch_ser01,
+        k_param_JU_pitch_ser02n,
         k_param_JU_pitch_ser02,
         k_param_JU_phsi_P,
         k_param_JU_phsi_0,
         k_param_Jinityawable,
         k_param_JU_y_I,
         k_param_JU_y_P,
-        
-
+        k_param_JU_y_Imax,
+        k_param_JU_WP_fromMP,
+        k_param_JU_WP_1lat,
+        k_param_JU_WP_1lng,
+        k_param_JU_WP_2lat,
+        k_param_JU_WP_2lng,
         // 254,255: reserved
     };
 
@@ -494,8 +497,6 @@ public:
     AP_Int16 pitch_trim_cd;
     AP_Int16 FBWB_min_altitude_cm;
     AP_Int8  hil_servos;
-    AP_Float JU_Pq;
-    AP_Float JU_Ptheta;
     AP_Float JU_Pclimbrate;
     AP_Float JU_Iclimbrate;
     AP_Float JU_climbrate1;//should be a negative number such as -2
@@ -511,19 +512,24 @@ public:
     AP_Float JU_init_transtime;//s
     AP_Float JU_theta01;//degree
     AP_Float JU_theta02;//degree
-    AP_Int8 JU_flare_theta_enable; //0=disabled, 1=enabled to only control theta during flare section
+    AP_Int8  JU_flare_theta_enable; //0=disabled, 1=enabled to only control theta during flare section
     AP_Float JU_Ioutmax;//degree
     AP_Float JU_thetaoutmax;//degree
     AP_Float JU_tho_Verr;
     AP_Int32 JU_pitch_ser01;
+    AP_Int32 JU_pitch_ser02n;
     AP_Int32 JU_pitch_ser02;
     AP_Float JU_phsi_P;
     AP_Float JU_phsi_0;
     AP_Int8  Jinityawable;
     AP_Float JU_y_I;
+    AP_Float JU_y_Imax;
     AP_Float JU_y_P;
-    
-
+    AP_Int8  JU_WP_fromMP;// 1=from Mission Planner  0=handwritten
+    AP_Int32 JU_WP_1lat;// should be input  degree multiply 10^7
+    AP_Int32 JU_WP_1lng;
+    AP_Int32 JU_WP_2lat;
+    AP_Int32 JU_WP_2lng;
 
 #if HIL_SUPPORT
     AP_Int8  hil_mode;

@@ -583,7 +583,6 @@ private:
     float jTAS_err;
     int32_t throttle_servo_out_init1;
     int32_t throttle_servo_out_init2;
-    int32_t pitch_servo_out_init1;
     int32_t pitch_servo_out_init2;
     float  JU_bearing_cmd; //rad
     struct Location ju_prev_WP {};
@@ -592,6 +591,9 @@ private:
     float jbearing1;
     float jbearing2;
     float jdeltay_err;
+    float Jy_integrator_delta;
+    float Jy_pid_info_I;
+
     //struct JUWP  {
     //uint8_t JUbytes[12];
     //};

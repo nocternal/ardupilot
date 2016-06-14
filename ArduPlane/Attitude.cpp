@@ -114,36 +114,26 @@ void Plane::stabilize_pitch(float speed_scaler)
     if (control_mode == STABILIZE ||
     	control_mode == JULAND)
     {   
-    	if (jinit_counter ==0) {
-           pitch_servo_out_init1 = channel_pitch->servo_out ;
-           channel_pitch->servo_out = pitch_servo_out_init1;
-         }
         if (jinit_counter <= g.JU_init_transtime) {
-           channel_pitch->servo_out = (1-jinit_counter/g.JU_init_transtime) * pitch_servo_out_init1 + (jinit_counter/g.JU_init_transtime)*g.JU_pitch_ser01 + channel_pitch->servo_out*(jinit_counter/g.JU_init_transtime);
+           channel_pitch->servo_out +=(jinit_counter/g.JU_init_transtime)*g.JU_pitch_ser01;
          }
         else {
-
            if (ju_flarestage == 0) {
               channel_pitch->servo_out += g.JU_pitch_ser01;
              }
            else {
-              channel_pitch->servo_out += g.JU_pitch_ser02;
+               if(jflare_counter == 0) {
+                  pitch_servo_out_init2 = channel_pitch->servo_out ;
+                  channel_pitch->servo_out = pitch_servo_out_init2 + g.JU_pitch_ser02n;
+                 }
+               if(jflare_counter <= g.JU_flare_transition_time) {
+                  channel_pitch->servo_out += (jflare_counter/g.JU_flare_transition_time)*g.JU_pitch_ser02 + g.JU_pitch_ser02n;
+                 }
+               else {
+                 channel_pitch->servo_out += g.JU_pitch_ser02 + g.JU_pitch_ser02n;
+                 } 
              }
          }
-
-
-
-//        if (ju_flarestage == 1) {
-//           if(jthoflare_counter == 0) {
-//              pitch_servo_out_init2 = channel_pitch->servo_out ;
-//           }
-//           if(jthoflare_counter<=g.JU_tho_flaret) {
-//           	  channel_pitch->servo_out = (1-jthoflare_counter/g.JU_tho_flaret) * pitch_servo_out_init2 + (jthoflare_counter/g.JU_tho_flaret)*g.JU_pitch_ser02 + channel_pitch->servo_out*(jthoflare_counter/g.JU_tho_flaret);
-//           }
-//           else {
-//           channel_pitch->servo_out += g.JU_pitch_ser02;
-//           }
-//        }
     }
 }
 
@@ -761,28 +751,17 @@ void Plane::calc_juland_nav_roll()
    float bearingtrue = ahrs.yaw_sensor/100.0f;
    //AP_Mission::Mission_Command cmd;
 
-if (g.Jinityawable == 1) {
+if (g.Jinityawable == 1 ||
+	ju_flarestage == 1) {
    JU_bearing_cmd =  g.JU_phsi_0 + channel_rudder->pwm_to_angle()/100.0f;//degree channel_rudder->pwm_to_angle() is a value from -4500 ~4500
    } // only control phsi. 
 
 
 else {
- mission.set_current_cmd(2);
- ju_next_WP = mission.get_current_nav_cmd().content.location;
- mission.set_current_cmd(1);
- ju_prev_WP = mission.get_current_nav_cmd().content.location;
-
-
-/*ju_next_WP.lat = (int32_t)(-35.350977 * 1.0e7f);
-ju_next_WP.lng = (int32_t)(149.163869 * 1.0e7f);
-
-
-ju_prev_WP.lat = (int32_t)(-35.366436 * 1.0e7f);
-ju_prev_WP.lng = (int32_t)(149.165482 * 1.0e7f);*/
-
-
-
-
+ /*ju_next_WP.lat = (int32_t)(-35.350977 * 1.0e7f);
+ ju_next_WP.lng = (int32_t)(149.163869 * 1.0e7f);
+ ju_prev_WP.lat = (int32_t)(-35.366436 * 1.0e7f);
+ ju_prev_WP.lng = (int32_t)(149.165482 * 1.0e7f);*/
  jS1 = get_distance(current_loc,ju_next_WP);
  jbearing1 = get_bearing_cd(current_loc,ju_next_WP)*0.01f; 
  jbearing2 = get_bearing_cd(ju_prev_WP,ju_next_WP)*0.01f; 
@@ -795,20 +774,27 @@ ju_prev_WP.lng = (int32_t)(149.165482 * 1.0e7f);*/
      jbearing_err = jbearing_err - 360.0f;
      }  
 
- jdeltay_err = jS1 * sinf(jbearing_err/57.3f) + channel_rudder->pwm_to_angle()/300.0f;
+ jdeltay_err = jS1 * sinf(jbearing_err/57.3f) + g.rc_6.pwm_to_angle()/150.0f;
 
+ if (jdt>0) {
+         Jy_integrator_delta = jdeltay_err * jdelta_time * g.JU_y_I;    //degree     
+         Jy_pid_info_I += Jy_integrator_delta;
+         if(jdeltay_err>10.0f || 
+         	 jdeltay_err<-10.0f) {
+             Jy_pid_info_I = 0;    
+             }
+    }
+ else {
+         Jy_pid_info_I = 0;
+    }
+     Jy_pid_info_I = constrain_float(Jy_pid_info_I, -g.JU_y_Imax, g.JU_y_Imax);
 
-
- JU_bearing_cmd = jdeltay_err * g.JU_y_P;
-
-
-
+ JU_bearing_cmd = jdeltay_err * g.JU_y_P + Jy_pid_info_I;  //when deltay_err>0,bering_cmd>0
  JU_bearing_cmd = constrain_float(JU_bearing_cmd, -90.0f, 90.0f);
  JU_bearing_cmd +=g.JU_phsi_0;
 
 /* plane.gcs_send_text_fmt(MAV_SEVERITY_INFO, "jdeltay_er = %.4fm",
                                         (float)(jdeltay_err));*/
- 
 }
 
 

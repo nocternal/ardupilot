@@ -990,20 +990,6 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(crash_detection_enable,         "CRASH_DETECT",   0),
 
-    // @Param: JU_Pq
-    // @DisplayName: JU_Pq
-    // @Description: pitch rate's P   
-    // @Values: 0.001 1000
-    // @User: Advanced
-    GSCALAR(JU_Pq,         "JU_Pq",   JU_Pq_DEFAULT),
-
-    // @Param: JU_Ptheta
-    // @DisplayName: JU_Ptheta
-    // @Description: theta's P   
-    // @Values: 0.001 1000
-    // @User: Advanced
-    GSCALAR(JU_Ptheta,         "JU_Ptheta",   JU_Ptheta_DEFAULT),
-
     // @Param: JU_Pclimbrate
     // @DisplayName: JU_Pclimbrate
     // @Description: climbrate's P   
@@ -1144,6 +1130,14 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(JU_pitch_ser01,         "JU_pitch_ser01",   0),
 
+    // @Param: JU_pitch_ser02n 
+    // @DisplayName: JU_pitch_ser02n
+    // @Description: pitch servo_out compensate when at flare begin need some big deltan
+    // @Values: -4500 4500
+    // @User: Advanced
+    GSCALAR(JU_pitch_ser02n,         "JU_pitch_ser02n",   0),
+
+
     // @Param: JU_pitch_ser02 
     // @DisplayName: JU_pitch_ser02
     // @Description: pitch servo_out compensate when at flare
@@ -1173,6 +1167,12 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(JU_y_I,         "JU_y_I",   0),
 
+    // @Param:JU_y_Imax
+    // @DisplayName: JU_y_Imax
+    // @Description: delta y's Imax to phsi ,degree
+    // @Values: -90 90
+    // @User: Advanced
+    GSCALAR(JU_y_Imax,         "JU_y_Imax",   0),
 
     // @Param:JU_y_P
     // @DisplayName: JU_y_P
@@ -1181,13 +1181,47 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(JU_y_P,         "JU_y_P",   0.7f),
 
-
     // @Param:Jinityawable
     // @DisplayName: Jinityawable
     // @Description: when Jinityawable= 1 ,control phsi,Jinityawable= 0,control delta y.
     // @Values: 0 1
     // @User: Advanced
     GSCALAR(Jinityawable,         "Jinityawable",   0),
+
+    // @Param:JU_WP_fromMP
+    // @DisplayName: JU_WP_fromMP
+    // @Description: when JU_WP_fromMP= 1 ,load way point from mission planner's file,JU_WP_fromMP= 0,load waypoint from hand written WP parameters.
+    // @Values: 0 1
+    // @User: Advanced
+    GSCALAR(JU_WP_fromMP,         "JU_WP_fromMP",   1),
+
+    // @Param:JU_WP_1lat
+    // @DisplayName: JU_WP_1lat
+    // @Description: it's  first way point's latitude multiply 1e^7 when JU_WP_fromMP =0
+    // @Values: -2147483648 2147483648 
+    // @User: Advanced
+    GSCALAR(JU_WP_1lat,         "JU_WP_1lat",   0),
+
+    // @Param:JU_WP_1lng
+    // @DisplayName: JU_WP_1lng
+    // @Description: it's  first way point's longitude multiply 1e^7 when JU_WP_fromMP =0
+    // @Values: -2147483648 2147483648 
+    // @User: Advanced
+    GSCALAR(JU_WP_1lng,         "JU_WP_1lng",   0),
+
+    // @Param:JU_WP_2lat
+    // @DisplayName: JU_WP_2lat
+    // @Description: it's  second way point's latitude multiply 1e^7 when JU_WP_fromMP =0
+    // @Values: -2147483648 2147483648 
+    // @User: Advanced
+    GSCALAR(JU_WP_2lat,         "JU_WP_2lat",   0),
+
+    // @Param:JU_WP_2lng
+    // @DisplayName: JU_WP_2lng
+    // @Description: it's  second way point's longitude multiply 1e^7 when JU_WP_fromMP =0
+    // @Values: -2147483648 2147483648 
+    // @User: Advanced
+    GSCALAR(JU_WP_2lng,         "JU_WP_2lng",   0),
 
     // barometer ground calibration. The GND_ prefix is chosen for
     // compatibility with previous releases of ArduPlane

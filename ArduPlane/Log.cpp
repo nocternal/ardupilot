@@ -187,10 +187,10 @@ void Plane::Log_Write_Attitude(void)
 struct PACKED log_Performance {
     LOG_PACKET_HEADER;
     uint64_t time_us;
-    uint32_t loop_time;
-    uint16_t main_loop_count;
-    uint32_t g_dt_max;
-    int16_t  gyro_drift_x;
+    int16_t  throttle_out1;//uint32_t loop_time;
+    int16_t  Jpitch_out;//uint16_t main_loop_count;
+    int8_t   Jflaretime;//uint32_t g_dt_max;
+    float    Jyerr;//int16_t  gyro_drift_x;
     int16_t  gyro_drift_y;
     int16_t  gyro_drift_z;
     uint8_t  i2c_lockup_count;
@@ -203,10 +203,10 @@ void Plane::Log_Write_Performance()
     struct log_Performance pkt = {
         LOG_PACKET_HEADER_INIT(LOG_PERFORMANCE_MSG),
         time_us         : AP_HAL::micros64(),
-        loop_time       : millis() - perf_mon_timer,
-        main_loop_count : mainLoop_count,
-        g_dt_max        : G_Dt_max,
-        gyro_drift_x    : (int16_t)(ahrs.get_gyro_drift().x * 1000),
+        throttle_out1   : (int16_t)channel_throttle->servo_out,//millis() - perf_mon_timer,
+        Jpitch_out      : (int16_t)channel_pitch->servo_out, //main_loop_count : mainLoop_count,
+        Jflaretime      : (int16_t)ju_flarestage,//g_dt_max        : G_Dt_max,
+        Jyerr           : (float)jdeltay_err,//gyro_drift_x    : (int16_t)(ahrs.get_gyro_drift().x * 1000),
         gyro_drift_y    : (int16_t)(ahrs.get_gyro_drift().y * 1000),
         gyro_drift_z    : (int16_t)(ahrs.get_gyro_drift().z * 1000),
         i2c_lockup_count: hal.i2c->lockup_count(),
@@ -243,10 +243,6 @@ struct PACKED log_Control_Tuning {
     int16_t throttle_out;
     int16_t rudder_out;
     float   accel_y;
- //   float hdotpout;
- //   float hdoti;
- //   int16_t jutheta0;
- //   float thop;
 };
 
 // Write a control tuning packet. Total length : 22 bytes
@@ -262,9 +258,7 @@ void Plane::Log_Write_Control_Tuning()
         pitch           : (int16_t)ahrs.pitch_sensor,
         throttle_out    : (int16_t)channel_throttle->servo_out,
         rudder_out      : (int16_t)channel_rudder->servo_out,
-        accel_y         : accel.y,
-    //    hdoti           : climbiout,
-    //    thop            : JU_tho_pout
+        accel_y         : accel.y
     };
     DataFlash.WriteBlock(&pkt, sizeof(pkt));
 }
@@ -485,11 +479,11 @@ void Plane::Log_Write_Home_And_Origin()
 static const struct LogStructure log_structure[] = {
     LOG_COMMON_STRUCTURES,
     { LOG_PERFORMANCE_MSG, sizeof(log_Performance), 
-      "PM",  "QIHIhhhBH", "TimeUS,LTime,MLC,gDt,GDx,GDy,GDz,I2CErr,INSErr" },
+      "PM",  "QhhhfhhBH", "TimeUS,Thoout,ptchout,flare,yErr,GDy,GDz,I2CErr,INSErr" },
     { LOG_STARTUP_MSG, sizeof(log_Startup),         
       "STRT", "QBH",         "TimeUS,SType,CTot" },
     { LOG_CTUN_MSG, sizeof(log_Control_Tuning),     
-      "CTUN", "Qcccchhfff",    "TimeUS,NavRoll,Roll,NavPitch,Pitch,ThrOut,RdrOut,AccY" },
+      "CTUN", "Qcccchhf",    "TimeUS,NavRoll,Roll,NavPitch,Pitch,ThrOut,RdrOut,AccY" },
     { LOG_NTUN_MSG, sizeof(log_Nav_Tuning),         
       "NTUN", "QCfccccCIf",  "TimeUS,Yaw,WpDist,TargBrg,NavBrg,AltErr,Arspd,JuYawc,GSpdCM,XT" },
     { LOG_SONAR_MSG, sizeof(log_Sonar),             
