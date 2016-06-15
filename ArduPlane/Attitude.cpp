@@ -774,13 +774,17 @@ else {
      jbearing_err = jbearing_err - 360.0f;
      }  
 
- jdeltay_err = jS1 * sinf(jbearing_err/57.3f) + g.rc_6.pwm_to_angle()/150.0f;
+    g.rc_6.set_angle(4500);
+    g.rc_6.set_default_dead_zone(80);
+    g.rc_6.set_type(RC_CHANNEL_TYPE_ANGLE);
+    jdeltay_err = jS1 * sinf(jbearing_err/57.3f) + g.rc_6.pwm_to_angle()/150.0f; //make new rc6 set_angle(4500),original rc6 is set_range....
 
  if (jdt>0) {
-         Jy_integrator_delta = jdeltay_err * jdelta_time * g.JU_y_I;    //degree     
+         Jy_integrator_delta = jdeltay_err * jdelta_time * g.JU_y_I;    //degree    when rc have deltay input or deltay is bigger than 15m then intergrater won't work
          Jy_pid_info_I += Jy_integrator_delta;
-         if(jdeltay_err>10.0f || 
-         	 jdeltay_err<-10.0f) {
+         if(jdeltay_err>15.0f || 
+         	(g.rc_6.pwm_to_angle() != 0) || 
+         	 jdeltay_err<-15.0f) {
              Jy_pid_info_I = 0;    
              }
     }

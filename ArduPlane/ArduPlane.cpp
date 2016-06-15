@@ -362,8 +362,14 @@ plane.gcs_send_text_fmt(MAV_SEVERITY_INFO, "1lat = %.5fd\n 1lng = %.5fd\n",
                                         (float)(ju_prev_WP.lng * 1e-7f));
  }*/
 
+                                        
+/*if (control_mode == STABILIZE) {
+plane.gcs_send_text_fmt(MAV_SEVERITY_INFO, "6_in=%i  ang= %i",
+                                        (int)(g.rc_6.radio_in),
+                                        (int)(g.rc_6.pwm_to_angle()));
+ }
 
-}
+}*/
 
 void Plane::log_perf_info()
 {

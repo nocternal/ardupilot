@@ -507,6 +507,7 @@ void Plane::set_mode(enum FlightMode mode)
     jinit_counter = 0;
     ju_flarestage = 0;
     jthoflare_counter = 0;
+    Jy_pid_info_I = 0;
 }
 
 /*
