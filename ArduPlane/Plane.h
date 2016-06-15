@@ -577,7 +577,7 @@ private:
     float jtheta0;
     float jtheta_init;
     float JU_tho_pout;
-    int8_t ju_flarestage; //to judge whether in final flare stage
+    int16_t ju_flarestage; //to judge whether in final flare stage
     float jEAS; //estimated airspeed;
     float jTAS_dem;
     float jTAS_err;

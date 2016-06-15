@@ -189,7 +189,7 @@ struct PACKED log_Performance {
     uint64_t time_us;
     int16_t  throttle_out1;//uint32_t loop_time;
     int16_t  Jpitch_out;//uint16_t main_loop_count;
-    int8_t   Jflaretime;//uint32_t g_dt_max;
+    int16_t  Jflaretime;//uint32_t g_dt_max;
     float    Jyerr;//int16_t  gyro_drift_x;
     int16_t  gyro_drift_y;
     int16_t  gyro_drift_z;
