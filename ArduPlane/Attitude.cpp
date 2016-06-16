@@ -777,7 +777,7 @@ else {
     g.rc_6.set_angle(4500);
     g.rc_6.set_default_dead_zone(80);
     g.rc_6.set_type(RC_CHANNEL_TYPE_ANGLE);
-    jdeltay_err = jS1 * sinf(jbearing_err/57.3f) + g.rc_6.pwm_to_angle()/150.0f; //make new rc6 set_angle(4500),original rc6 is set_range....
+    jdeltay_err = jS1 * sinf(jbearing_err/57.3f) + g.rc_6.pwm_to_angle()/300.0f; //make new rc6 set_angle(4500),original rc6 is set_range....
 
  if (jdt>0) {
          Jy_integrator_delta = jdeltay_err * jdelta_time * g.JU_y_I;    //degree    when rc have deltay input or deltay is bigger than 15m then intergrater won't work
@@ -826,7 +826,7 @@ else {
 
      if (ju_flarestage == 1) {
      nav_roll_cd = constrain_int32(nav_roll_cd, -1000, 1000);
-       if  (height_from_home<=1.0f) {
+       if  (height_from_home<=0.6f) {
           nav_roll_cd = 0 ;
         }
 
