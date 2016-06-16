@@ -201,6 +201,9 @@ void Plane::update_julandcontrol(void)
         calc_juland_nav_roll();
         calc_juland_throttle();
     }
+    if (should_log(MASK_LOG_PM)) {
+        Log_Write_Performance();
+    }
 }
 
 
@@ -452,9 +455,6 @@ void Plane::update_GPS_50Hz(void)
             last_gps_reading[i] = gps.last_message_time_ms(i);
             if (should_log(MASK_LOG_GPS)) {
                 Log_Write_GPS(i);
-            }
-            if (should_log(MASK_LOG_PM)) {
-                Log_Write_Performance();
             }
         }
     }
