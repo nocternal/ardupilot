@@ -364,6 +364,14 @@ public:
         k_param_JU_WP_1lng,
         k_param_JU_WP_2lat,
         k_param_JU_WP_2lng,
+        k_param_JU_trim_auto,
+        k_param_JU_trim_v1,
+        k_param_JU_trim_v2,
+        k_param_JU_trim_ps1,
+        k_param_JU_trim_ps2,
+        k_param_JU_trim_v3,
+        k_param_JU_trim_ps3,
+        k_param_JU_trim_rs,
         // 254,255: reserved
     };
 
@@ -530,6 +538,14 @@ public:
     AP_Int32 JU_WP_1lng;
     AP_Int32 JU_WP_2lat;
     AP_Int32 JU_WP_2lng;
+    AP_Int8  JU_trim_auto;
+    AP_Float JU_trim_v1;
+    AP_Float JU_trim_v2;
+    AP_Float JU_trim_v3;
+    AP_Int32 JU_trim_ps1;
+    AP_Int32 JU_trim_ps2;
+    AP_Int32 JU_trim_ps3;
+    AP_Int32 JU_trim_rs;
 
 #if HIL_SUPPORT
     AP_Int8  hil_mode;

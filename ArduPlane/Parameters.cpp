@@ -1183,8 +1183,8 @@ const AP_Param::Info Plane::var_info[] = {
 
     // @Param:Jinityawable
     // @DisplayName: Jinityawable
-    // @Description: when Jinityawable= 1 ,control phsi,Jinityawable= 0,control delta y.
-    // @Values: 0 1
+    // @Description: Jinityawable= 2 ,fbwa's roll control mode and STICK_MIXING need to =0,when Jinityawable= 1 ,control phsi,Jinityawable= 0,control delta y.
+    // @Values: 0 1 2
     // @User: Advanced
     GSCALAR(Jinityawable,         "Jinityawable",   0),
 
@@ -1222,6 +1222,62 @@ const AP_Param::Info Plane::var_info[] = {
     // @Values: -2147483648 2147483648 
     // @User: Advanced
     GSCALAR(JU_WP_2lng,         "JU_WP_2lng",   0),
+
+    // @Param:JU_trim_auto
+    // @DisplayName: JU_trim_auto
+    // @Description: when it =1 ,will give different pitch_servo depends on velocity
+    // @Values: 0 1
+    // @User: Advanced
+    GSCALAR(JU_trim_auto,         "JU_trim_auto",   0),
+
+    // @Param:JU_trim_v1
+    // @DisplayName: JU_trim_v1
+    // @Description: minimum reference velocity for auto trim 
+    // @Values: 0 100
+    // @User: Advanced
+    GSCALAR(JU_trim_v1,         "JU_trim_v1",   10.0f),
+
+    // @Param:JU_trim_v2
+    // @DisplayName: JU_trim_v2
+    // @Description: reference velocity for auto trim 
+    // @Values: 0 100
+    // @User: Advanced
+    GSCALAR(JU_trim_v2,         "JU_trim_v2",   15.0f),
+
+    // @Param:JU_trim_v3
+    // @DisplayName: JU_trim_v3
+    // @Description:maximum reference velocity for auto trim 
+    // @Values: 0 100
+    // @User: Advanced
+    GSCALAR(JU_trim_v3,         "JU_trim_v3",   20.0f),
+
+    // @Param:JU_trim_ps1
+    // @DisplayName: JU_trim_ps1
+    // @Description:maximum pitch_servo trim value, if velocity below v1, the trim value won't become bigger.
+    // @Values: -4500 4500
+    // @User: Advanced
+    GSCALAR(JU_trim_ps1,         "JU_trim_ps1",   0),
+
+    // @Param:JU_trim_ps2
+    // @DisplayName: JU_trim_ps2
+    // @Description:pitch_servo trim value
+    // @Values: -4500 4500
+    // @User: Advanced
+    GSCALAR(JU_trim_ps2,         "JU_trim_ps2",   0),
+
+    // @Param:JU_trim_ps3
+    // @DisplayName: JU_trim_ps3
+    // @Description: minimum pitch_servo trim value,it won't get smaller as velocity get higher than v3
+    // @Values: -4500 4500
+    // @User: Advanced
+    GSCALAR(JU_trim_ps3,         "JU_trim_ps3",   0),
+
+    // @Param:JU_trim_rs
+    // @DisplayName: JU_trim_rs
+    // @Description: roll_servo trim value
+    // @Values: -4500 4500
+    // @User: Advanced
+    GSCALAR(JU_trim_rs,         "JU_trim_rs",   0),
 
     // barometer ground calibration. The GND_ prefix is chosen for
     // compatibility with previous releases of ArduPlane

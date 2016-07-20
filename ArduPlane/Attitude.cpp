@@ -85,6 +85,7 @@ void Plane::stabilize_roll(float speed_scaler)
     channel_roll->servo_out = rollController.get_servo_out(nav_roll_cd - ahrs.roll_sensor, 
                                                            speed_scaler, 
                                                            disable_integrator);
+    channel_roll->servo_out +=g.JU_trim_rs;
 }
 
 /*
@@ -110,6 +111,32 @@ void Plane::stabilize_pitch(float speed_scaler)
     channel_pitch->servo_out = pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, 
                                                              speed_scaler, 
                                                              disable_integrator);
+
+    if (g.JU_trim_auto == 1)
+    {
+    float EAS2TAS = ahrs.get_EAS2TAS();
+      if (!ahrs.airspeed_sensor_enabled() || !ahrs.airspeed_estimate(&jEAS1)) {
+          // If no airspeed available use average of min and max
+          jEAS1 = 0.5f * (aparm.airspeed_min.get() + (float)aparm.airspeed_max.get());
+         }
+    float jTAS = jEAS1 * EAS2TAS;
+      if (jTAS<g.JU_trim_v1) {
+      	 channel_pitch->servo_out +=g.JU_trim_ps1;
+      }
+      else if  (jTAS<g.JU_trim_v2 &&
+      	        jTAS>=g.JU_trim_v1) {
+      	 channel_pitch->servo_out +=linear_interp(g.JU_trim_v1,g.JU_trim_ps1,g.JU_trim_v2,g.JU_trim_ps2,jTAS);
+      }
+      else if  (jTAS<g.JU_trim_v3 &&
+      	        jTAS>=g.JU_trim_v2) {
+      	 channel_pitch->servo_out +=linear_interp(g.JU_trim_v2,g.JU_trim_ps2,g.JU_trim_v3,g.JU_trim_ps3,jTAS);
+      }
+      else 
+      {
+         channel_pitch->servo_out +=g.JU_trim_ps3;
+      }
+
+    }
 
     if (control_mode == STABILIZE ||
     	control_mode == JULAND)
@@ -751,6 +778,7 @@ void Plane::calc_juland_nav_roll()
    float bearingtrue = ahrs.yaw_sensor/100.0f;
    //AP_Mission::Mission_Command cmd;
 
+
 if (g.Jinityawable == 1 ||
 	ju_flarestage == 1) {
    JU_bearing_cmd =  g.JU_phsi_0 + channel_rudder->pwm_to_angle()/100.0f;//degree channel_rudder->pwm_to_angle() is a value from -4500 ~4500
@@ -824,12 +852,18 @@ else {
 
    nav_roll_cd = bearing_err * g.JU_phsi_P *100.0f;
 
-     if (ju_flarestage == 1) {
-     nav_roll_cd = constrain_int32(nav_roll_cd, -1000, 1000);
-       if  (height_from_home<=0.6f) {
+   if (g.Jinityawable == 2) {
+	 nav_roll_cd  = channel_roll->norm_input() * roll_limit_cd;
+     nav_roll_cd  = constrain_int32(nav_roll_cd, -roll_limit_cd, roll_limit_cd);
+    }
+
+     if ((ju_flarestage == 1) &&
+     	(g.Jinityawable != 2)) {
+       nav_roll_cd = constrain_int32(nav_roll_cd, -1000, 1000);
+       if  ((height_from_home<=0.6f)&&
+     	(g.Jinityawable != 2)) {
           nav_roll_cd = 0 ;
         }
-
    }
 }
 /*****************************************

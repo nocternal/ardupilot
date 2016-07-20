@@ -578,7 +578,8 @@ private:
     float jtheta_init;
     float JU_tho_pout;
     int16_t ju_flarestage; //to judge whether in final flare stage
-    float jEAS; //estimated airspeed;
+    float jEAS; //estimated airspeed in calc_ju_throttle();
+    float jEAS1;//estimated airspeed in stabilize_pitch();
     float jTAS_dem;
     float jTAS_err;
     int32_t throttle_servo_out_init1;

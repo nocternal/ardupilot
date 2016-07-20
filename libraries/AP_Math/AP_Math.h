@@ -102,6 +102,9 @@ uint32_t                get_distance_cm(const struct Location &loc1, const struc
 // return bearing in centi-degrees between two locations
 int32_t                 get_bearing_cd(const struct Location &loc1, const struct Location &loc2);
 
+//use linear interpolation to get a servo trim value at fly velocity
+int32_t                 linear_interp(float v0,int32_t ser0,float v1,int32_t ser1,float v);
+
 // return determinant of square matrix
 float                   detnxn(const float C[], const uint8_t n);
 
