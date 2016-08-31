@@ -102,7 +102,35 @@ void Plane::stabilize_pitch(float speed_scaler)
         channel_pitch->servo_out = 45*force_elevator;
         return;
     }
+
     int32_t demanded_pitch = nav_pitch_cd + g.pitch_trim_cd + channel_throttle->servo_out * g.kff_throttle_to_pitch;
+
+    if (g.JU_trim_auto == 1)
+    {
+    float EAS2TAS = ahrs.get_EAS2TAS();
+      if (!ahrs.airspeed_sensor_enabled() || !ahrs.airspeed_estimate(&jEAS1)) {
+          // If no airspeed available use average of min and max
+          jEAS1 = 0.5f * (aparm.airspeed_min.get() + (float)aparm.airspeed_max.get());
+         }
+    float jTAS = jEAS1 * EAS2TAS;
+      if (jTAS<g.JU_trim_v1) {
+      	 demanded_pitch +=(int32_t)(g.JU_trim_theta1*100);
+      }
+      else if  (jTAS<g.JU_trim_v2 &&
+      	        jTAS>=g.JU_trim_v1) {
+      	 demanded_pitch +=linear_interp(g.JU_trim_v1,(int32_t)(g.JU_trim_theta1*100),g.JU_trim_v2,(int32_t)(g.JU_trim_theta2*100),jTAS);
+      }
+      else if  (jTAS<g.JU_trim_v3 &&
+      	        jTAS>=g.JU_trim_v2) {
+      	 demanded_pitch +=linear_interp(g.JU_trim_v2,(int32_t)(g.JU_trim_theta2*100),g.JU_trim_v3,(int32_t)(g.JU_trim_theta3*100),jTAS);
+      }
+      else 
+      {
+         demanded_pitch +=(int32_t)(g.JU_trim_theta3*100);
+      }
+
+    }
+
     bool disable_integrator = false;
  //   if (control_mode == STABILIZE && channel_pitch->control_in != 0) {
  //       disable_integrator = true;
@@ -810,9 +838,9 @@ else {
  if (jdt>0) {
          Jy_integrator_delta = jdeltay_err * jdelta_time * g.JU_y_I;    //degree    when rc have deltay input or deltay is bigger than 15m then intergrater won't work
          Jy_pid_info_I += Jy_integrator_delta;
-         if(jdeltay_err>15.0f || 
+         if(jdeltay_err>20.0f || 
          	(g.rc_6.pwm_to_angle() != 0) || 
-         	 jdeltay_err<-15.0f) {
+         	 jdeltay_err<-20.0f) {
              Jy_pid_info_I = 0;    
              }
     }

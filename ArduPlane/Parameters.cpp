@@ -1272,6 +1272,27 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(JU_trim_ps3,         "JU_trim_ps3",   0),
 
+    // @Param:JU_trim_theta1
+    // @DisplayName: JU_trim_theta1
+    // @Description:maximum theta trim value, if velocity below v1, the trim value won't become bigger.
+    // @Values: -45 45
+    // @User: Advanced
+    GSCALAR(JU_trim_theta1,         "JU_trim_theta1",   0.0f),
+
+    // @Param:JU_trim_theta2
+    // @DisplayName: JU_trim_theta2
+    // @Description:pitch_servo trim value
+    // @Values: -45 45
+    // @User: Advanced
+    GSCALAR(JU_trim_theta2,         "JU_trim_theta2",   0.0f),
+
+    // @Param:JU_trim_theta3
+    // @DisplayName: JU_trim_theta3
+    // @Description: minimum theta trim value,it won't get smaller as velocity get higher than v3
+    // @Values: -45 45
+    // @User: Advanced
+    GSCALAR(JU_trim_theta3,         "JU_trim_theta3",   0.0f),
+
     // @Param:JU_trim_rs
     // @DisplayName: JU_trim_rs
     // @Description: roll_servo trim value

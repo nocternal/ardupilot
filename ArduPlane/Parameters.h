@@ -367,10 +367,13 @@ public:
         k_param_JU_trim_auto,
         k_param_JU_trim_v1,
         k_param_JU_trim_v2,
+        k_param_JU_trim_v3,
         k_param_JU_trim_ps1,
         k_param_JU_trim_ps2,
-        k_param_JU_trim_v3,
         k_param_JU_trim_ps3,
+        k_param_JU_trim_theta1,
+        k_param_JU_trim_theta2,
+        k_param_JU_trim_theta3,        
         k_param_JU_trim_rs,
         // 254,255: reserved
     };
@@ -545,6 +548,9 @@ public:
     AP_Int32 JU_trim_ps1;
     AP_Int32 JU_trim_ps2;
     AP_Int32 JU_trim_ps3;
+    AP_Float JU_trim_theta1;
+    AP_Float JU_trim_theta2;
+    AP_Float JU_trim_theta3;   
     AP_Int32 JU_trim_rs;
 
 #if HIL_SUPPORT
