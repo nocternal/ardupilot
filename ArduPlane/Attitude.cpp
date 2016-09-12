@@ -82,10 +82,12 @@ void Plane::stabilize_roll(float speed_scaler)
   //  if (control_mode == STABILIZE && channel_roll->control_in != 0) {
   //    disable_integrator = true;
   //}
+
     channel_roll->servo_out = rollController.get_servo_out(nav_roll_cd - ahrs.roll_sensor, 
                                                            speed_scaler, 
                                                            disable_integrator);
     channel_roll->servo_out +=g.JU_trim_rs;
+    channel_roll->servo_out=constrain_float(channel_roll->servo_out, -4500, 4500);
 }
 
 /*
@@ -103,8 +105,6 @@ void Plane::stabilize_pitch(float speed_scaler)
         return;
     }
 
-    int32_t demanded_pitch = nav_pitch_cd + g.pitch_trim_cd + channel_throttle->servo_out * g.kff_throttle_to_pitch;
-
     if (g.JU_trim_auto == 1)
     {
     float EAS2TAS = ahrs.get_EAS2TAS();
@@ -114,22 +114,32 @@ void Plane::stabilize_pitch(float speed_scaler)
          }
     float jTAS = jEAS1 * EAS2TAS;
       if (jTAS<g.JU_trim_v1) {
-      	 demanded_pitch +=(int32_t)(g.JU_trim_theta1*100);
+      	 nav_pitch_cd +=(int32_t)(g.JU_trim_theta1*100);
       }
       else if  (jTAS<g.JU_trim_v2 &&
       	        jTAS>=g.JU_trim_v1) {
-      	 demanded_pitch +=linear_interp(g.JU_trim_v1,(int32_t)(g.JU_trim_theta1*100),g.JU_trim_v2,(int32_t)(g.JU_trim_theta2*100),jTAS);
+      	 nav_pitch_cd +=linear_interp(g.JU_trim_v1,(int32_t)(g.JU_trim_theta1*100),g.JU_trim_v2,(int32_t)(g.JU_trim_theta2*100),jTAS);
       }
       else if  (jTAS<g.JU_trim_v3 &&
       	        jTAS>=g.JU_trim_v2) {
-      	 demanded_pitch +=linear_interp(g.JU_trim_v2,(int32_t)(g.JU_trim_theta2*100),g.JU_trim_v3,(int32_t)(g.JU_trim_theta3*100),jTAS);
+      	 nav_pitch_cd +=linear_interp(g.JU_trim_v2,(int32_t)(g.JU_trim_theta2*100),g.JU_trim_v3,(int32_t)(g.JU_trim_theta3*100),jTAS);
       }
       else 
       {
-         demanded_pitch +=(int32_t)(g.JU_trim_theta3*100);
+         nav_pitch_cd +=(int32_t)(g.JU_trim_theta3*100);
       }
 
     }
+    if (control_mode == STABILIZE ||
+        control_mode == JULAND) {
+        nav_pitch_cd = constrain_int32(nav_pitch_cd, -g.JU_thetaoutmax*100, g.JU_thetaoutmax*100);
+    }
+    else {
+        nav_pitch_cd = constrain_int32(nav_pitch_cd, pitch_limit_min_cd, aparm.pitch_limit_max_cd.get());	
+    }
+
+
+    int32_t demanded_pitch = nav_pitch_cd + g.pitch_trim_cd + channel_throttle->servo_out * g.kff_throttle_to_pitch;
 
     bool disable_integrator = false;
  //   if (control_mode == STABILIZE && channel_pitch->control_in != 0) {
@@ -190,6 +200,7 @@ void Plane::stabilize_pitch(float speed_scaler)
              }
          }
     }
+    channel_pitch->servo_out=constrain_float(channel_pitch->servo_out, -4500, 4500);
 }
 
 /*
@@ -737,7 +748,6 @@ void Plane::calc_juland_nav_pitch()
             }
         }
         nav_pitch_cd = 0.3f * nav_pitch_cd + 0.7f * nav_pitch_cd_old;  //Apply first order lag 
-        nav_pitch_cd = constrain_float(nav_pitch_cd, -g.JU_thetaoutmax*100.0f, g.JU_thetaoutmax*100.0f);
         nav_pitch_cd_old = nav_pitch_cd; 
 }
 
@@ -803,7 +813,8 @@ void Plane::calc_nav_roll()
 
 void Plane::calc_juland_nav_roll()
 {
-   float bearingtrue = ahrs.yaw_sensor/100.0f;
+   float bearingtrue =gps.ground_course_cd()/100.0f;// ahrs.yaw_sensor/100.0f;
+
    //AP_Mission::Mission_Command cmd;
 
 
@@ -833,7 +844,7 @@ else {
     g.rc_6.set_angle(4500);
     g.rc_6.set_default_dead_zone(80);
     g.rc_6.set_type(RC_CHANNEL_TYPE_ANGLE);
-    jdeltay_err = jS1 * sinf(jbearing_err/57.3f) + g.rc_6.pwm_to_angle()/300.0f; //make new rc6 set_angle(4500),original rc6 is set_range....
+    jdeltay_err = jS1 * sinf(jbearing_err/57.3f) + g.rc_6.pwm_to_angle()/200.0f; //make new rc6 set_angle(4500),original rc6 is set_range....
 
  if (jdt>0) {
          Jy_integrator_delta = jdeltay_err * jdelta_time * g.JU_y_I;    //degree    when rc have deltay input or deltay is bigger than 15m then intergrater won't work

@@ -189,7 +189,7 @@ struct PACKED log_Performance {
     uint64_t time_us;
     int16_t  throttle_out1;//uint32_t loop_time;
     int16_t  Jpitch_out;//uint16_t main_loop_count;
-    int16_t  Jflaretime;//uint32_t g_dt_max;
+    int16_t  Jroll_out;//uint32_t g_dt_max;
     float    Jyerr;//int16_t  gyro_drift_x;
     int16_t  gyro_drift_y;
     int16_t  gyro_drift_z;
@@ -205,7 +205,7 @@ void Plane::Log_Write_Performance()
         time_us         : AP_HAL::micros64(),
         throttle_out1   : (int16_t)channel_throttle->servo_out,//millis() - perf_mon_timer,
         Jpitch_out      : (int16_t)channel_pitch->servo_out, //main_loop_count : mainLoop_count,
-        Jflaretime      : (int16_t)ju_flarestage,//g_dt_max        : G_Dt_max,
+        Jroll_out       : (int16_t)channel_roll->servo_out,//ju_flarestage,//g_dt_max        : G_Dt_max,
         Jyerr           : (float)jdeltay_err,//gyro_drift_x    : (int16_t)(ahrs.get_gyro_drift().x * 1000),
         gyro_drift_y    : (int16_t)(ahrs.get_gyro_drift().y * 1000),
         gyro_drift_z    : (int16_t)(ahrs.get_gyro_drift().z * 1000),
@@ -479,7 +479,7 @@ void Plane::Log_Write_Home_And_Origin()
 static const struct LogStructure log_structure[] = {
     LOG_COMMON_STRUCTURES,
     { LOG_PERFORMANCE_MSG, sizeof(log_Performance), 
-      "PM",  "QhhhfhhBH", "TimeUS,Thoout,ptchout,flare,yErr,GDy,GDz,I2CErr,INSErr" },
+      "PM",  "QhhhfhhBH", "TimeUS,Thoout,ptchout,rollout,yErr,GDy,GDz,I2CErr,INSErr" },
     { LOG_STARTUP_MSG, sizeof(log_Startup),         
       "STRT", "QBH",         "TimeUS,SType,CTot" },
     { LOG_CTUN_MSG, sizeof(log_Control_Tuning),     
