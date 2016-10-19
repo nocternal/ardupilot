@@ -538,7 +538,7 @@ void Plane::handle_auto_mode(void)
         takeoff_calc_pitch();
         calc_throttle();
     } else if (nav_cmd_id == MAV_CMD_NAV_LAND) {
-        calc_nav_roll();
+/*      calc_nav_roll();
         calc_nav_pitch();
         
         if (auto_state.land_complete) {
@@ -552,7 +552,10 @@ void Plane::handle_auto_mode(void)
             // we are in the final stage of a landing - force
             // zero throttle
             channel_throttle->servo_out = 0;
-        }
+        }*/
+        //it's APM's original logic ,now we want to change mode to ourselves' autoland mode
+        set_mode(STABILIZE);
+        
     } else {
         // we are doing normal AUTO flight, the special cases
         // are for takeoff and landing
