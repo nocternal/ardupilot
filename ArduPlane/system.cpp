@@ -390,10 +390,15 @@ void Plane::set_mode(enum FlightMode mode)
     case MANUAL:
     case STABILIZE:
     if (g.JU_WP_fromMP == 1) {
-         mission.set_current_cmd(2);
          ju_next_WP = mission.get_current_nav_cmd().content.location;
-         mission.set_current_cmd(1);
+             gcs_send_text_fmt(MAV_SEVERITY_INFO, "Begin JULAND,fly to waypoint #%i dist %um",
+             (unsigned)mission.get_current_nav_cmd().index,
+             (unsigned)get_distance(current_loc, ju_next_WP));
+             uint16_t prev_ju_cmd_idx = mission.get_prev_nav_cmd_index();
+             mission.set_current_cmd(prev_ju_cmd_idx);
          ju_prev_WP = mission.get_current_nav_cmd().content.location;
+             gcs_send_text_fmt(MAV_SEVERITY_INFO, "just passed waypoint #%i ",
+             (unsigned)mission.get_current_nav_cmd().index);
          } 
     else {
          ju_next_WP.lat = (int32_t)(g.JU_WP_2lat);
@@ -547,10 +552,10 @@ void Plane::exit_mode(enum FlightMode mode)
         if (mission.state() == AP_Mission::MISSION_RUNNING) {
             mission.stop();
 
-            if (mission.get_current_nav_cmd().id == MAV_CMD_NAV_LAND)
+/*            if (mission.get_current_nav_cmd().id == MAV_CMD_NAV_LAND)
             {
                 restart_landing_sequence();
-            }
+            }*/ // for I want to change mode to JULAND to land,so I cancel restart_landing_sequence() logic-20161023
         }
         auto_state.started_flying_in_auto_ms = 0;
     }

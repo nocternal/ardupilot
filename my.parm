@@ -323,7 +323,7 @@ JU_y_P           1.000000
 Jflarethetaable  0.000000
 Jflaretranstime  2.000000
 Jinittranstime   1.000000
-Jinityawable     1.000000
+Jinityawable     0.000000
 KFF_RDDRMIX      0.500000
 KFF_THR2PTCH     0.000000
 LAND_ABORT_THR   0.000000

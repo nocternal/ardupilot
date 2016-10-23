@@ -555,7 +555,6 @@ void Plane::handle_auto_mode(void)
         }*/
         //it's APM's original logic ,now we want to change mode to ourselves' autoland mode
         set_mode(STABILIZE);
-        
     } else {
         // we are doing normal AUTO flight, the special cases
         // are for takeoff and landing
