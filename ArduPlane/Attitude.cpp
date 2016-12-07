@@ -79,12 +79,13 @@ void Plane::stabilize_roll(float speed_scaler)
     }
 
     bool disable_integrator = false;
-    if (control_mode == STABILIZE && channel_roll->get_control_in() != 0) {
-        disable_integrator = true;
-    }
-    channel_roll->set_servo_out(rollController.get_servo_out(nav_roll_cd - ahrs.roll_sensor, 
+
+  //  if (control_mode == STABILIZE && channel_roll->get_control_in() != 0) {
+  //      disable_integrator = true;
+  //  }
+       channel_roll->set_servo_out(rollController.get_servo_out(nav_roll_cd - ahrs.roll_sensor, 
                                                            speed_scaler, 
-                                                           disable_integrator));
+                                                           disable_integrator)+g.JU_trim_rs);
 }
 
 /*
@@ -101,14 +102,122 @@ void Plane::stabilize_pitch(float speed_scaler)
         channel_pitch->set_servo_out(45*force_elevator);
         return;
     }
+<<<<<<< HEAD
     int32_t demanded_pitch = nav_pitch_cd + g.pitch_trim_cd + channel_throttle->get_servo_out() * g.kff_throttle_to_pitch;
     bool disable_integrator = false;
-    if (control_mode == STABILIZE && channel_pitch->get_control_in() != 0) {
-        disable_integrator = true;
+    //if (control_mode == STABILIZE && channel_pitch->get_control_in() != 0) {
+    //    disable_integrator = true;
+    //}
+    if (g.JU_trim_auto == 1)
+    {
+    float EAS2TAS = ahrs.get_EAS2TAS();
+      if (!ahrs.airspeed_sensor_enabled() || !ahrs.airspeed_estimate(&jEAS1)) {
+          // If no airspeed available use average of min and max
+          jEAS1 = 0.5f * (aparm.airspeed_min.get() + (float)aparm.airspeed_max.get());
+         }
+    float jTAS = jEAS1 * EAS2TAS;
+      if (jTAS<g.JU_trim_v1) {
+      	 nav_pitch_cd +=(int32_t)(g.JU_trim_theta1*100);
+      }
+      else if  (jTAS<g.JU_trim_v2 &&
+      	        jTAS>=g.JU_trim_v1) {
+      	 nav_pitch_cd +=linear_interp(g.JU_trim_v1,(int32_t)(g.JU_trim_theta1*100),g.JU_trim_v2,(int32_t)(g.JU_trim_theta2*100),jTAS);
+      }
+      else if  (jTAS<g.JU_trim_v3 &&
+      	        jTAS>=g.JU_trim_v2) {
+      	 nav_pitch_cd +=linear_interp(g.JU_trim_v2,(int32_t)(g.JU_trim_theta2*100),g.JU_trim_v3,(int32_t)(g.JU_trim_theta3*100),jTAS);
+      }
+      else 
+      {
+         nav_pitch_cd +=(int32_t)(g.JU_trim_theta3*100);
+      }
+
     }
+    if (control_mode == STABILIZE ||
+        control_mode == JULAND) {
+        nav_pitch_cd = constrain_int32(nav_pitch_cd, -g.JU_thetaoutmax*100, g.JU_thetaoutmax*100);
+    }
+    else {
+        nav_pitch_cd = constrain_int32(nav_pitch_cd, pitch_limit_min_cd, aparm.pitch_limit_max_cd.get());	
+    }
+
+
+    int32_t demanded_pitch = nav_pitch_cd + g.pitch_trim_cd + channel_throttle->servo_out * g.kff_throttle_to_pitch;
+
+    bool disable_integrator = false;
+ //   if (control_mode == STABILIZE && channel_pitch->control_in != 0) {
+ //       disable_integrator = true;
+ //   }  
+  //original file STABILIAZE's I doesn't work,I comment it to let it also integrate
     channel_pitch->set_servo_out(pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, 
                                                              speed_scaler, 
                                                              disable_integrator));
+    if (g.JU_trim_auto == 1)
+    {
+    float EAS2TAS = ahrs.get_EAS2TAS();
+      if (!ahrs.airspeed_sensor_enabled() || !ahrs.airspeed_estimate(&jEAS1)) {
+          // If no airspeed available use average of min and max
+          jEAS1 = 0.5f * (aparm.airspeed_min.get() + (float)aparm.airspeed_max.get());
+         }
+    float jTAS = jEAS1 * EAS2TAS;
+      if (jTAS<g.JU_trim_v1) {
+         channel_pitch->set_servo_out(pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, 
+                                                             speed_scaler, 
+                                                             disable_integrator)+g.JU_trim_ps1);
+      }
+      else if  (jTAS<g.JU_trim_v2 &&
+      	        jTAS>=g.JU_trim_v1) {
+         channel_pitch->set_servo_out(pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, 
+                                                             speed_scaler, 
+                                                             disable_integrator)+linear_interp(g.JU_trim_v1,g.JU_trim_ps1,g.JU_trim_v2,g.JU_trim_ps2,jTAS));
+      }
+      else if  (jTAS<g.JU_trim_v3 &&
+      	        jTAS>=g.JU_trim_v2) {
+         channel_pitch->set_servo_out(pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, 
+                                                             speed_scaler, 
+                                                             disable_integrator)+linear_interp(g.JU_trim_v2,g.JU_trim_ps2,g.JU_trim_v3,g.JU_trim_ps3,jTAS));        
+      }
+      else 
+      {
+         channel_pitch->set_servo_out(pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, 
+                                                             speed_scaler, 
+                                                             disable_integrator)+g.JU_trim_ps3);
+      }
+
+    }
+
+    if (control_mode == STABILIZE ||
+    	control_mode == JULAND)
+    {   
+        if (jinit_counter <= g.JU_init_transtime) {
+            channel_pitch->set_servo_out(pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, 
+                                                             speed_scaler, 
+                                                             disable_integrator)+(jinit_counter/g.JU_init_transtime)*g.JU_pitch_ser01);
+         }
+        else {
+           if (ju_flarestage == 0) {
+            channel_pitch->set_servo_out(pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, 
+                                                             speed_scaler, 
+                                                             disable_integrator)+g.JU_pitch_ser01);              
+             }
+           else {
+               if(jflare_counter == 0) {
+                  pitch_servo_out_init2 = channel_pitch->get_servo_out();
+                  channel_pitch->set_servo_out(pitch_servo_out_init2 + g.JU_pitch_ser02n);                   
+                 }
+               if(jflare_counter <= g.JU_flare_transition_time) {
+                  channel_pitch->set_servo_out(pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, 
+                                                             speed_scaler, 
+                                                             disable_integrator) + (jflare_counter/g.JU_flare_transition_time)*g.JU_pitch_ser02 + g.JU_pitch_ser02n);
+                 }
+               else {
+                  channel_pitch->set_servo_out(pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, 
+                                                             speed_scaler, 
+                                                             disable_integrator) + g.JU_pitch_ser02 + g.JU_pitch_ser02n);                 
+                 } 
+             }
+         }
+    }
 }
 
 /*
@@ -156,7 +265,8 @@ void Plane::stabilize_stick_mixing_direct()
         control_mode == QLOITER ||
         control_mode == QLAND ||
         control_mode == QRTL ||
-        control_mode == TRAINING) {
+        control_mode == TRAINING ||
+        control_mode == STABILIZE) {
         return;
     }
     stick_mix_channel(channel_roll);
@@ -190,7 +300,7 @@ void Plane::stabilize_stick_mixing_fbw()
     // non-linear and ends up as 2x the maximum, to ensure that
     // the user can direct the plane in any direction with stick
     // mixing.
-    float roll_input = channel_roll->norm_input();
+    float roll_input = channel_roll->norm_input_dz();
     if (roll_input > 0.5f) {
         roll_input = (3*roll_input - 1);
     } else if (roll_input < -0.5f) {
@@ -199,7 +309,7 @@ void Plane::stabilize_stick_mixing_fbw()
     nav_roll_cd += roll_input * roll_limit_cd;
     nav_roll_cd = constrain_int32(nav_roll_cd, -roll_limit_cd, roll_limit_cd);
     
-    float pitch_input = channel_pitch->norm_input();
+    float pitch_input = channel_pitch->norm_input_dz();
     if (pitch_input > 0.5f) {
         pitch_input = (3*pitch_input - 1);
     } else if (pitch_input < -0.5f) {
@@ -386,12 +496,12 @@ void Plane::stabilize()
                control_mode == QRTL) {
         quadplane.control_run();
     } else {
-        if (g.stick_mixing == STICK_MIXING_FBW && control_mode != STABILIZE) {
+        if (g.stick_mixing == STICK_MIXING_FBW) {
             stabilize_stick_mixing_fbw();
         }
         stabilize_roll(speed_scaler);
         stabilize_pitch(speed_scaler);
-        if (g.stick_mixing == STICK_MIXING_DIRECT || control_mode == STABILIZE) {
+        if (g.stick_mixing == STICK_MIXING_DIRECT) {
             stabilize_stick_mixing_direct();
         }
         stabilize_yaw(speed_scaler);
@@ -551,6 +661,209 @@ void Plane::calc_nav_pitch()
     nav_pitch_cd = constrain_int32(commanded_pitch, pitch_limit_min_cd, aparm.pitch_limit_max_cd.get());
 }
 
+void Plane::calc_juland_nav_pitch()
+{   
+    jtnow= AP_HAL::millis();
+    jdt = jtnow - jlast_t;
+    if (jlast_t == 0 || jdt > 1000) {
+    jdt = 0;
+    }
+    jlast_t = jtnow;  
+    jdelta_time = (float)jdt * 0.001f;
+
+    Vector3f posned;
+
+    if (ahrs.get_relative_position_NED(posned)) {
+        height_from_home = -posned.z;
+
+        if (rangefinder.has_data() && 
+        	((-posned.z)<=(rangefinder.max_distance_cm()*0.01f)) &&
+             (rangefinder.status() != RangeFinder::RangeFinder_OutOfRangeHigh) &&
+              (rangefinder.status() != RangeFinder::RangeFinder_OutOfRangeLow) ) {
+                      height_from_home = rangefinder.distance_cm()*0.01f ;
+            }
+    }
+    else {
+        height_from_home = ahrs.get_baro().get_altitude();
+        if ( rangefinder.has_data()   &&
+             (ahrs.get_baro().get_altitude()<=(rangefinder.max_distance_cm()*0.01f))&&
+             (rangefinder.status() != RangeFinder::RangeFinder_OutOfRangeHigh) &&
+              (rangefinder.status() != RangeFinder::RangeFinder_OutOfRangeLow) ) {
+                      height_from_home = rangefinder.distance_cm()*0.01f ;
+            }
+    }
+
+	float sink_rate;
+    Vector3f vel;
+    if(ahrs.get_velocity_NED(vel)) {
+        sink_rate = vel.z;
+    } else if (gps.status() >= AP_GPS::GPS_OK_FIX_3D && gps.have_vertical_velocity()) {
+        sink_rate = gps.velocity().z;
+    } else {
+       // sink_rate = -barometer.get_climb_rate();        
+    
+    
+        /*
+          use a complimentary filter to calculate climb_rate. This is
+          designed to minimise lag
+         */
+        float baro_alt = ahrs.get_baro().get_altitude();
+        // Get height acceleration
+        float hgt_ddot_mea = -(ahrs.get_accel_ef().z + GRAVITY_MSS);
+        // Perform filter calculation using backwards Euler integration
+        // Coefficients selected to place all three filter poles at omega
+        float _hgtCompFiltOmega = 3;
+        float omega2 = _hgtCompFiltOmega*_hgtCompFiltOmega;
+        float hgt_err = baro_alt - _height_filter_height;
+        float integ1_input = hgt_err * omega2 * _hgtCompFiltOmega;
+
+        _height_filter_dd_height += integ1_input * jdelta_time ;
+
+        float integ2_input = _height_filter_dd_height + hgt_ddot_mea + hgt_err * omega2 * 3.0f;
+
+        _jclimb_rate += integ2_input * jdelta_time ;
+
+        sink_rate = - _jclimb_rate;
+
+        float integ3_input = _jclimb_rate + hgt_err * _hgtCompFiltOmega * 3.0f;
+        // If more than 1 second has elapsed since last update then reset the integrator state
+        // to the measured height
+        if (jdelta_time > 1.0f) {
+            _height_filter_height = height_from_home;
+        } else {
+            _height_filter_height += integ3_input*jdelta_time ;
+        }
+    }
+        /*
+          when come into this mode ,command change gently
+         */
+        if(jinit_counter == 0) {
+            jclimbrate_temp1 = -sink_rate;
+            jtheta_init = ahrs.pitch_sensor - g.pitch_trim_cd - channel_throttle->servo_out * g.kff_throttle_to_pitch; 
+            jtheta0 = jtheta_init;
+            JU_climb_rate_err = 0;  
+            climb_pid_info_I = 0;
+            nav_pitch_cd_old = ahrs.pitch_sensor;
+            //channel_throttle->servo_out = 30.0;
+        }
+        if(jinit_counter <= g.JU_init_transtime) {
+            JU_climb_rate_err = jclimbrate_temp1 +  (g.JU_climbrate1 - jclimbrate_temp1) *  jinit_counter /(g.JU_init_transtime) - (-sink_rate);
+            //channel_throttle->servo_out = 30.0 + 1.0 * jflare_counter;
+            jtheta0 = jtheta_init + (g.JU_theta01*100.0f - jtheta_init) *  jinit_counter /(g.JU_init_transtime);
+            jinit_counter += jdelta_time;
+            }
+        else {
+            JU_climb_rate_err = g.JU_climbrate1 - (-sink_rate); 
+            jtheta0 = g.JU_theta01*100.0f;
+            //channel_throttle->servo_out = 34;  
+             }
+        /*
+          when come into flare stage,just stimulate it once
+         */
+         if (height_from_home <= g.JU_flare_alt) {
+            ju_flarestage = 1;
+         }
+        /*
+          flare transition period
+        */ 
+         if (ju_flarestage == 1) {
+               if(jflare_counter == 0) {
+               jclimbrate_temp = -sink_rate;
+               jtheta_init = ahrs.pitch_sensor - g.pitch_trim_cd - channel_throttle->servo_out * g.kff_throttle_to_pitch;
+               jtheta0 = jtheta_init;
+               JU_climb_rate_err = 0;  //change desend rate commad as flare alt's descend rate
+               climb_pid_info_I = 0;      //clear integrater
+               nav_pitch_cd_old = ahrs.pitch_sensor;
+               }
+               if(jflare_counter <= g.JU_flare_transition_time) {
+               JU_climb_rate_err = jclimbrate_temp +  (g.JU_climbrate2 - jclimbrate_temp) *  jflare_counter /(g.JU_flare_transition_time) - (-sink_rate);
+               jtheta0 = jtheta_init + (g.JU_theta02*100.0f - jtheta_init) *  jflare_counter /(g.JU_flare_transition_time);
+               jflare_counter += jdelta_time;
+               }
+               else {
+               JU_climb_rate_err = g.JU_climbrate2 - (-sink_rate);
+               jtheta0 = g.JU_theta02*100.0f;  
+               }  
+         }
+         else {
+            jflare_counter = 0;
+         }
+
+
+        if (jdt>0) {
+        climb_integrator_delta = JU_climb_rate_err * jdelta_time * g.JU_Iclimbrate * 5729.0f;    //5729 means rad to centidegree       
+          if(nav_pitch_cd>g.JU_thetaoutmax*100.0f) {
+          climb_integrator_delta = MIN(climb_integrator_delta,0);    
+          } else if (nav_pitch_cd<-g.JU_thetaoutmax*100.0f) {
+          climb_integrator_delta = MAX(climb_integrator_delta,0);
+          }
+          climb_pid_info_I += climb_integrator_delta;
+          }
+        else {
+           climb_pid_info_I = 0;
+        }
+        climb_pid_info_I = constrain_float(climb_pid_info_I, -g.JU_Ioutmax*100.0f, g.JU_Ioutmax*100.0f);
+
+        //channel_throttle->servo_out = 30.0;
+        climbpout = JU_climb_rate_err * g.JU_Pclimbrate * 5729.0f ; //P's centidegree
+        climbiout = climb_pid_info_I ;
+        nav_pitch_cd = climbpout + climbiout + jtheta0;
+        if (ju_flarestage == 1) {
+            if (g.JU_flare_theta_enable == 1) {
+                nav_pitch_cd = jtheta0;
+            }
+        }
+        nav_pitch_cd = 0.3f * nav_pitch_cd + 0.7f * nav_pitch_cd_old;  //Apply first order lag 
+        nav_pitch_cd_old = nav_pitch_cd; 
+}
+
+void Plane::calc_juland_throttle()
+{
+    float EAS2TAS = ahrs.get_EAS2TAS();
+    float EAS_dem = g.JU_speed1;
+    jTAS_dem  = EAS_dem * EAS2TAS;
+    if (!ahrs.airspeed_sensor_enabled() || !ahrs.airspeed_estimate(&jEAS)) {
+        // If no airspeed available use average of min and max
+        jEAS = 0.5f * (aparm.airspeed_min.get() + (float)aparm.airspeed_max.get());
+    }
+    float jTAS = jEAS * EAS2TAS;
+    jTAS_err = jTAS_dem - jTAS;
+    jTAS_err = constrain_float(jTAS_err, -g.JU_tho_Verr, g.JU_tho_Verr);
+    JU_tho_pout = g.JU_tho_P * jTAS_err;
+
+    int32_t last_throttle_servo_out = channel_throttle->servo_out;
+
+        if(jinit_counter == 0) {
+          throttle_servo_out_init1 = last_throttle_servo_out ;
+          channel_throttle->set_servo_out(throttle_servo_out_init1);
+        }
+        if(jinit_counter <= g.JU_init_transtime) {
+              channel_throttle->set_servo_out((1-jinit_counter/g.JU_init_transtime) * throttle_servo_out_init1 + g.JU_tho_10 * (jinit_counter/g.JU_init_transtime) + JU_tho_pout * (jinit_counter/g.JU_init_transtime));
+              //jinit_counter += jdelta_time; needn't plus counter again,already added in calc_juland_nav_pitch
+            }
+        else {
+              channel_throttle->set_servo_out(g.JU_tho_10 + JU_tho_pout);
+             }
+
+
+
+        if (ju_flarestage == 1) {
+               if(jthoflare_counter == 0) {
+               throttle_servo_out_init2 = channel_throttle->servo_out;
+               channel_throttle->set_servo_out(throttle_servo_out_init2);
+               }
+               if(jthoflare_counter <= g.JU_tho_flaret) {
+               channel_throttle->set_servo_out((1-jthoflare_counter/g.JU_tho_flaret) * throttle_servo_out_init2 +  g.JU_tho_20 * (jthoflare_counter/g.JU_tho_flaret));
+               jthoflare_counter += jdelta_time;
+               }
+               else {
+               channel_throttle->set_servo_out(g.JU_tho_20);
+               }  
+         }
+         else {
+            jthoflare_counter = 0;
+         }
+}
 
 /*
   calculate a new nav_roll_cd from the navigation controller
@@ -570,7 +883,100 @@ void Plane::calc_nav_roll()
     update_load_factor();
 }
 
+void Plane::calc_juland_nav_roll()
+{
+   float bearingtrue =gps.ground_course_cd()/100.0f;// ahrs.yaw_sensor/100.0f;
 
+   //AP_Mission::Mission_Command cmd;
+
+
+if (g.Jinityawable == 1 ||
+	ju_flarestage == 1) {
+   JU_bearing_cmd =  g.JU_phsi_0 + channel_rudder->pwm_to_angle()/100.0f;//degree channel_rudder->pwm_to_angle() is a value from -4500 ~4500
+   } // only control phsi. 
+
+
+else {
+ /*ju_next_WP.lat = (int32_t)(-35.350977 * 1.0e7f);
+ ju_next_WP.lng = (int32_t)(149.163869 * 1.0e7f);
+ ju_prev_WP.lat = (int32_t)(-35.366436 * 1.0e7f);
+ ju_prev_WP.lng = (int32_t)(149.165482 * 1.0e7f);*/
+ jS1 = get_distance(current_loc,ju_next_WP);
+ jbearing1 = get_bearing_cd(current_loc,ju_next_WP)*0.01f; 
+ jbearing2 = get_bearing_cd(ju_prev_WP,ju_next_WP)*0.01f; 
+ float jbearing_err = jbearing1 -jbearing2;
+
+ if (jbearing_err<-180.0f) {
+     jbearing_err = 360.0f + jbearing_err;
+     }  
+ if (jbearing_err>180.0f) {
+     jbearing_err = jbearing_err - 360.0f;
+     }  
+
+    g.rc_6.set_angle(4500);
+    g.rc_6.set_default_dead_zone(80);
+    g.rc_6.set_type(RC_CHANNEL_TYPE_ANGLE);
+    jdeltay_err = jS1 * sinf(jbearing_err/57.3f) + g.rc_6.pwm_to_angle()/200.0f; //make new rc6 set_angle(4500),original rc6 is set_range....
+
+ if (jdt>0) {
+         Jy_integrator_delta = jdeltay_err * jdelta_time * g.JU_y_I;    //degree    when rc have deltay input or deltay is bigger than 15m then intergrater won't work
+         Jy_pid_info_I += Jy_integrator_delta;
+         if(jdeltay_err>20.0f || 
+         	(g.rc_6.pwm_to_angle() != 0) || 
+         	 jdeltay_err<-20.0f) {
+             Jy_pid_info_I = 0;    
+             }
+    }
+ else {
+         Jy_pid_info_I = 0;
+    }
+     Jy_pid_info_I = constrain_float(Jy_pid_info_I, -g.JU_y_Imax, g.JU_y_Imax);
+
+ JU_bearing_cmd = jdeltay_err * g.JU_y_P + Jy_pid_info_I;  //when deltay_err>0,bering_cmd>0
+ JU_bearing_cmd = constrain_float(JU_bearing_cmd, -90.0f, 90.0f);
+ JU_bearing_cmd +=g.JU_phsi_0;
+
+/* plane.gcs_send_text_fmt(MAV_SEVERITY_INFO, "jdeltay_er = %.4fm",
+                                        (float)(jdeltay_err));*/
+}
+
+
+ //phsi command is given by delta y error.
+
+
+   if (JU_bearing_cmd>360.0f) {
+   	JU_bearing_cmd = JU_bearing_cmd - 360.0f;
+   }
+   if (JU_bearing_cmd<0.0f) {
+   	JU_bearing_cmd = 360.0f + JU_bearing_cmd;
+   }
+
+   JU_bearing_cmd = constrain_float(JU_bearing_cmd ,0,360.0f);
+
+   float bearing_err = JU_bearing_cmd - bearingtrue;
+   if (bearing_err<-180.0f) {
+     bearing_err = 360.0f + bearing_err;
+    }  
+   if (bearing_err>180.0f) {
+     bearing_err = bearing_err - 360.0f;
+    }  
+
+   nav_roll_cd = bearing_err * g.JU_phsi_P *100.0f;
+
+   if (g.Jinityawable == 2) {
+	 nav_roll_cd  = channel_roll->norm_input() * roll_limit_cd;
+     nav_roll_cd  = constrain_int32(nav_roll_cd, -roll_limit_cd, roll_limit_cd);
+    }
+
+     if ((ju_flarestage == 1) &&
+     	(g.Jinityawable != 2)) {
+       nav_roll_cd = constrain_int32(nav_roll_cd, -1000, 1000);
+       if  ((height_from_home<=0.6f)&&
+     	(g.Jinityawable != 2)) {
+          nav_roll_cd = 0 ;
+        }
+   }
+}
 /*****************************************
 * Throttle slew limit
 *****************************************/
@@ -714,8 +1120,8 @@ void Plane::channel_output_mixer(uint8_t mixing_type, int16_t & chan1_out, int16
     int16_t v1, v2;
 
     // first get desired elevator and rudder as -500..500 values
-    c1 = chan1_out - 1500;
-    c2 = chan2_out - 1500;
+    c1 = chan1_out - channel_pitch->get_radio_trim(); // should it minus 1500 or radio trim? it's still not clear- edit by juhan 2016.12.07
+    c2 = chan2_out - channel_roll->get_radio_trim();
 
     // apply MIXING_OFFSET to input channels using long-integer version
     //  of formula:  x = x * (g.mixing_offset/100.0 + 1.0)
@@ -1059,7 +1465,8 @@ void Plane::set_servos(void)
                     control_mode == TRAINING ||
                     control_mode == ACRO ||
                     control_mode == FLY_BY_WIRE_A ||
-                    control_mode == AUTOTUNE) &&
+                    control_mode == AUTOTUNE ||
+                    control_mode == JULAND) &&
                    !failsafe.ch3_counter) {
             // manual pass through of throttle while in FBWA or
             // STABILIZE mode with THR_PASS_STAB set

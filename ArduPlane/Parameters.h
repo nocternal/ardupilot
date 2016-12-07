@@ -302,6 +302,7 @@ public:
         k_param_flight_mode4,
         k_param_flight_mode5,
         k_param_flight_mode6,
+        k_param_flight_mode7,
         k_param_initial_mode,
         k_param_land_slope_recalc_shallow_threshold,
         k_param_land_slope_recalc_steep_threshold_to_abort,
@@ -347,7 +348,50 @@ public:
         k_param_dspoiler_rud_rate,
 
         k_param_DataFlash = 253, // Logging Group
-
+        k_param_JU_Pclimbrate,
+        k_param_JU_Iclimbrate,
+        k_param_JU_Ioutmax,//it's a theta command max for Iclimbrate output,degree
+        k_param_JU_thetaoutmax,//it's a theta command max for navpitch output from autolandmode
+        k_param_JU_climbrate1,// first steep descend rate
+        k_param_JU_theta01,//first theta0
+        k_param_JU_climbrate2,// shalow descend rate
+        k_param_JU_theta02,//final theta0
+        k_param_JU_speed1, //first steep descend speed
+        k_param_JU_speedprotect,// can't lower than that
+        k_param_JU_tho_P,
+        k_param_JU_tho_10,//first descend tho0
+        k_param_JU_tho_20,//flare tho0
+        k_param_JU_tho_flaret,//how long to close throttle
+        k_param_JU_flare_alt,
+        k_param_JU_flare_transition_time,
+        k_param_JU_init_transtime,//from other modes to this mode need a demand transition,
+        k_param_JU_flare_theta_enable,//if it's value=1 ,only control theta in flare section
+        k_param_JU_tho_Verr,
+        k_param_JU_pitch_ser01,
+        k_param_JU_pitch_ser02n,
+        k_param_JU_pitch_ser02,
+        k_param_JU_phsi_P,
+        k_param_JU_phsi_0,
+        k_param_Jinityawable,
+        k_param_JU_y_I,
+        k_param_JU_y_P,
+        k_param_JU_y_Imax,
+        k_param_JU_WP_fromMP,
+        k_param_JU_WP_1lat,
+        k_param_JU_WP_1lng,
+        k_param_JU_WP_2lat,
+        k_param_JU_WP_2lng,
+        k_param_JU_trim_auto,
+        k_param_JU_trim_v1,
+        k_param_JU_trim_v2,
+        k_param_JU_trim_v3,
+        k_param_JU_trim_ps1,
+        k_param_JU_trim_ps2,
+        k_param_JU_trim_ps3,
+        k_param_JU_trim_theta1,
+        k_param_JU_trim_theta2,
+        k_param_JU_trim_theta3,        
+        k_param_JU_trim_rs,
         // 254,255: reserved
     };
 
@@ -447,6 +491,7 @@ public:
     AP_Int8 flight_mode4;
     AP_Int8 flight_mode5;
     AP_Int8 flight_mode6;
+    AP_Int8 flight_mode7;
     AP_Int8 initial_mode;
 
     // Navigational maneuvering limits
@@ -487,6 +532,51 @@ public:
     AP_Int16 pitch_trim_cd;
     AP_Int16 FBWB_min_altitude_cm;
     AP_Int8  hil_servos;
+    AP_Float JU_Pclimbrate;
+    AP_Float JU_Iclimbrate;
+    AP_Float JU_climbrate1;//should be a negative number such as -2
+    AP_Float JU_climbrate2;//should be a negative number such as -0.5
+    AP_Float JU_speed1;
+    AP_Float JU_speedprotect;
+    AP_Float JU_tho_P;
+    AP_Int32 JU_tho_10;//it represent percent
+    AP_Int32 JU_tho_20;
+    AP_Float JU_tho_flaret;  
+    AP_Float JU_flare_alt;//m
+    AP_Float JU_flare_transition_time;//s
+    AP_Float JU_init_transtime;//s
+    AP_Float JU_theta01;//degree
+    AP_Float JU_theta02;//degree
+    AP_Int8  JU_flare_theta_enable; //0=disabled, 1=enabled to only control theta during flare section
+    AP_Float JU_Ioutmax;//degree
+    AP_Float JU_thetaoutmax;//degree
+    AP_Float JU_tho_Verr;
+    AP_Int32 JU_pitch_ser01;
+    AP_Int32 JU_pitch_ser02n;
+    AP_Int32 JU_pitch_ser02;
+    AP_Float JU_phsi_P;
+    AP_Float JU_phsi_0;
+    AP_Int8  Jinityawable;
+    AP_Float JU_y_I;
+    AP_Float JU_y_Imax;
+    AP_Float JU_y_P;
+    AP_Int8  JU_WP_fromMP;// 1=from Mission Planner  0=handwritten
+    AP_Int32 JU_WP_1lat;// should be input  degree multiply 10^7
+    AP_Int32 JU_WP_1lng;
+    AP_Int32 JU_WP_2lat;
+    AP_Int32 JU_WP_2lng;
+    AP_Int8  JU_trim_auto;
+    AP_Float JU_trim_v1;
+    AP_Float JU_trim_v2;
+    AP_Float JU_trim_v3;
+    AP_Int32 JU_trim_ps1;
+    AP_Int32 JU_trim_ps2;
+    AP_Int32 JU_trim_ps3;
+    AP_Float JU_trim_theta1;
+    AP_Float JU_trim_theta2;
+    AP_Float JU_trim_theta3;   
+    AP_Int32 JU_trim_rs;
+
 #if HIL_SUPPORT
     AP_Int8  hil_mode;
 #endif

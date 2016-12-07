@@ -54,6 +54,7 @@ void Plane::send_heartbeat(mavlink_channel_t chan)
     case LOITER:
     case AVOID_ADSB:
     case GUIDED:
+    case JULAND:
     case CIRCLE:
     case QRTL:
         base_mode = MAV_MODE_FLAG_GUIDED_ENABLED |
@@ -186,6 +187,7 @@ void Plane::send_extended_status1(mavlink_channel_t chan)
     case STABILIZE:
     case FLY_BY_WIRE_A:
     case AUTOTUNE:
+    case JULAND:
     case QSTABILIZE:
     case QHOVER:
     case QLAND:

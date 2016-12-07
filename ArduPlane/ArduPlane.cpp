@@ -58,6 +58,7 @@ const AP_Scheduler::Task Plane::scheduler_tasks[] = {
     SCHED_TASK(read_battery,           10,    300),
     SCHED_TASK(compass_accumulate,     50,    200),
     SCHED_TASK(barometer_accumulate,   50,    150),
+    SCHED_TASK(update_julandcontrol,   50,    500),
     SCHED_TASK(update_notify,          50,    300),
     SCHED_TASK(read_rangefinder,       50,    100),
     SCHED_TASK(ice_update,             10,    100),
@@ -188,6 +189,22 @@ void Plane::update_speed_height(void)
         SpdHgt_Controller->update_50hz();
     }
 }
+
+void Plane::update_julandcontrol(void)
+{
+    if (control_mode == STABILIZE ||
+        control_mode == JULAND ) {
+
+        calc_juland_nav_pitch();//50Hz
+        calc_juland_nav_roll();
+        calc_juland_throttle();
+    }
+    if (should_log(MASK_LOG_PM)) {
+        Log_Write_Performance();
+    }
+}
+
+
 
 
 /*
@@ -362,10 +379,6 @@ void Plane::log_perf_info()
                           (unsigned)(DataFlash.num_dropped() - perf.last_log_dropped));
     }
 
-    if (should_log(MASK_LOG_PM)) {
-        Log_Write_Performance();
-    }
-
     resetPerfData();
 }
 
@@ -527,7 +540,7 @@ void Plane::handle_auto_mode(void)
         takeoff_calc_pitch();
         calc_throttle();
     } else if (nav_cmd_id == MAV_CMD_NAV_LAND) {
-        calc_nav_roll();
+/*      calc_nav_roll();
         calc_nav_pitch();
         
         if (auto_state.land_complete) {
@@ -542,6 +555,10 @@ void Plane::handle_auto_mode(void)
             // zero throttle
             channel_throttle->set_servo_out(0);
         }
+            channel_throttle->servo_out = 0;
+        }*/
+        //it's APM's original logic ,now we want to change mode to ourselves' autoland mode
+        set_mode(STABILIZE,MODE_REASON_UNKNOWN);
     } else {
         // we are doing normal AUTO flight, the special cases
         // are for takeoff and landing
@@ -713,9 +730,9 @@ void Plane::update_flight_mode(void)
         break;
         
     case STABILIZE:
-        nav_roll_cd        = 0;
-        nav_pitch_cd       = 0;
-        // throttle is passthrough
+        //nav_roll_cd        = 0;
+        //nav_pitch_cd       = 0;
+        //update_julandcontrol();//in the attutude.cpp     in fact we shouldn't put it here. if so it willmake  update_julandcontrol become 400hz?  
         break;
         
     case CIRCLE:
@@ -738,7 +755,8 @@ void Plane::update_flight_mode(void)
         break;
         //roll: -13788.000,  pitch: -13698.000,   thr: 0.000, rud: -13742.000
 
-
+    case JULAND:
+       break;
     case QSTABILIZE:
     case QHOVER:
     case QLOITER:
@@ -834,6 +852,7 @@ void Plane::update_navigation()
     case QLAND:
     case QRTL:
         // nothing to do
+    case JULAND:
         break;
     }
 }

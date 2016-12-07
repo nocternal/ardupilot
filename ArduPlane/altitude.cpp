@@ -27,7 +27,8 @@
 void Plane::adjust_altitude_target()
 {
     if (control_mode == FLY_BY_WIRE_B ||
-        control_mode == CRUISE) {
+        control_mode == CRUISE ||
+        control_mode == JULAND) {
         return;
     }
     if (flight_stage == AP_SpdHgtControl::FLIGHT_LAND_FINAL) {
@@ -580,10 +581,15 @@ float Plane::rangefinder_correction(void)
 
     // for now we only support the rangefinder for landing 
     bool using_rangefinder = (g.rangefinder_landing &&
-                              control_mode == AUTO && 
+                              (control_mode == AUTO ||
+                               control_mode == STABILIZE ||
+                               control_mode == JULAND)&& 
                               (flight_stage == AP_SpdHgtControl::FLIGHT_LAND_APPROACH ||
                                flight_stage == AP_SpdHgtControl::FLIGHT_LAND_PREFLARE ||
-                               flight_stage == AP_SpdHgtControl::FLIGHT_LAND_FINAL));
+                               flight_stage == AP_SpdHgtControl::FLIGHT_LAND_FINAL
+                               control_mode == JULAND ||
+                               control_mode == STABILIZE));
+
     if (!using_rangefinder) {
         return 0;
     }
@@ -627,6 +633,8 @@ void Plane::rangefinder_height_update(void)
                  flight_stage == AP_SpdHgtControl::FLIGHT_LAND_FINAL ||
                  control_mode == QLAND ||
                  control_mode == QRTL ||
+                 control_mode == STABILIZE ||  
+                 control_mode == JULAND ||
                  (control_mode == AUTO && plane.mission.get_current_nav_cmd().id == MAV_CMD_NAV_VTOL_LAND)) &&
                 g.rangefinder_landing) {
                 rangefinder_state.in_use = true;

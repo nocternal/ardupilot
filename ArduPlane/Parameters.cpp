@@ -690,42 +690,42 @@ const AP_Param::Info Plane::var_info[] = {
     // @Param: FLTMODE2
     // @DisplayName: FlightMode2
     // @Description: Flight mode for switch position 2 (1231 to 1360)
-    // @Values: 0:Manual,1:CIRCLE,2:STABILIZE,3:TRAINING,4:ACRO,5:FBWA,6:FBWB,7:CRUISE,8:AUTOTUNE,10:Auto,11:RTL,12:Loiter,14:AVOID_ADSB,15:Guided,17:QSTABILIZE,18:QHOVER,19:QLOITER,20:QLAND,21:QRTL
+    // @Values: 0:Manual,1:CIRCLE,2:STABILIZE,3:TRAINING,4:ACRO,5:FBWA,6:FBWB,7:CRUISE,8:AUTOTUNE,10:Auto,11:RTL,12:Loiter,14:AVOID_ADSB,15:Guided,17:QSTABILIZE,18:QHOVER,19:QLOITER,20:QLAND,21:QRTL,22:JULAND
     // @User: Standard
     GSCALAR(flight_mode2,           "FLTMODE2",       FLIGHT_MODE_2),
 
     // @Param: FLTMODE3
     // @DisplayName: FlightMode3
     // @Description: Flight mode for switch position 3 (1361 to 1490)
-    // @Values: 0:Manual,1:CIRCLE,2:STABILIZE,3:TRAINING,4:ACRO,5:FBWA,6:FBWB,7:CRUISE,8:AUTOTUNE,10:Auto,11:RTL,12:Loiter,14:AVOID_ADSB,15:Guided,17:QSTABILIZE,18:QHOVER,19:QLOITER,20:QLAND,21:QRTL
+    // @Values: 0:Manual,1:CIRCLE,2:STABILIZE,3:TRAINING,4:ACRO,5:FBWA,6:FBWB,7:CRUISE,8:AUTOTUNE,10:Auto,11:RTL,12:Loiter,14:AVOID_ADSB,15:Guided,17:QSTABILIZE,18:QHOVER,19:QLOITER,20:QLAND,21:QRTL,22:JULAND
     // @User: Standard
     GSCALAR(flight_mode3,           "FLTMODE3",       FLIGHT_MODE_3),
 
     // @Param: FLTMODE4
     // @DisplayName: FlightMode4
     // @Description: Flight mode for switch position 4 (1491 to 1620)
-    // @Values: 0:Manual,1:CIRCLE,2:STABILIZE,3:TRAINING,4:ACRO,5:FBWA,6:FBWB,7:CRUISE,8:AUTOTUNE,10:Auto,11:RTL,12:Loiter,14:AVOID_ADSB,15:Guided,17:QSTABILIZE,18:QHOVER,19:QLOITER,20:QLAND,21:QRTL
+    // @Values: 0:Manual,1:CIRCLE,2:STABILIZE,3:TRAINING,4:ACRO,5:FBWA,6:FBWB,7:CRUISE,8:AUTOTUNE,10:Auto,11:RTL,12:Loiter,14:AVOID_ADSB,15:Guided,17:QSTABILIZE,18:QHOVER,19:QLOITER,20:QLAND,21:QRTL,22:JULAND
     // @User: Standard
     GSCALAR(flight_mode4,           "FLTMODE4",       FLIGHT_MODE_4),
 
     // @Param: FLTMODE5
     // @DisplayName: FlightMode5
     // @Description: Flight mode for switch position 5 (1621 to 1749)
-    // @Values: 0:Manual,1:CIRCLE,2:STABILIZE,3:TRAINING,4:ACRO,5:FBWA,6:FBWB,7:CRUISE,8:AUTOTUNE,10:Auto,11:RTL,12:Loiter,14:AVOID_ADSB,15:Guided,17:QSTABILIZE,18:QHOVER,19:QLOITER,20:QLAND,21:QRTL
+    // @Values: 0:Manual,1:CIRCLE,2:STABILIZE,3:TRAINING,4:ACRO,5:FBWA,6:FBWB,7:CRUISE,8:AUTOTUNE,10:Auto,11:RTL,12:Loiter,14:AVOID_ADSB,15:Guided,17:QSTABILIZE,18:QHOVER,19:QLOITER,20:QLAND,21:QRTL,22:JULAND
     // @User: Standard
     GSCALAR(flight_mode5,           "FLTMODE5",       FLIGHT_MODE_5),
 
     // @Param: FLTMODE6
     // @DisplayName: FlightMode6
     // @Description: Flight mode for switch position 6 (1750 to 2049)
-    // @Values: 0:Manual,1:CIRCLE,2:STABILIZE,3:TRAINING,4:ACRO,5:FBWA,6:FBWB,7:CRUISE,8:AUTOTUNE,10:Auto,11:RTL,12:Loiter,14:AVOID_ADSB,15:Guided,17:QSTABILIZE,18:QHOVER,19:QLOITER,20:QLAND,21:QRTL
+    // @Values: 0:Manual,1:CIRCLE,2:STABILIZE,3:TRAINING,4:ACRO,5:FBWA,6:FBWB,7:CRUISE,8:AUTOTUNE,10:Auto,11:RTL,12:Loiter,14:AVOID_ADSB,15:Guided,17:QSTABILIZE,18:QHOVER,19:QLOITER,20:QLAND,21:QRTL,22:JULAND
     // @User: Standard
     GSCALAR(flight_mode6,           "FLTMODE6",       FLIGHT_MODE_6),
 
     // @Param: INITIAL_MODE
     // @DisplayName: Initial flight mode
     // @Description: This selects the mode to start in on boot. This is useful for when you want to start in AUTO mode on boot without a receiver.
-    // @Values: 0:Manual,1:CIRCLE,2:STABILIZE,3:TRAINING,4:ACRO,5:FBWA,6:FBWB,7:CRUISE,8:AUTOTUNE,10:Auto,11:RTL,12:Loiter,14:AVOID_ADSB,15:Guided,17:QSTABILIZE,18:QHOVER,19:QLOITER,20:QLAND,21:QRTL
+    // @Values: 0:Manual,1:CIRCLE,2:STABILIZE,3:TRAINING,4:ACRO,5:FBWA,6:FBWB,7:CRUISE,8:AUTOTUNE,10:Auto,11:RTL,12:Loiter,14:AVOID_ADSB,15:Guided,17:QSTABILIZE,18:QHOVER,19:QLOITER,20:QLAND,21:QRTL,22:JULAND
     // @User: Advanced
     GSCALAR(initial_mode,        "INITIAL_MODE",     MANUAL),
 
@@ -1084,6 +1084,316 @@ const AP_Param::Info Plane::var_info[] = {
     // @Bitmask: 0:Disarm
     // @User: Advanced
     GSCALAR(crash_detection_enable,         "CRASH_DETECT",   0),
+
+    // @Param: JU_Pclimbrate
+    // @DisplayName: JU_Pclimbrate
+    // @Description: climbrate's P   
+    // @Values: 0.001 1000
+    // @User: Advanced
+    GSCALAR(JU_Pclimbrate,         "JU_Pclimbrate",   JU_Pclimbrate_DEFAULT),
+
+    // @Param: JU_Iclimbrate
+    // @DisplayName: JU_Iclimbrate
+    // @Description: climbrate's I   
+    // @Values: 0.001 1000
+    // @User: Advanced
+    GSCALAR(JU_Iclimbrate,         "JU_Iclimbrate",   JU_Iclimbrate_DEFAULT),
+
+    // @Param: JU_climbrate1
+    // @DisplayName: JU_climbrate1
+    // @Description: desire climbrate at steep sescend stage. should be negative number   
+    // @Values: -5 5
+    // @User: Advanced
+    GSCALAR(JU_climbrate1,         "JU_climbrate1",   JU_climbrate1_DEFAULT),
+
+    // @Param: JU_climbrate2
+    // @DisplayName: JU_climbrate2
+    // @Description: desire climbrate at shalow sescend stage. should be negative number   
+    // @Values: -5 5
+    // @User: Advanced
+    GSCALAR(JU_climbrate2,         "JU_climbrate2",   JU_climbrate2_DEFAULT),
+
+    // @Param: JU_speed1
+    // @DisplayName: JU_speed1
+    // @Description: desire velocity when descend  
+    // @Values: 5 30
+    // @User: Advanced
+    GSCALAR(JU_speed1,         "JU_speed1",   JU_speed1_DEFAULT),
+
+    // @Param: JU_speedprotect
+    // @DisplayName: JU_speedprotect
+    // @Description: lowest permit speed when descend to land 
+    // @Values: 5 30
+    // @User: Advanced
+    GSCALAR(JU_speedprotect,         "JU_speedprotect",   JU_speedprotect_DEFAULT),
+
+    // @Param: JU_tho_P
+    // @DisplayName: JU_tho_P
+    // @Description: throttle propotion
+    // @Values: 0 1000
+    // @User: Advanced
+    GSCALAR(JU_tho_P,         "JU_tho_P",   30),
+
+    // @Param: JU_tho_10
+    // @DisplayName: JU_tho_10
+    // @Description: tho0 in first descend section
+    // @Values: 0 100
+    // @User: Advanced
+    GSCALAR(JU_tho_10,         "JU_tho_10",   10),
+
+    // @Param: JU_tho_20
+    // @DisplayName: JU_tho_20
+    // @Description: tho0 in flare section,percentage, set to 10 means 10%
+    // @Values: 0 100
+    // @User: Advanced
+    GSCALAR(JU_tho_20,         "JU_tho_20",   0),
+
+    // @Param: JU_tho_flaret
+    // @DisplayName: JU_tho_flaret
+    // @Description: time for flare throttle change
+    // @Values: 0 100
+    // @User: Advanced
+    GSCALAR(JU_tho_flaret,         "JU_tho_flaret",   1),
+
+    // @Param: JU_flare_alt
+    // @DisplayName: JU_flare_alt
+    // @Description: flare alt
+    // @Values: 0 1000
+    // @User: Advanced
+    GSCALAR(JU_flare_alt,         "JU_flare_alt",   6.75f),
+
+    // @Param: JU_flare_transition_time
+    // @DisplayName: JU_flare_transition_time
+    // @Description: how long from climbrate1 to climbrate2
+    // @Values: 0 100
+    // @User: Advanced
+    GSCALAR(JU_flare_transition_time,         "Jflaretranstime",   5.0f), // ""'s string is limited to 16 characters
+
+    // @Param: JU_init_transtime
+    // @DisplayName: JU_init_transtime
+    // @Description: how long from old mode's command to this mode's command
+    // @Values: 0 10
+    // @User: Advanced
+    GSCALAR(JU_init_transtime,         "Jinittranstime",   2.0f), 
+    
+    // @Param: JU_theta01
+    // @DisplayName: JU_theta01
+    // @Description: first steep descend section's theta0 command,degree
+    // @Values: -45 45
+    // @User: Advanced
+    GSCALAR(JU_theta01,         "JU_theta01",   -5.0f), 
+
+    // @Param: JU_theta02
+    // @DisplayName: JU_theta02
+    // @Description: flare section's theta0 command,degree
+    // @Values: -45 45
+    // @User: Advanced
+    GSCALAR(JU_theta02,         "JU_theta02",   5.0f), 
+
+    // @Param: JU_flare_theta_enable
+    // @DisplayName: JU_flare_theta_enable
+    // @Description: whether only control theta during flare period,enable will only control theta
+    // @Values: 0:Disabled,1:enabled
+    // @User: Advanced
+    GSCALAR(JU_flare_theta_enable,         "Jflarethetaable",   0), 
+
+    // @Param: JU_Ioutmax 
+    // @DisplayName: JU_Ioutmax 
+    // @Description: the max Iclimbrate output ,degree
+    // @Values: 0 1000
+    // @User: Advanced
+    GSCALAR(JU_Ioutmax,         "JU_Ioutmax",   4.0f), 
+
+    // @Param: JU_thetaoutmax  
+    // @DisplayName: JU_thetaoutmax 
+    // @Description: the max nav_pitch output in climbrate feedback section,degree
+    // @Values: 0 60
+    // @User: Advanced
+    GSCALAR(JU_thetaoutmax,         "JU_thetaoutmax",   20.0f), 
+
+    // @Param: JU_tho_Verr  
+    // @DisplayName: JU_tho_Verr
+    // @Description: the max V err which throttle control law can get
+    // @Values: 0 60
+    // @User: Advanced
+    GSCALAR(JU_tho_Verr,         "JU_tho_Verr",   1.0f),
+
+    // @Param: JU_pitch_ser01  
+    // @DisplayName: JU_pitch_ser01
+    // @Description: pitch servo_out compensate when at steep descend,
+    // @Values: -4500 4500
+    // @User: Advanced
+    GSCALAR(JU_pitch_ser01,         "JU_pitch_ser01",   0),
+
+    // @Param: JU_pitch_ser02n 
+    // @DisplayName: JU_pitch_ser02n
+    // @Description: pitch servo_out compensate when at flare begin need some big deltan
+    // @Values: -4500 4500
+    // @User: Advanced
+    GSCALAR(JU_pitch_ser02n,         "JU_pitch_ser02n",   0),
+
+
+    // @Param: JU_pitch_ser02 
+    // @DisplayName: JU_pitch_ser02
+    // @Description: pitch servo_out compensate when at flare
+    // @Values: -4500 4500
+    // @User: Advanced
+    GSCALAR(JU_pitch_ser02,         "JU_pitch_ser02",   0),
+
+    // @Param:JU_phsi_P
+    // @DisplayName: JU_phsi_P
+    // @Description: phsi's P to phi
+    // @Values: 0 10000
+    // @User: Advanced
+    GSCALAR(JU_phsi_P,         "JU_phsi_P",   2.0f),
+
+
+    // @Param:JU_phsi_0
+    // @DisplayName: JU_phsi_0
+    // @Description: base phsi command
+    // @Values: 0 360
+    // @User: Advanced
+    GSCALAR(JU_phsi_0,         "JU_phsi_0",   0.0f),
+
+    // @Param:JU_y_I
+    // @DisplayName: JU_y_I
+    // @Description: delta y's I
+    // @Values: 0 10000
+    // @User: Advanced
+    GSCALAR(JU_y_I,         "JU_y_I",   0),
+
+    // @Param:JU_y_Imax
+    // @DisplayName: JU_y_Imax
+    // @Description: delta y's Imax to phsi ,degree
+    // @Values: -90 90
+    // @User: Advanced
+    GSCALAR(JU_y_Imax,         "JU_y_Imax",   0),
+
+    // @Param:JU_y_P
+    // @DisplayName: JU_y_P
+    // @Description: delta y's P
+    // @Values: 0 100000
+    // @User: Advanced
+    GSCALAR(JU_y_P,         "JU_y_P",   0.7f),
+
+    // @Param:Jinityawable
+    // @DisplayName: Jinityawable
+    // @Description: Jinityawable= 2 ,fbwa's roll control mode and STICK_MIXING need to =0,when Jinityawable= 1 ,control phsi,Jinityawable= 0,control delta y.
+    // @Values: 0 1 2
+    // @User: Advanced
+    GSCALAR(Jinityawable,         "Jinityawable",   0),
+
+    // @Param:JU_WP_fromMP
+    // @DisplayName: JU_WP_fromMP
+    // @Description: when JU_WP_fromMP= 1 ,load way point from mission planner's file,JU_WP_fromMP= 0,load waypoint from hand written WP parameters.
+    // @Values: 0 1
+    // @User: Advanced
+    GSCALAR(JU_WP_fromMP,         "JU_WP_fromMP",   1),
+
+    // @Param:JU_WP_1lat
+    // @DisplayName: JU_WP_1lat
+    // @Description: it's  first way point's latitude multiply 1e^7 when JU_WP_fromMP =0
+    // @Values: -2147483648 2147483648 
+    // @User: Advanced
+    GSCALAR(JU_WP_1lat,         "JU_WP_1lat",   0),
+
+    // @Param:JU_WP_1lng
+    // @DisplayName: JU_WP_1lng
+    // @Description: it's  first way point's longitude multiply 1e^7 when JU_WP_fromMP =0
+    // @Values: -2147483648 2147483648 
+    // @User: Advanced
+    GSCALAR(JU_WP_1lng,         "JU_WP_1lng",   0),
+
+    // @Param:JU_WP_2lat
+    // @DisplayName: JU_WP_2lat
+    // @Description: it's  second way point's latitude multiply 1e^7 when JU_WP_fromMP =0
+    // @Values: -2147483648 2147483648 
+    // @User: Advanced
+    GSCALAR(JU_WP_2lat,         "JU_WP_2lat",   0),
+
+    // @Param:JU_WP_2lng
+    // @DisplayName: JU_WP_2lng
+    // @Description: it's  second way point's longitude multiply 1e^7 when JU_WP_fromMP =0
+    // @Values: -2147483648 2147483648 
+    // @User: Advanced
+    GSCALAR(JU_WP_2lng,         "JU_WP_2lng",   0),
+
+    // @Param:JU_trim_auto
+    // @DisplayName: JU_trim_auto
+    // @Description: when it =1 ,will give different pitch_servo depends on velocity
+    // @Values: 0 1
+    // @User: Advanced
+    GSCALAR(JU_trim_auto,         "JU_trim_auto",   0),
+
+    // @Param:JU_trim_v1
+    // @DisplayName: JU_trim_v1
+    // @Description: minimum reference velocity for auto trim 
+    // @Values: 0 100
+    // @User: Advanced
+    GSCALAR(JU_trim_v1,         "JU_trim_v1",   10.0f),
+
+    // @Param:JU_trim_v2
+    // @DisplayName: JU_trim_v2
+    // @Description: reference velocity for auto trim 
+    // @Values: 0 100
+    // @User: Advanced
+    GSCALAR(JU_trim_v2,         "JU_trim_v2",   15.0f),
+
+    // @Param:JU_trim_v3
+    // @DisplayName: JU_trim_v3
+    // @Description:maximum reference velocity for auto trim 
+    // @Values: 0 100
+    // @User: Advanced
+    GSCALAR(JU_trim_v3,         "JU_trim_v3",   20.0f),
+
+    // @Param:JU_trim_ps1
+    // @DisplayName: JU_trim_ps1
+    // @Description:maximum pitch_servo trim value, if velocity below v1, the trim value won't become bigger.
+    // @Values: -4500 4500
+    // @User: Advanced
+    GSCALAR(JU_trim_ps1,         "JU_trim_ps1",   0),
+
+    // @Param:JU_trim_ps2
+    // @DisplayName: JU_trim_ps2
+    // @Description:pitch_servo trim value
+    // @Values: -4500 4500
+    // @User: Advanced
+    GSCALAR(JU_trim_ps2,         "JU_trim_ps2",   0),
+
+    // @Param:JU_trim_ps3
+    // @DisplayName: JU_trim_ps3
+    // @Description: minimum pitch_servo trim value,it won't get smaller as velocity get higher than v3
+    // @Values: -4500 4500
+    // @User: Advanced
+    GSCALAR(JU_trim_ps3,         "JU_trim_ps3",   0),
+
+    // @Param:JU_trim_theta1
+    // @DisplayName: JU_trim_theta1
+    // @Description:maximum theta trim value, if velocity below v1, the trim value won't become bigger.
+    // @Values: -45 45
+    // @User: Advanced
+    GSCALAR(JU_trim_theta1,         "JU_trim_theta1",   0.0f),
+
+    // @Param:JU_trim_theta2
+    // @DisplayName: JU_trim_theta2
+    // @Description:pitch_servo trim value
+    // @Values: -45 45
+    // @User: Advanced
+    GSCALAR(JU_trim_theta2,         "JU_trim_theta2",   0.0f),
+
+    // @Param:JU_trim_theta3
+    // @DisplayName: JU_trim_theta3
+    // @Description: minimum theta trim value,it won't get smaller as velocity get higher than v3
+    // @Values: -45 45
+    // @User: Advanced
+    GSCALAR(JU_trim_theta3,         "JU_trim_theta3",   0.0f),
+
+    // @Param:JU_trim_rs
+    // @DisplayName: JU_trim_rs
+    // @Description: roll_servo trim value
+    // @Values: -4500 4500
+    // @User: Advanced
+    GSCALAR(JU_trim_rs,         "JU_trim_rs",   0),
 
     // barometer ground calibration. The GND_ prefix is chosen for
     // compatibility with previous releases of ArduPlane

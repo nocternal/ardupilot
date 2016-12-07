@@ -260,6 +260,8 @@
 //                  |
 //  MANUAL          | Full manual control via the hardware multiplexer.
 //                  |
+//  JULAND          | very original ju style.
+//                  |
 //  STABILIZE       | Tries to maintain level flight, but can be overridden with radio control inputs.
 //                  |
 //  FLY_BY_WIRE_A   | Autopilot style control via user input, with manual throttle.

@@ -391,6 +391,24 @@ void Plane::set_mode(enum FlightMode mode, mode_reason_t reason)
 
     case MANUAL:
     case STABILIZE:
+    if (g.JU_WP_fromMP == 1) {
+         ju_next_WP = mission.get_current_nav_cmd().content.location;
+             gcs_send_text_fmt(MAV_SEVERITY_INFO, "Begin JULAND,fly to waypoint #%i dist %um",
+             (unsigned)mission.get_current_nav_cmd().index,
+             (unsigned)get_distance(current_loc, ju_next_WP));
+             uint16_t prev_ju_cmd_idx = mission.get_prev_nav_cmd_index();
+             mission.set_current_cmd(prev_ju_cmd_idx);
+         ju_prev_WP = mission.get_current_nav_cmd().content.location;
+             gcs_send_text_fmt(MAV_SEVERITY_INFO, "just passed waypoint #%i ",
+             (unsigned)mission.get_current_nav_cmd().index);
+         } 
+    else {
+         ju_next_WP.lat = (int32_t)(g.JU_WP_2lat);
+         ju_next_WP.lng = (int32_t)(g.JU_WP_2lng);
+         ju_prev_WP.lat = (int32_t)(g.JU_WP_1lat);
+         ju_prev_WP.lng = (int32_t)(g.JU_WP_1lng);
+          }
+        break;
     case TRAINING:
     case FLY_BY_WIRE_A:
         auto_throttle_mode = false;
@@ -469,7 +487,20 @@ void Plane::set_mode(enum FlightMode mode, mode_reason_t reason)
         guided_WP_loc = current_loc;
         set_guided_WP();
         break;
-
+    case JULAND:
+        if (g.JU_WP_fromMP == 1) {
+         mission.set_current_cmd(2);
+         ju_next_WP = mission.get_current_nav_cmd().content.location;
+         mission.set_current_cmd(1);
+         ju_prev_WP = mission.get_current_nav_cmd().content.location;
+         } 
+        else {
+         ju_next_WP.lat = (int32_t)(g.JU_WP_2lat);
+         ju_next_WP.lng = (int32_t)(g.JU_WP_2lng);
+         ju_prev_WP.lat = (int32_t)(g.JU_WP_1lat);
+         ju_prev_WP.lng = (int32_t)(g.JU_WP_1lng);
+          }
+        break;
     case QSTABILIZE:
     case QHOVER:
     case QLOITER:
@@ -497,7 +528,13 @@ void Plane::set_mode(enum FlightMode mode, mode_reason_t reason)
     rollController.reset_I();
     pitchController.reset_I();
     yawController.reset_I();    
-    steerController.reset_I();    
+    steerController.reset_I();
+    climb_pid_info_I = 0; // ju's climb I parameter
+    jflare_counter = 0;
+    jinit_counter = 0;
+    ju_flarestage = 0;
+    jthoflare_counter = 0;
+    Jy_pid_info_I = 0;
 }
 
 /*
@@ -520,6 +557,7 @@ bool Plane::mavlink_set_mode(uint8_t mode)
     case AUTO:
     case RTL:
     case LOITER:
+    case JULAND:
     case QSTABILIZE:
     case QHOVER:
     case QLOITER:
@@ -539,10 +577,10 @@ void Plane::exit_mode(enum FlightMode mode)
         if (mission.state() == AP_Mission::MISSION_RUNNING) {
             mission.stop();
 
-            if (mission.get_current_nav_cmd().id == MAV_CMD_NAV_LAND)
+/*            if (mission.get_current_nav_cmd().id == MAV_CMD_NAV_LAND)
             {
                 restart_landing_sequence();
-            }
+            }*/ // for I want to change mode to JULAND to land,so I cancel restart_landing_sequence() logic-20161023
         }
         auto_state.started_flying_in_auto_ms = 0;
     }
@@ -735,6 +773,8 @@ void Plane::print_flight_mode(AP_HAL::BetterStream *port, uint8_t mode)
         break;
     case QRTL:
         port->print("QRTL");
+    case JULAND:
+        port->print("JULAND");
         break;
     default:
         port->printf("Mode(%u)", (unsigned)mode);

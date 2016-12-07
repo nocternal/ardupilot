@@ -340,6 +340,7 @@ sub parseMessage
 	  $control_mode == 12 && do { 	$control_mode_alpha = "LOITER"; last SWITCH; };
 	  $control_mode == 13 && do { 	$control_mode_alpha = "TAKEOFF"; last SWITCH; };
 	  $control_mode == 14 && do { 	$control_mode_alpha = "LAND"; last SWITCH; };
+	  $control_mode == 20 && do { 	$control_mode_alpha = "JULAND"; last SWITCH; };
 	}
 
 	$bearing_error = sprintf("%.1f", $bearing_error);

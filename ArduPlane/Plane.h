@@ -641,6 +641,56 @@ private:
     // a smoothed airspeed estimate, used for limiting roll angle
     float smoothed_airspeed;
 
+    float JU_climb_rate_err;
+    uint32_t jtnow;
+    uint32_t jdt;
+    uint32_t jlast_t;
+    float climbpout;
+    float climbiout;
+    float climb_pid_info_I;
+    float climb_integrator_delta; 
+    float jdelta_time; 
+    float jflare_counter;
+    float jthoflare_counter;
+    float jinit_counter;
+    float jclimbrate_temp; 
+    float height_from_home;
+    float nav_pitch_cd_old; 
+    // height filter second derivative
+    float _height_filter_dd_height;
+    // height integration
+    float _height_filter_height;
+    float _jclimb_rate;
+    float jclimbrate_temp1;
+    float jtheta0;
+    float jtheta_init;
+    float JU_tho_pout;
+    int16_t ju_flarestage; //to judge whether in final flare stage
+    float jEAS; //estimated airspeed in calc_ju_throttle();
+    float jEAS1;//estimated airspeed in stabilize_pitch();
+    float jTAS_dem;
+    float jTAS_err;
+    int32_t throttle_servo_out_init1;
+    int32_t throttle_servo_out_init2;
+    int32_t pitch_servo_out_init2;
+    float  JU_bearing_cmd; //rad
+    struct Location ju_prev_WP {};
+    struct Location ju_next_WP {};
+    float jS1;
+    float jbearing1;
+    float jbearing2;
+    float jdeltay_err;
+    float Jy_integrator_delta;
+    float Jy_pid_info_I;
+
+    //struct JUWP  {
+    //uint8_t JUbytes[12];
+    //};
+    //struct JUWP JUWP1;
+    //struct JUWP JUWP2;
+
+
+
     // Mission library
     AP_Mission mission {ahrs, 
             FUNCTOR_BIND_MEMBER(&Plane::start_command_callback, bool, const AP_Mission::Mission_Command &),
@@ -1019,6 +1069,7 @@ private:
     void print_hit_enter();
     void ahrs_update();
     void update_speed_height(void);
+    void update_julandcontrol(void);
     void update_GPS_50Hz(void);
     void update_GPS_10Hz(void);
     void update_compass(void);
@@ -1052,6 +1103,9 @@ private:
     void calc_throttle();
     void calc_nav_roll();
     void calc_nav_pitch();
+    void calc_juland_nav_pitch();
+    void calc_juland_nav_roll();
+    void calc_juland_throttle();
     void update_flight_stage();
     void update_navigation();
     void set_flight_stage(AP_SpdHgtControl::FlightStage fs);

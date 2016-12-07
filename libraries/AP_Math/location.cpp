@@ -79,6 +79,13 @@ int32_t get_bearing_cd(const struct Location &loc1, const struct Location &loc2)
     return bearing;
 }
 
+// use linear interpolation to get a servo trim value at fly velocity
+int32_t linear_interp(float v0,int32_t ser0,float v1,int32_t ser1,float v)
+{ 
+   int32_t ser = ser0 + (v - v0)*(ser1 -ser0)/(v1-v0);
+   return ser;
+}
+
 // see if location is past a line perpendicular to
 // the line between point1 and point2. If point1 is
 // our previous waypoint and point2 is our target waypoint

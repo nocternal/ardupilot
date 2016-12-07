@@ -208,6 +208,10 @@ struct PACKED log_Performance {
     uint32_t g_dt_max;
     uint32_t g_dt_min;
     uint32_t log_dropped;
+    int16_t  throttle_out1;
+    int16_t  Jpitch_out;
+    int16_t  Jroll_out;
+    float    Jyerr;
 };
 
 // Write a performance monitoring packet. Total length : 19 bytes
@@ -220,7 +224,11 @@ void Plane::Log_Write_Performance()
         main_loop_count : perf.mainLoop_count,
         g_dt_max        : perf.G_Dt_max,
         g_dt_min        : perf.G_Dt_min,
-        log_dropped     : DataFlash.num_dropped() - perf.last_log_dropped
+        log_dropped     : DataFlash.num_dropped() - perf.last_log_dropped,
+        throttle_out1   : (int16_t)channel_throttle->get_servo_out(),
+        Jpitch_out      : (int16_t)channel_pitch->get_servo_out(), 
+        Jroll_out       : (int16_t)channel_roll->get_servo_out(),
+        Jyerr           : (float)jdeltay_err
     };
     DataFlash.WriteCriticalBlock(&pkt, sizeof(pkt));
 }
@@ -279,6 +287,9 @@ struct PACKED log_Nav_Tuning {
     int16_t target_bearing_cd;
     int16_t nav_bearing_cd;
     int16_t altitude_error_cm;
+    int16_t airspeed_cm;
+    uint16_t ju_yawc;
+    uint32_t groundspeed_cm;
     float   xtrack_error;
     float   xtrack_error_i;
     float   airspeed_error;
@@ -294,6 +305,9 @@ void Plane::Log_Write_Nav_Tuning()
         target_bearing_cd   : (int16_t)nav_controller->target_bearing_cd(),
         nav_bearing_cd      : (int16_t)nav_controller->nav_bearing_cd(),
         altitude_error_cm   : (int16_t)altitude_error_cm,
+        airspeed_cm         : (int16_t)airspeed.get_airspeed_cm(),
+        ju_yawc             : (uint16_t)(JU_bearing_cmd),
+        groundspeed_cm      : (uint32_t)(gps.ground_speed()*100),
         xtrack_error        : nav_controller->crosstrack_error(),
         xtrack_error_i      : nav_controller->crosstrack_error_integrator(),
         airspeed_error      : airspeed_error
@@ -476,13 +490,13 @@ void Plane::Log_Write_Home_And_Origin()
 const struct LogStructure Plane::log_structure[] = {
     LOG_COMMON_STRUCTURES,
     { LOG_PERFORMANCE_MSG, sizeof(log_Performance), 
-      "PM",  "QHHIII",  "TimeUS,NLon,NLoop,MaxT,MinT,LogDrop" },
+      "PM",  "QHHIIIhhhf",  "TimeUS,NLon,NLoop,MaxT,MinT,LogDrop,Thoout,ptchout,rollout" },
     { LOG_STARTUP_MSG, sizeof(log_Startup),         
       "STRT", "QBH",         "TimeUS,SType,CTot" },
     { LOG_CTUN_MSG, sizeof(log_Control_Tuning),     
       "CTUN", "Qcccchhh",    "TimeUS,NavRoll,Roll,NavPitch,Pitch,ThrOut,RdrOut,ThrDem" },
     { LOG_NTUN_MSG, sizeof(log_Nav_Tuning),         
-      "NTUN", "Qfcccfff",  "TimeUS,WpDist,TargBrg,NavBrg,AltErr,XT,XTi,ArspdErr" },
+      "NTUN", "QfccccHIfff",  "TimeUS,WpDist,TargBrg,NavBrg,AltErr,Arspd,JuYawc,GSpdCM,XT,XTi,ArspdErr" },
     { LOG_SONAR_MSG, sizeof(log_Sonar),             
       "SONR", "QffBf",   "TimeUS,Dist,Volt,Cnt,Corr" },
     { LOG_ARM_DISARM_MSG, sizeof(log_Arm_Disarm),

@@ -17,6 +17,7 @@ void Plane::failsafe_short_on_event(enum failsafe_state fstype, mode_reason_t re
     case AUTOTUNE:
     case FLY_BY_WIRE_B:
     case CRUISE:
+    case JULAND:
     case TRAINING:
         failsafe.saved_mode = control_mode;
         failsafe.saved_mode_set = 1;
@@ -76,6 +77,7 @@ void Plane::failsafe_long_on_event(enum failsafe_state fstype, mode_reason_t rea
     case AUTOTUNE:
     case FLY_BY_WIRE_B:
     case CRUISE:
+    case JULAND:
     case TRAINING:
     case CIRCLE:
         if(g.long_fs_action == 3) {
