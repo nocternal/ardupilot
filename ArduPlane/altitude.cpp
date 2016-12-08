@@ -586,7 +586,7 @@ float Plane::rangefinder_correction(void)
                                control_mode == JULAND)&& 
                               (flight_stage == AP_SpdHgtControl::FLIGHT_LAND_APPROACH ||
                                flight_stage == AP_SpdHgtControl::FLIGHT_LAND_PREFLARE ||
-                               flight_stage == AP_SpdHgtControl::FLIGHT_LAND_FINAL
+                               flight_stage == AP_SpdHgtControl::FLIGHT_LAND_FINAL    ||
                                control_mode == JULAND ||
                                control_mode == STABILIZE));
 

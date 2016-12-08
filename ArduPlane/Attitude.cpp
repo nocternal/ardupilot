@@ -102,12 +102,6 @@ void Plane::stabilize_pitch(float speed_scaler)
         channel_pitch->set_servo_out(45*force_elevator);
         return;
     }
-<<<<<<< HEAD
-    int32_t demanded_pitch = nav_pitch_cd + g.pitch_trim_cd + channel_throttle->get_servo_out() * g.kff_throttle_to_pitch;
-    bool disable_integrator = false;
-    //if (control_mode == STABILIZE && channel_pitch->get_control_in() != 0) {
-    //    disable_integrator = true;
-    //}
     if (g.JU_trim_auto == 1)
     {
     float EAS2TAS = ahrs.get_EAS2TAS();
@@ -142,7 +136,7 @@ void Plane::stabilize_pitch(float speed_scaler)
     }
 
 
-    int32_t demanded_pitch = nav_pitch_cd + g.pitch_trim_cd + channel_throttle->servo_out * g.kff_throttle_to_pitch;
+    int32_t demanded_pitch = nav_pitch_cd + g.pitch_trim_cd + channel_throttle->get_servo_out() * g.kff_throttle_to_pitch;
 
     bool disable_integrator = false;
  //   if (control_mode == STABILIZE && channel_pitch->control_in != 0) {
@@ -739,7 +733,7 @@ void Plane::calc_juland_nav_pitch()
          */
         if(jinit_counter == 0) {
             jclimbrate_temp1 = -sink_rate;
-            jtheta_init = ahrs.pitch_sensor - g.pitch_trim_cd - channel_throttle->servo_out * g.kff_throttle_to_pitch; 
+            jtheta_init = ahrs.pitch_sensor - g.pitch_trim_cd - channel_throttle->get_servo_out() * g.kff_throttle_to_pitch; 
             jtheta0 = jtheta_init;
             JU_climb_rate_err = 0;  
             climb_pid_info_I = 0;
@@ -769,7 +763,7 @@ void Plane::calc_juland_nav_pitch()
          if (ju_flarestage == 1) {
                if(jflare_counter == 0) {
                jclimbrate_temp = -sink_rate;
-               jtheta_init = ahrs.pitch_sensor - g.pitch_trim_cd - channel_throttle->servo_out * g.kff_throttle_to_pitch;
+               jtheta_init = ahrs.pitch_sensor - g.pitch_trim_cd - channel_throttle->get_servo_out() * g.kff_throttle_to_pitch;
                jtheta0 = jtheta_init;
                JU_climb_rate_err = 0;  //change desend rate commad as flare alt's descend rate
                climb_pid_info_I = 0;      //clear integrater
@@ -831,7 +825,7 @@ void Plane::calc_juland_throttle()
     jTAS_err = constrain_float(jTAS_err, -g.JU_tho_Verr, g.JU_tho_Verr);
     JU_tho_pout = g.JU_tho_P * jTAS_err;
 
-    int32_t last_throttle_servo_out = channel_throttle->servo_out;
+    int32_t last_throttle_servo_out = channel_throttle->get_servo_out();
 
         if(jinit_counter == 0) {
           throttle_servo_out_init1 = last_throttle_servo_out ;
@@ -849,7 +843,7 @@ void Plane::calc_juland_throttle()
 
         if (ju_flarestage == 1) {
                if(jthoflare_counter == 0) {
-               throttle_servo_out_init2 = channel_throttle->servo_out;
+               throttle_servo_out_init2 = channel_throttle->get_servo_out();
                channel_throttle->set_servo_out(throttle_servo_out_init2);
                }
                if(jthoflare_counter <= g.JU_tho_flaret) {

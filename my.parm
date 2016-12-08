@@ -291,12 +291,12 @@ JU_WP_fromMP     1.000000
 JU_climbrate1    -1.00000
 JU_climbrate2    -0.500000
 JU_flare_alt     30.000000
-JU_phsi_0        0.000000
+JU_phsi_0        0.00000
 JU_phsi_P        2.000000
 JU_pitch_ser01   0.000000
 JU_pitch_ser02   0.000000
 JU_pitch_ser02n  0.000000
-JU_speed1        15.000000
+JU_speed1        20.000000
 JU_speedprotect  8.000000
 JU_theta01       -3.000000
 JU_theta02       5.000000
@@ -321,7 +321,7 @@ JU_y_I           0.100000
 JU_y_Imax        10.000000
 JU_y_P           1.000000
 Jflarethetaable  0.000000
-Jflaretranstime  2.000000
+Jflaretranstime  0.5000000
 Jinittranstime   1.000000
 Jinityawable     0.000000
 KFF_RDDRMIX      0.500000
