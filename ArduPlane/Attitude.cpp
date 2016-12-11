@@ -102,7 +102,9 @@ void Plane::stabilize_pitch(float speed_scaler)
         channel_pitch->set_servo_out(45*force_elevator);
         return;
     }
-    if (g.JU_trim_auto == 1)
+    if ((g.JU_trim_auto == 1) &&
+      (control_mode == STABILIZE ||
+      control_mode == JULAND))
     {
     float EAS2TAS = ahrs.get_EAS2TAS();
       if (!ahrs.airspeed_sensor_enabled() || !ahrs.airspeed_estimate(&jEAS1)) {
@@ -146,7 +148,9 @@ void Plane::stabilize_pitch(float speed_scaler)
     channel_pitch->set_servo_out(pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, 
                                                              speed_scaler, 
                                                              disable_integrator));
-    if (g.JU_trim_auto == 1)
+    if ((g.JU_trim_auto == 1) &&
+      (control_mode == STABILIZE ||
+      control_mode == JULAND))
     {
     float EAS2TAS = ahrs.get_EAS2TAS();
       if (!ahrs.airspeed_sensor_enabled() || !ahrs.airspeed_estimate(&jEAS1)) {
@@ -762,11 +766,11 @@ void Plane::calc_juland_nav_pitch()
         */ 
          if (ju_flarestage == 1) {
                if(jflare_counter == 0) {
+               gcs_send_text_fmt(MAV_SEVERITY_WARNING, "Flare begin. Plane head to front");
                jclimbrate_temp = -sink_rate;
                jtheta_init = ahrs.pitch_sensor - g.pitch_trim_cd - channel_throttle->get_servo_out() * g.kff_throttle_to_pitch;
                jtheta0 = jtheta_init;
                JU_climb_rate_err = 0;  //change desend rate commad as flare alt's descend rate
-               climb_pid_info_I = 0;      //clear integrater
                nav_pitch_cd_old = ahrs.pitch_sensor;
                }
                if(jflare_counter <= g.JU_flare_transition_time) {
@@ -807,12 +811,11 @@ void Plane::calc_juland_nav_pitch()
                 nav_pitch_cd = jtheta0;
             }
         }
-        nav_pitch_cd = 0.3f * nav_pitch_cd + 0.7f * nav_pitch_cd_old;  //Apply first order lag 
-        nav_pitch_cd_old = nav_pitch_cd; 
 }
 
 void Plane::calc_juland_throttle()
-{
+{   int8_t min_throttle = 0;
+    int8_t max_throttle = 100;
     float EAS2TAS = ahrs.get_EAS2TAS();
     float EAS_dem = g.JU_speed1;
     jTAS_dem  = EAS_dem * EAS2TAS;
@@ -832,13 +835,14 @@ void Plane::calc_juland_throttle()
           channel_throttle->set_servo_out(throttle_servo_out_init1);
         }
         if(jinit_counter <= g.JU_init_transtime) {
-              channel_throttle->set_servo_out((1-jinit_counter/g.JU_init_transtime) * throttle_servo_out_init1 + g.JU_tho_10 * (jinit_counter/g.JU_init_transtime) + JU_tho_pout * (jinit_counter/g.JU_init_transtime));
+              int16_t  jthotrans=(1-jinit_counter/g.JU_init_transtime) * throttle_servo_out_init1 + g.JU_tho_10 * (jinit_counter/g.JU_init_transtime) + JU_tho_pout * (jinit_counter/g.JU_init_transtime);
+              channel_throttle->set_servo_out(constrain_int16(jthotrans,min_throttle,max_throttle));
               //jinit_counter += jdelta_time; needn't plus counter again,already added in calc_juland_nav_pitch
             }
         else {
-              channel_throttle->set_servo_out(g.JU_tho_10 + JU_tho_pout);
+             int16_t   jthofinal=g.JU_tho_10 + JU_tho_pout;
+             channel_throttle->set_servo_out(constrain_int16(jthofinal,min_throttle,max_throttle));
              }
-
 
 
         if (ju_flarestage == 1) {
@@ -847,7 +851,8 @@ void Plane::calc_juland_throttle()
                channel_throttle->set_servo_out(throttle_servo_out_init2);
                }
                if(jthoflare_counter <= g.JU_tho_flaret) {
-               channel_throttle->set_servo_out((1-jthoflare_counter/g.JU_tho_flaret) * throttle_servo_out_init2 +  g.JU_tho_20 * (jthoflare_counter/g.JU_tho_flaret));
+               int16_t jthotransflare = (1-jthoflare_counter/g.JU_tho_flaret) * throttle_servo_out_init2 +  g.JU_tho_20 * (jthoflare_counter/g.JU_tho_flaret);
+               channel_throttle->set_servo_out(constrain_int16(jthotransflare,min_throttle,max_throttle));
                jthoflare_counter += jdelta_time;
                }
                else {
@@ -957,20 +962,26 @@ else {
 
    nav_roll_cd = bearing_err * g.JU_phsi_P *100.0f;
 
-   if (g.Jinityawable == 2) {
-	 nav_roll_cd  = channel_roll->norm_input() * roll_limit_cd;
+    if (g.Jinityawable == 2) {
+	   nav_roll_cd  = channel_roll->norm_input() * roll_limit_cd;
      nav_roll_cd  = constrain_int32(nav_roll_cd, -roll_limit_cd, roll_limit_cd);
     }
-
-     if ((ju_flarestage == 1) &&
+    if (ju_flarestage==0) {
+       messagerolllevel = true;
+    }
+    if ((ju_flarestage == 1) &&
      	(g.Jinityawable != 2)) {
        nav_roll_cd = constrain_int32(nav_roll_cd, -1000, 1000);
        if  ((height_from_home<=0.6f)&&
-     	(g.Jinityawable != 2)) {
-          nav_roll_cd = 0 ;
-        }
+          	(g.Jinityawable != 2)) {
+           nav_roll_cd = 0 ;
+             if (messagerolllevel) {
+             gcs_send_text_fmt(MAV_SEVERITY_WARNING, "Let plane roll level");
+             messagerolllevel = false;
+            }
+       }
+    }
    }
-}
 /*****************************************
 * Throttle slew limit
 *****************************************/

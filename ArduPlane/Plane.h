@@ -665,7 +665,7 @@ private:
     float jtheta0;
     float jtheta_init;
     float JU_tho_pout;
-    int16_t ju_flarestage; //to judge whether in final flare stage
+    int16_t ju_flarestage=0; //to judge whether in final flare stage
     float jEAS; //estimated airspeed in calc_ju_throttle();
     float jEAS1;//estimated airspeed in stabilize_pitch();
     float jTAS_dem;
@@ -682,6 +682,7 @@ private:
     float jdeltay_err;
     float Jy_integrator_delta;
     float Jy_pid_info_I;
+    bool  messagerolllevel:1;  //this 1 not mwans it's value is true,it means this Variable has 1 bit
 
     //struct JUWP  {
     //uint8_t JUbytes[12];

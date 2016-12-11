@@ -198,7 +198,7 @@ void Plane::update_julandcontrol(void)
         calc_juland_nav_pitch();//50Hz
         calc_juland_nav_roll();
         calc_juland_throttle();
-    }
+    //    channel_throttle->set_servo_out(10);
     if (should_log(MASK_LOG_PM)) {
         Log_Write_Performance();
     }
@@ -324,6 +324,16 @@ void Plane::one_second_loop()
 
     // make it possible to change control channel ordering at runtime
     set_control_channels();
+
+if (control_mode == STABILIZE) {
+    if (g.Jinityawable == 0 &&
+    ju_flarestage == 0) {
+     gcs_send_text_fmt(MAV_SEVERITY_INFO,"track_err=%.1fm,rc6_cmd=%.1fm",(float)jdeltay_err,(float)(g.rc_6.pwm_to_angle()/200));
+    }
+     gcs_send_text_fmt(MAV_SEVERITY_INFO,"h=%.1fm hdot_err=%.1fm,theta=%.1f,theta_err=%.1f",(float)height_from_home,(float)(JU_climb_rate_err),(float)((ahrs.pitch_sensor)/100),(float)((nav_pitch_cd-ahrs.pitch_sensor)/100));
+     gcs_send_text_fmt(MAV_SEVERITY_INFO,"ptch_servo_out=%u,Ihdotout=%.1fdeg",(int16_t)channel_pitch->get_servo_out(),(float)(climbiout/100));
+     gcs_send_text_fmt(MAV_SEVERITY_INFO,"tho_servo_out=%u",(int16_t)channel_throttle->get_servo_out());
+ }
 
 #if HAVE_PX4_MIXER
     if (!hal.util->get_soft_armed() && (last_mixer_crc == -1)) {

@@ -391,17 +391,19 @@ void Plane::set_mode(enum FlightMode mode, mode_reason_t reason)
 
     case MANUAL:
     case STABILIZE:
-    if (g.JU_WP_fromMP == 1) {
-         ju_next_WP = mission.get_current_nav_cmd().content.location;
-             gcs_send_text_fmt(MAV_SEVERITY_INFO, "Begin JULAND,fly to waypoint #%i dist %um",
-             (unsigned)mission.get_current_nav_cmd().index,
-             (unsigned)get_distance(current_loc, ju_next_WP));
-             uint16_t prev_ju_cmd_idx = mission.get_prev_nav_cmd_index();
-             mission.set_current_cmd(prev_ju_cmd_idx);
-         ju_prev_WP = mission.get_current_nav_cmd().content.location;
-             gcs_send_text_fmt(MAV_SEVERITY_INFO, "just passed waypoint #%i ",
-             (unsigned)mission.get_current_nav_cmd().index);
-         } 
+         auto_throttle_mode = false;
+         auto_navigation_mode = false;
+         if (g.JU_WP_fromMP == 1) {
+             ju_next_WP = mission.get_current_nav_cmd().content.location;
+                 gcs_send_text_fmt(MAV_SEVERITY_INFO, "Begin JULAND,fly to waypoint #%i dist %um",
+                 (unsigned)mission.get_current_nav_cmd().index,
+                 (unsigned)get_distance(current_loc, ju_next_WP));
+                 uint16_t prev_ju_cmd_idx = mission.get_prev_nav_cmd_index();
+                 mission.set_current_cmd(prev_ju_cmd_idx);
+             ju_prev_WP = mission.get_current_nav_cmd().content.location;
+                 gcs_send_text_fmt(MAV_SEVERITY_INFO, "just passed waypoint #%i ",
+                 (unsigned)mission.get_current_nav_cmd().index);
+         }
     else {
          ju_next_WP.lat = (int32_t)(g.JU_WP_2lat);
          ju_next_WP.lng = (int32_t)(g.JU_WP_2lng);
