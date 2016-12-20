@@ -345,6 +345,7 @@ void Plane::set_mode(enum FlightMode mode, mode_reason_t reason)
     // reset crash detection
     crash_state.is_crashed = false;
     crash_state.impact_detected = false;
+    jimpact_detected = false;
 
     // reset external attitude guidance
     guided_state.last_forced_rpy_ms.zero();
@@ -533,7 +534,9 @@ void Plane::set_mode(enum FlightMode mode, mode_reason_t reason)
     steerController.reset_I();
     climb_pid_info_I = 0; // ju's climb I parameter
     jflare_counter = 0;
+    jservoflare_counter = 0;
     jinit_counter = 0;
+    jservoinit_counter = 0;    
     ju_flarestage = 0;
     jthoflare_counter = 0;
     Jy_pid_info_I = 0;

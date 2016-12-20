@@ -39,6 +39,7 @@ const AP_Scheduler::Task Plane::scheduler_tasks[] = {
     SCHED_TASK(check_short_failsafe,   50,    100),
     SCHED_TASK(update_speed_height,    50,    200),
     SCHED_TASK(update_flight_mode,    400,    100),
+    SCHED_TASK(update_julandcontrol,   50,    500),
     SCHED_TASK(stabilize,             400,    100),
     SCHED_TASK(set_servos,            400,    100),
     SCHED_TASK(read_control_switch,     7,    100),
@@ -58,7 +59,6 @@ const AP_Scheduler::Task Plane::scheduler_tasks[] = {
     SCHED_TASK(read_battery,           10,    300),
     SCHED_TASK(compass_accumulate,     50,    200),
     SCHED_TASK(barometer_accumulate,   50,    150),
-    SCHED_TASK(update_julandcontrol,   50,    500),
     SCHED_TASK(update_notify,          50,    300),
     SCHED_TASK(read_rangefinder,       50,    100),
     SCHED_TASK(ice_update,             10,    100),
@@ -192,15 +192,14 @@ void Plane::update_speed_height(void)
 
 void Plane::update_julandcontrol(void)
 {
+
     if (control_mode == STABILIZE ||
         control_mode == JULAND ) {
 
         calc_juland_nav_pitch();//50Hz
         calc_juland_nav_roll();
         calc_juland_throttle();
-    //    channel_throttle->set_servo_out(10);
-    if (should_log(MASK_LOG_PM)) {
-        Log_Write_Performance();
+        jimpact_detect();
     }
 }
 
@@ -331,8 +330,8 @@ if (control_mode == STABILIZE) {
      gcs_send_text_fmt(MAV_SEVERITY_INFO,"track_err=%.1fm,rc6_cmd=%.1fm",(float)jdeltay_err,(float)(g.rc_6.pwm_to_angle()/200));
     }
      gcs_send_text_fmt(MAV_SEVERITY_INFO,"h=%.1fm hdot_err=%.1fm,theta=%.1f,theta_err=%.1f",(float)height_from_home,(float)(JU_climb_rate_err),(float)((ahrs.pitch_sensor)/100),(float)((nav_pitch_cd-ahrs.pitch_sensor)/100));
-     gcs_send_text_fmt(MAV_SEVERITY_INFO,"ptch_servo_out=%u,Ihdotout=%.1fdeg",(int16_t)channel_pitch->get_servo_out(),(float)(climbiout/100));
-     gcs_send_text_fmt(MAV_SEVERITY_INFO,"tho_servo_out=%u",(int16_t)channel_throttle->get_servo_out());
+     gcs_send_text_fmt(MAV_SEVERITY_INFO,"ptch_servo_out=%d,Ihdotout=%.1fdeg",(int16_t)channel_pitch->get_servo_out(),(float)(climbiout/100));
+     gcs_send_text_fmt(MAV_SEVERITY_INFO,"tho_servo_out=%d",(int16_t)channel_throttle->get_servo_out());
  }
 
 #if HAVE_PX4_MIXER
@@ -550,23 +549,23 @@ void Plane::handle_auto_mode(void)
         takeoff_calc_pitch();
         calc_throttle();
     } else if (nav_cmd_id == MAV_CMD_NAV_LAND) {
-/*      calc_nav_roll();
-        calc_nav_pitch();
+        //calc_nav_roll();
+        //calc_nav_pitch();
         
-        if (auto_state.land_complete) {
-            // during final approach constrain roll to the range
-            // allowed for level flight
-            nav_roll_cd = constrain_int32(nav_roll_cd, -g.level_roll_limit*100UL, g.level_roll_limit*100UL);
-        }
-        calc_throttle();
+        // if (auto_state.land_complete) {
+        //     // during final approach constrain roll to the range
+        //     // allowed for level flight
+        //     nav_roll_cd = constrain_int32(nav_roll_cd, -g.level_roll_limit*100UL, g.level_roll_limit*100UL);
+        // }
+        //calc_throttle();
         
-        if (auto_state.land_complete) {
-            // we are in the final stage of a landing - force
-            // zero throttle
-            channel_throttle->set_servo_out(0);
-        }
-            channel_throttle->servo_out = 0;
-        }*/
+        // if (auto_state.land_complete) {
+        //     // we are in the final stage of a landing - force
+        //     // zero throttle
+        //     channel_throttle->set_servo_out(0);
+        // }
+        //     channel_throttle->servo_out = 0;
+        // }
         //it's APM's original logic ,now we want to change mode to ourselves' autoland mode
         set_mode(STABILIZE,MODE_REASON_UNKNOWN);
     } else {

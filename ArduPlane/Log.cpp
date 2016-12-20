@@ -258,7 +258,8 @@ struct PACKED log_Control_Tuning {
     int16_t pitch;
     int16_t throttle_out;
     int16_t rudder_out;
-    int16_t throttle_dem;
+    //int16_t throttle_dem;
+    float jhdotcmd;
 };
 
 // Write a control tuning packet. Total length : 22 bytes
@@ -273,7 +274,8 @@ void Plane::Log_Write_Control_Tuning()
         pitch           : (int16_t)ahrs.pitch_sensor,
         throttle_out    : (int16_t)channel_throttle->get_servo_out(),
         rudder_out      : (int16_t)channel_rudder->get_servo_out(),
-        throttle_dem    : (int16_t)SpdHgt_Controller->get_throttle_demand()
+        //throttle_dem    : (int16_t)SpdHgt_Controller->get_throttle_demand()
+        jhdotcmd        : (float)JU_climb_rate_cmd
     };
     DataFlash.WriteBlock(&pkt, sizeof(pkt));
 }
@@ -282,8 +284,10 @@ struct PACKED log_Nav_Tuning {
     LOG_PACKET_HEADER;
     uint64_t time_us;
     float wp_distance;
-    int16_t target_bearing_cd;
-    int16_t nav_bearing_cd;
+    //int16_t target_bearing_cd;
+    //int16_t nav_bearing_cd;
+    float hud_alt;
+    int16_t jtrimout;
     int16_t altitude_error_cm;
     int16_t airspeed_cm;
     uint16_t ju_yawc;
@@ -299,8 +303,10 @@ void Plane::Log_Write_Nav_Tuning()
         LOG_PACKET_HEADER_INIT(LOG_NTUN_MSG),
         time_us             : AP_HAL::micros64(),
         wp_distance         : auto_state.wp_distance,
-        target_bearing_cd   : (int16_t)nav_controller->target_bearing_cd(),
-        nav_bearing_cd      : (int16_t)nav_controller->nav_bearing_cd(),
+        //target_bearing_cd   : (int16_t)nav_controller->target_bearing_cd(),
+        //nav_bearing_cd      : (int16_t)nav_controller->nav_bearing_cd(),
+        hud_alt:(float)current_loc.alt,
+        jtrimout:(int16_t)jtrimservo_out,
         altitude_error_cm   : (int16_t)altitude_error_cm,
         airspeed_cm         : (int16_t)airspeed.get_airspeed_cm(),
         ju_yawc             : (uint16_t)(JU_bearing_cmd),
@@ -336,7 +342,8 @@ void Plane::Log_Write_Status()
         ,is_crashed  : crash_state.is_crashed
         ,is_still    : plane.ins.is_still()
         ,stage       : static_cast<uint8_t>(flight_stage)
-        ,impact      : crash_state.impact_detected
+        //,impact      : crash_state.impact_detected
+        ,impact      : jimpact_detected
         };
 
     DataFlash.WriteBlock(&pkt, sizeof(pkt));
@@ -490,9 +497,10 @@ const struct LogStructure Plane::log_structure[] = {
     { LOG_STARTUP_MSG, sizeof(log_Startup),         
       "STRT", "QBH",         "TimeUS,SType,CTot" },
     { LOG_CTUN_MSG, sizeof(log_Control_Tuning),     
-      "CTUN", "Qcccchhh",    "TimeUS,NavRoll,Roll,NavPitch,Pitch,ThrOut,RdrOut,ThrDem" },
+      "CTUN", "Qcccchhf",    "TimeUS,NavRoll,Roll,NavPitch,Pitch,ThrOut,RdrOut,jHdotcmd" },
     { LOG_NTUN_MSG, sizeof(log_Nav_Tuning),         
-      "NTUN", "QfccccH",  "TimeUS,WpDist,TargBrg,NavBrg,AltErr,Arspd,JuYawc" },
+    //  "NTUN", "QfccccH",  "TimeUS,WpDist,TargBrg,NavBrg,AltErr,Arspd,JuYawc" },
+      "NTUN", "QffhccH",  "TimeUS,WpDist,hudh,jtrimser,AltErr,Arspd,JuYawc" },
     { LOG_SONAR_MSG, sizeof(log_Sonar),             
       "SONR", "QffBf",   "TimeUS,Dist,Volt,Cnt,Corr" },
     { LOG_ARM_DISARM_MSG, sizeof(log_Arm_Disarm),

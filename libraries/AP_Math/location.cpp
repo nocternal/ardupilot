@@ -80,9 +80,9 @@ int32_t get_bearing_cd(const struct Location &loc1, const struct Location &loc2)
 }
 
 // use linear interpolation to get a servo trim value at fly velocity
-int32_t linear_interp(float v0,int32_t ser0,float v1,int32_t ser1,float v)
+int16_t linear_interp(float v0,int32_t ser0,float v1,int32_t ser1,float v)
 { 
-   int32_t ser = ser0 + (v - v0)*(ser1 -ser0)/(v1-v0);
+   int16_t ser = ser0 + (v - v0)*(ser1 -ser0)/(v1-v0);
    return ser;
 }
 

@@ -83,9 +83,14 @@ void Plane::stabilize_roll(float speed_scaler)
   //  if (control_mode == STABILIZE && channel_roll->get_control_in() != 0) {
   //      disable_integrator = true;
   //  }
-       channel_roll->set_servo_out(rollController.get_servo_out(nav_roll_cd - ahrs.roll_sensor, 
+    channel_roll->set_servo_out(rollController.get_servo_out(nav_roll_cd - ahrs.roll_sensor, 
                                                            speed_scaler, 
                                                            disable_integrator)+g.JU_trim_rs);
+    channel_roll->set_servo_out(constrain_int16(channel_roll->get_servo_out(),-4500,4500));
+    if (jimpact_detected)
+    {
+      channel_roll->set_servo_out(0);
+    }
 }
 
 /*
@@ -95,6 +100,13 @@ void Plane::stabilize_roll(float speed_scaler)
  */
 void Plane::stabilize_pitch(float speed_scaler)
 {
+    uint32_t snow= AP_HAL::millis();
+    uint32_t sdt = snow - slast_t;
+    if (slast_t == 0 || sdt > 1000) {
+    sdt = 0;
+    }
+    slast_t = snow;  
+//    float sdelta_time = sdt * 0.001f;
     int8_t force_elevator = takeoff_tail_hold();
     if (force_elevator != 0) {
         // we are holding the tail down during takeoff. Just convert
@@ -102,35 +114,32 @@ void Plane::stabilize_pitch(float speed_scaler)
         channel_pitch->set_servo_out(45*force_elevator);
         return;
     }
-    if ((g.JU_trim_auto == 1) &&
-      (control_mode == STABILIZE ||
-      control_mode == JULAND))
-    {
-    float EAS2TAS = ahrs.get_EAS2TAS();
-      if (!ahrs.airspeed_sensor_enabled() || !ahrs.airspeed_estimate(&jEAS1)) {
-          // If no airspeed available use average of min and max
-          jEAS1 = 0.5f * (aparm.airspeed_min.get() + (float)aparm.airspeed_max.get());
-         }
-    float jTAS = jEAS1 * EAS2TAS;
-      if (jTAS<g.JU_trim_v1) {
-      	 nav_pitch_cd +=(int32_t)(g.JU_trim_theta1*100);
-      }
-      else if  (jTAS<g.JU_trim_v2 &&
-      	        jTAS>=g.JU_trim_v1) {
-      	 nav_pitch_cd +=linear_interp(g.JU_trim_v1,(int32_t)(g.JU_trim_theta1*100),g.JU_trim_v2,(int32_t)(g.JU_trim_theta2*100),jTAS);
-      }
-      else if  (jTAS<g.JU_trim_v3 &&
-      	        jTAS>=g.JU_trim_v2) {
-      	 nav_pitch_cd +=linear_interp(g.JU_trim_v2,(int32_t)(g.JU_trim_theta2*100),g.JU_trim_v3,(int32_t)(g.JU_trim_theta3*100),jTAS);
-      }
-      else 
-      {
-         nav_pitch_cd +=(int32_t)(g.JU_trim_theta3*100);
-      }
-
-    }
     if (control_mode == STABILIZE ||
         control_mode == JULAND) {
+            if (g.JU_trim_auto == 1)
+            {
+               float EAS2TAS = ahrs.get_EAS2TAS();
+               if (!ahrs.airspeed_sensor_enabled() || !ahrs.airspeed_estimate(&jEAS1)) {
+               // If no airspeed available use average of min and max
+               jEAS1 = 0.5f * (aparm.airspeed_min.get() + (float)aparm.airspeed_max.get());
+               }
+               float jTAS = jEAS1 * EAS2TAS;
+               if (jTAS<g.JU_trim_v1) {
+               nav_pitch_cd +=(int32_t)(g.JU_trim_theta1*100);
+               }
+               else if  (jTAS<g.JU_trim_v2 &&
+                         jTAS>=g.JU_trim_v1) {
+                nav_pitch_cd +=linear_interp(g.JU_trim_v1,(int32_t)(g.JU_trim_theta1*100),g.JU_trim_v2,(int32_t)(g.JU_trim_theta2*100),jTAS);
+               }
+               else if  (jTAS<g.JU_trim_v3 &&
+                jTAS>=g.JU_trim_v2) {
+                nav_pitch_cd +=linear_interp(g.JU_trim_v2,(int32_t)(g.JU_trim_theta2*100),g.JU_trim_v3,(int32_t)(g.JU_trim_theta3*100),jTAS);
+               }
+               else 
+               {
+               nav_pitch_cd +=(int32_t)(g.JU_trim_theta3*100);
+               }
+            }
         nav_pitch_cd = constrain_int32(nav_pitch_cd, -g.JU_thetaoutmax*100, g.JU_thetaoutmax*100);
     }
     else {
@@ -148,49 +157,20 @@ void Plane::stabilize_pitch(float speed_scaler)
     channel_pitch->set_servo_out(pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, 
                                                              speed_scaler, 
                                                              disable_integrator));
-    if ((g.JU_trim_auto == 1) &&
-      (control_mode == STABILIZE ||
-      control_mode == JULAND))
-    {
-    float EAS2TAS = ahrs.get_EAS2TAS();
-      if (!ahrs.airspeed_sensor_enabled() || !ahrs.airspeed_estimate(&jEAS1)) {
-          // If no airspeed available use average of min and max
-          jEAS1 = 0.5f * (aparm.airspeed_min.get() + (float)aparm.airspeed_max.get());
-         }
-    float jTAS = jEAS1 * EAS2TAS;
-      if (jTAS<g.JU_trim_v1) {
-         channel_pitch->set_servo_out(pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, 
-                                                             speed_scaler, 
-                                                             disable_integrator)+g.JU_trim_ps1);
-      }
-      else if  (jTAS<g.JU_trim_v2 &&
-      	        jTAS>=g.JU_trim_v1) {
-         channel_pitch->set_servo_out(pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, 
-                                                             speed_scaler, 
-                                                             disable_integrator)+linear_interp(g.JU_trim_v1,g.JU_trim_ps1,g.JU_trim_v2,g.JU_trim_ps2,jTAS));
-      }
-      else if  (jTAS<g.JU_trim_v3 &&
-      	        jTAS>=g.JU_trim_v2) {
-         channel_pitch->set_servo_out(pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, 
-                                                             speed_scaler, 
-                                                             disable_integrator)+linear_interp(g.JU_trim_v2,g.JU_trim_ps2,g.JU_trim_v3,g.JU_trim_ps3,jTAS));        
-      }
-      else 
-      {
-         channel_pitch->set_servo_out(pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, 
-                                                             speed_scaler, 
-                                                             disable_integrator)+g.JU_trim_ps3);
-      }
 
-    }
 
     if (control_mode == STABILIZE ||
     	control_mode == JULAND)
     {   
-        if (jinit_counter <= g.JU_init_transtime) {
-            channel_pitch->set_servo_out(pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, 
-                                                             speed_scaler, 
-                                                             disable_integrator)+(jinit_counter/g.JU_init_transtime)*g.JU_pitch_ser01);
+        if (jservoinit_counter == 0) {
+            pitch_servo_out_init1=last_pitch_servo_out;
+         }     
+        if (jservoinit_counter <= (g.JU_init_transtime*1000)) {
+            int16_t pitch_servo_out1 = (jservoinit_counter/g.JU_init_transtime/1000)*pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, speed_scaler, disable_integrator) +                  
+                                       (jservoinit_counter/g.JU_init_transtime/1000)*g.JU_pitch_ser01 +
+                                       (1-jservoinit_counter/g.JU_init_transtime/1000) * pitch_servo_out_init1;                                            
+            channel_pitch->set_servo_out(pitch_servo_out1);
+            jservoinit_counter+=sdt;
          }
         else {
            if (ju_flarestage == 0) {
@@ -199,23 +179,62 @@ void Plane::stabilize_pitch(float speed_scaler)
                                                              disable_integrator)+g.JU_pitch_ser01);              
              }
            else {
-               if(jflare_counter == 0) {
-                  pitch_servo_out_init2 = channel_pitch->get_servo_out();
-                  channel_pitch->set_servo_out(pitch_servo_out_init2 + g.JU_pitch_ser02n);                   
+               if(jservoflare_counter == 0) {
+                  pitch_servo_out_init2 = last_pitch_servo_out;               
                  }
-               if(jflare_counter <= g.JU_flare_transition_time) {
-                  channel_pitch->set_servo_out(pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, 
-                                                             speed_scaler, 
-                                                             disable_integrator) + (jflare_counter/g.JU_flare_transition_time)*g.JU_pitch_ser02 + g.JU_pitch_ser02n);
+               if(jservoflare_counter <= (g.JU_flare_transition_time*1000)) {
+                  int16_t pitch_servo_out2 = (1-jservoflare_counter/g.JU_flare_transition_time/1000) * pitch_servo_out_init2+ 
+                                             (jservoflare_counter/g.JU_flare_transition_time/1000) * pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, speed_scaler, disable_integrator) +
+                                             (jservoflare_counter/g.JU_flare_transition_time/1000) * g.JU_pitch_ser02 + g.JU_pitch_ser02n;                                       
+                  channel_pitch->set_servo_out(pitch_servo_out2);
+                  jservoflare_counter+=sdt;
                  }
                else {
-                  channel_pitch->set_servo_out(pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, 
-                                                             speed_scaler, 
-                                                             disable_integrator) + g.JU_pitch_ser02 + g.JU_pitch_ser02n);                 
+                  flare_pitch_servo_out = pitchController.get_servo_out(demanded_pitch - ahrs.pitch_sensor, speed_scaler, disable_integrator) +
+                                          g.JU_pitch_ser02 + g.JU_pitch_ser02n;
+                  if (g.JU_trim_auto == 1) {
+                     //float EAS2TAS = ahrs.get_EAS2TAS();
+                     float EAS2TAS = 1; //暂用EAS代替TAS，因为地面站与log都是用的EAS，这样比较一致，好调整。
+                     if (!ahrs.airspeed_sensor_enabled() || !ahrs.airspeed_estimate(&jEAS1)) {
+                     // If no airspeed available use average of min and max
+                     jEAS1 = 0.5f * (aparm.airspeed_min.get() + (float)aparm.airspeed_max.get());
+                      }
+                     float jTAS = jEAS1 * EAS2TAS;
+                     if (jTAS<g.JU_trim_v1) {
+                     jtrimservo_out=g.JU_trim_ps1;
+                     flare_pitch_servo_out+= jtrimservo_out;
+                     
+                     }
+                     else if  (jTAS<g.JU_trim_v2 &&
+                                 jTAS>=g.JU_trim_v1) {
+                     jtrimservo_out=linear_interp(g.JU_trim_v1,g.JU_trim_ps1,g.JU_trim_v2,g.JU_trim_ps2,jTAS);
+                     flare_pitch_servo_out+=jtrimservo_out;
+                     
+                     }
+                     else if  (jTAS<g.JU_trim_v3 &&
+                     jTAS>=g.JU_trim_v2) {
+                     jtrimservo_out=linear_interp(g.JU_trim_v2,g.JU_trim_ps2,g.JU_trim_v3,g.JU_trim_ps3,jTAS);
+                     flare_pitch_servo_out+=jtrimservo_out;
+                     }
+                     else 
+                     {
+                     jtrimservo_out=g.JU_trim_ps3;
+                     flare_pitch_servo_out+=jtrimservo_out;
+                     }
+                  }
+                  channel_pitch->set_servo_out(flare_pitch_servo_out);
                  } 
              }
          }
     }
+if (jimpact_detected)
+{
+channel_pitch->set_servo_out(0);
+}
+channel_pitch->set_servo_out(constrain_int16(channel_pitch->get_servo_out(),-4500,4500));
+   if (should_log(MASK_LOG_PM)) {
+     Log_Write_Performance();
+   }
 }
 
 /*
@@ -263,8 +282,7 @@ void Plane::stabilize_stick_mixing_direct()
         control_mode == QLOITER ||
         control_mode == QLAND ||
         control_mode == QRTL ||
-        control_mode == TRAINING ||
-        control_mode == STABILIZE) {
+        control_mode == TRAINING) {
         return;
     }
     stick_mix_channel(channel_roll);
@@ -559,9 +577,9 @@ void Plane::calc_throttle()
 void Plane::calc_nav_yaw_coordinated(float speed_scaler)
 {
     bool disable_integrator = false;
-    if (control_mode == STABILIZE && rudder_input != 0) {
-        disable_integrator = true;
-    }
+//    if (control_mode == STABILIZE && rudder_input != 0) {
+//        disable_integrator = true;
+//    }
 
     int16_t commanded_rudder;
 
@@ -741,19 +759,18 @@ void Plane::calc_juland_nav_pitch()
             jtheta0 = jtheta_init;
             JU_climb_rate_err = 0;  
             climb_pid_info_I = 0;
-            nav_pitch_cd_old = ahrs.pitch_sensor;
-            //channel_throttle->servo_out = 30.0;
+            JU_climb_rate_cmd = jclimbrate_temp1;
         }
-        if(jinit_counter <= g.JU_init_transtime) {
-            JU_climb_rate_err = jclimbrate_temp1 +  (g.JU_climbrate1 - jclimbrate_temp1) *  jinit_counter /(g.JU_init_transtime) - (-sink_rate);
-            //channel_throttle->servo_out = 30.0 + 1.0 * jflare_counter;
-            jtheta0 = jtheta_init + (g.JU_theta01*100.0f - jtheta_init) *  jinit_counter /(g.JU_init_transtime);
-            jinit_counter += jdelta_time;
+        if(jinit_counter <= (g.JU_init_transtime*1000)) {
+            JU_climb_rate_cmd = jclimbrate_temp1 +  (g.JU_climbrate1 - jclimbrate_temp1) *  jinit_counter /(g.JU_init_transtime)/1000;
+            JU_climb_rate_err = JU_climb_rate_cmd - (-sink_rate);
+            jtheta0 = jtheta_init + (g.JU_theta01*100.0f - jtheta_init) *  jinit_counter /(g.JU_init_transtime)/1000;
+            jinit_counter += jdt;
             }
         else {
-            JU_climb_rate_err = g.JU_climbrate1 - (-sink_rate); 
+            JU_climb_rate_cmd = g.JU_climbrate1;
+            JU_climb_rate_err = JU_climb_rate_cmd - (-sink_rate); 
             jtheta0 = g.JU_theta01*100.0f;
-            //channel_throttle->servo_out = 34;  
              }
         /*
           when come into flare stage,just stimulate it once
@@ -766,25 +783,28 @@ void Plane::calc_juland_nav_pitch()
         */ 
          if (ju_flarestage == 1) {
                if(jflare_counter == 0) {
-               gcs_send_text_fmt(MAV_SEVERITY_WARNING, "Flare begin. Plane head to front");
+               gcs_send_text_fmt(MAV_SEVERITY_NOTICE, "Flare begin. Plane head to front");
                jclimbrate_temp = -sink_rate;
                jtheta_init = ahrs.pitch_sensor - g.pitch_trim_cd - channel_throttle->get_servo_out() * g.kff_throttle_to_pitch;
-               jtheta0 = jtheta_init;
-               JU_climb_rate_err = 0;  //change desend rate commad as flare alt's descend rate
-               nav_pitch_cd_old = ahrs.pitch_sensor;
                }
-               if(jflare_counter <= g.JU_flare_transition_time) {
-               JU_climb_rate_err = jclimbrate_temp +  (g.JU_climbrate2 - jclimbrate_temp) *  jflare_counter /(g.JU_flare_transition_time) - (-sink_rate);
-               jtheta0 = jtheta_init + (g.JU_theta02*100.0f - jtheta_init) *  jflare_counter /(g.JU_flare_transition_time);
-               jflare_counter += jdelta_time;
+               if(jflare_counter <= (g.JU_flare_transition_time*1000)) {
+               JU_climb_rate_cmd = (1-jflare_counter /g.JU_flare_transition_time/1000.0f)*g.JU_climbrate1 + jflare_counter/g.JU_flare_transition_time/1000.0f * g.JU_climbrate2;
+               JU_climb_rate_err = JU_climb_rate_cmd - (-sink_rate);
+               jtheta0 = jflare_counter /g.JU_flare_transition_time/1000.0f * g.JU_theta02*100.0f +(1 - jflare_counter /g.JU_flare_transition_time/1000.0f) * g.JU_theta01*100.0f;
+                   if (g.JU_flare_theta_enable == 1) {
+                   jtheta0 = jtheta_init + (g.JU_theta02*100.0f - jtheta_init) *  jflare_counter / g.JU_flare_transition_time/1000.0f;
+                   }
+               jflare_counter += jdt;
                }
                else {
-               JU_climb_rate_err = g.JU_climbrate2 - (-sink_rate);
+               JU_climb_rate_cmd = g.JU_climbrate2;
+               JU_climb_rate_err = JU_climb_rate_cmd - (-sink_rate);
                jtheta0 = g.JU_theta02*100.0f;  
                }  
          }
          else {
             jflare_counter = 0;
+            jservoflare_counter = 0;
          }
 
 
@@ -802,13 +822,12 @@ void Plane::calc_juland_nav_pitch()
         }
         climb_pid_info_I = constrain_float(climb_pid_info_I, -g.JU_Ioutmax*100.0f, g.JU_Ioutmax*100.0f);
 
-        //channel_throttle->servo_out = 30.0;
-        climbpout = JU_climb_rate_err * g.JU_Pclimbrate * 5729.0f ; //P's centidegree
+         climbpout = JU_climb_rate_err * g.JU_Pclimbrate * 5729.0f ; //P's centidegree
         climbiout = climb_pid_info_I ;
         nav_pitch_cd = climbpout + climbiout + jtheta0;
         if (ju_flarestage == 1) {
             if (g.JU_flare_theta_enable == 1) {
-                nav_pitch_cd = jtheta0;
+                nav_pitch_cd = jtheta0;          
             }
         }
 }
@@ -816,7 +835,8 @@ void Plane::calc_juland_nav_pitch()
 void Plane::calc_juland_throttle()
 {   int8_t min_throttle = 0;
     int8_t max_throttle = 100;
-    float EAS2TAS = ahrs.get_EAS2TAS();
+    //float EAS2TAS = ahrs.get_EAS2TAS(); 
+    float EAS2TAS = 1; //暂时还是用当量空速好了。。。毕竟地面站/数据记录等都还是记录的当量空速，当然在这个里面控TAS也不影响，因为指令与实际值都乘了EAS2TAS。但是用TECS最好还是控TAS。
     float EAS_dem = g.JU_speed1;
     jTAS_dem  = EAS_dem * EAS2TAS;
     if (!ahrs.airspeed_sensor_enabled() || !ahrs.airspeed_estimate(&jEAS)) {
@@ -824,18 +844,17 @@ void Plane::calc_juland_throttle()
         jEAS = 0.5f * (aparm.airspeed_min.get() + (float)aparm.airspeed_max.get());
     }
     float jTAS = jEAS * EAS2TAS;
+    jTAStest = jTAS;
     jTAS_err = jTAS_dem - jTAS;
     jTAS_err = constrain_float(jTAS_err, -g.JU_tho_Verr, g.JU_tho_Verr);
     JU_tho_pout = g.JU_tho_P * jTAS_err;
-
-    int32_t last_throttle_servo_out = channel_throttle->get_servo_out();
 
         if(jinit_counter == 0) {
           throttle_servo_out_init1 = last_throttle_servo_out ;
           channel_throttle->set_servo_out(throttle_servo_out_init1);
         }
-        if(jinit_counter <= g.JU_init_transtime) {
-              int16_t  jthotrans=(1-jinit_counter/g.JU_init_transtime) * throttle_servo_out_init1 + g.JU_tho_10 * (jinit_counter/g.JU_init_transtime) + JU_tho_pout * (jinit_counter/g.JU_init_transtime);
+        if(jinit_counter <= (g.JU_init_transtime*1000)) {
+              int16_t  jthotrans=(1-jinit_counter/g.JU_init_transtime/1000) * throttle_servo_out_init1 + g.JU_tho_10 * (jinit_counter/g.JU_init_transtime/1000) + JU_tho_pout * (jinit_counter/g.JU_init_transtime/1000);
               channel_throttle->set_servo_out(constrain_int16(jthotrans,min_throttle,max_throttle));
               //jinit_counter += jdelta_time; needn't plus counter again,already added in calc_juland_nav_pitch
             }
@@ -850,10 +869,10 @@ void Plane::calc_juland_throttle()
                throttle_servo_out_init2 = channel_throttle->get_servo_out();
                channel_throttle->set_servo_out(throttle_servo_out_init2);
                }
-               if(jthoflare_counter <= g.JU_tho_flaret) {
-               int16_t jthotransflare = (1-jthoflare_counter/g.JU_tho_flaret) * throttle_servo_out_init2 +  g.JU_tho_20 * (jthoflare_counter/g.JU_tho_flaret);
+               if(jthoflare_counter <= (g.JU_tho_flaret*1000)) {
+               int16_t jthotransflare = (1-jthoflare_counter/g.JU_tho_flaret/1000) * throttle_servo_out_init2 +  g.JU_tho_20 * (jthoflare_counter/g.JU_tho_flaret/1000);
                channel_throttle->set_servo_out(constrain_int16(jthotransflare,min_throttle,max_throttle));
-               jthoflare_counter += jdelta_time;
+               jthoflare_counter += jdt;
                }
                else {
                channel_throttle->set_servo_out(g.JU_tho_20);
@@ -862,6 +881,7 @@ void Plane::calc_juland_throttle()
          else {
             jthoflare_counter = 0;
          }
+channel_throttle->set_servo_out(constrain_int16(channel_throttle->get_servo_out(),0,100)); 
 }
 
 /*
@@ -976,7 +996,7 @@ else {
           	(g.Jinityawable != 2)) {
            nav_roll_cd = 0 ;
              if (messagerolllevel) {
-             gcs_send_text_fmt(MAV_SEVERITY_WARNING, "Let plane roll level");
+             gcs_send_text_fmt(MAV_SEVERITY_NOTICE, "Let plane roll level");
              messagerolllevel = false;
             }
        }
@@ -1693,6 +1713,9 @@ void Plane::set_servos(void)
     channel_throttle->output();
     channel_rudder->output();
     RC_Channel_aux::output_ch_all();
+    last_pitch_servo_out = channel_pitch->get_servo_out();
+    last_roll_servo_out = channel_roll->get_servo_out();
+    last_throttle_servo_out = channel_throttle->get_servo_out();
 }
 
 bool Plane::allow_reverse_thrust(void)

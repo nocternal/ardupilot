@@ -640,19 +640,22 @@ private:
 
     // a smoothed airspeed estimate, used for limiting roll angle
     float smoothed_airspeed;
-
+    float JU_climb_rate_cmd = 0;
     float JU_climb_rate_err;
     uint32_t jtnow;
     uint32_t jdt;
     uint32_t jlast_t;
+    uint32_t slast_t;
     float climbpout;
     float climbiout;
     float climb_pid_info_I;
     float climb_integrator_delta; 
     float jdelta_time; 
-    float jflare_counter;
-    float jthoflare_counter;
-    float jinit_counter;
+    uint32_t jflare_counter;
+    uint32_t jservoflare_counter;
+    uint32_t jthoflare_counter;
+    uint32_t jinit_counter;
+    uint32_t jservoinit_counter;
     float jclimbrate_temp; 
     float height_from_home;
     float nav_pitch_cd_old; 
@@ -670,9 +673,14 @@ private:
     float jEAS1;//estimated airspeed in stabilize_pitch();
     float jTAS_dem;
     float jTAS_err;
-    int32_t throttle_servo_out_init1;
-    int32_t throttle_servo_out_init2;
-    int32_t pitch_servo_out_init2;
+    int16_t throttle_servo_out_init1;
+    int16_t throttle_servo_out_init2;
+    int16_t pitch_servo_out_init1;
+    int16_t pitch_servo_out_init2;
+    int16_t last_pitch_servo_out;
+    int16_t last_roll_servo_out;
+    int16_t last_throttle_servo_out;
+    int16_t flare_pitch_servo_out;
     float  JU_bearing_cmd; //rad
     struct Location ju_prev_WP {};
     struct Location ju_next_WP {};
@@ -683,13 +691,9 @@ private:
     float Jy_integrator_delta;
     float Jy_pid_info_I;
     bool  messagerolllevel:1;  //this 1 not mwans it's value is true,it means this Variable has 1 bit
-
-    //struct JUWP  {
-    //uint8_t JUbytes[12];
-    //};
-    //struct JUWP JUWP1;
-    //struct JUWP JUWP2;
-
+    float jTAStest;
+    int16_t jtrimservo_out;
+    bool jimpact_detected:1;
 
 
     // Mission library
@@ -1106,6 +1110,7 @@ private:
     void calc_nav_pitch();
     void calc_juland_nav_pitch();
     void calc_juland_nav_roll();
+    void jimpact_detect();
     void calc_juland_throttle();
     void update_flight_stage();
     void update_navigation();

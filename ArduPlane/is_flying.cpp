@@ -182,6 +182,17 @@ bool Plane::is_flying(void)
     return (isFlyingProbability >= 0.9f);
 }
 
+
+void Plane::jimpact_detect(void)
+{   
+    if(ju_flarestage ==1 &&
+       height_from_home<1 ) {
+        if ((ahrs.get_ins().get_accel().z)< -(g.crash_accel_threshold))
+        {
+         jimpact_detected = true;
+        }    
+    }
+}
 /*
  * Determine if we have crashed
  */

@@ -45,7 +45,7 @@ template <class T>
 float safe_asin(const T v);
 
 //use linear interpolation to get a servo trim value at fly velocity
-int32_t                 linear_interp(float v0,int32_t ser0,float v1,int32_t ser1,float v);
+int16_t  linear_interp(float v0,int32_t ser0,float v1,int32_t ser1,float v);
 /*
  * A variant of sqrt() that checks the input ranges and ensures a valid value
  * as output. If a negative number is given then 0 is returned.  The reasoning
