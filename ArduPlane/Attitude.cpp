@@ -988,6 +988,7 @@ else {
     }
     if (ju_flarestage==0) {
        messagerolllevel = true;
+       message_impact = true;
     }
     if ((ju_flarestage == 1) &&
      	(g.Jinityawable != 2)) {

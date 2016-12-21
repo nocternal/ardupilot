@@ -694,6 +694,7 @@ private:
     float jTAStest;
     int16_t jtrimservo_out;
     bool jimpact_detected:1;
+    bool message_impact:1;
 
 
     // Mission library

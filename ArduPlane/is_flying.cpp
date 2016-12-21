@@ -190,6 +190,10 @@ void Plane::jimpact_detect(void)
         if ((ahrs.get_ins().get_accel().z)< -(g.crash_accel_threshold))
         {
          jimpact_detected = true;
+            if (message_impact) {
+             gcs_send_text_fmt(MAV_SEVERITY_WARNING, "Impact detected");
+             message_impact = false;
+            }
         }    
     }
 }
