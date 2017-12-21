@@ -560,7 +560,7 @@ void Plane::handle_auto_mode(void)
   main flight mode dependent update code 
  */
 void Plane::update_flight_mode(void)
-{
+{   
     enum FlightMode effective_mode = control_mode;
     if (control_mode == AUTO && g.auto_fbw_steer == 42) {
         effective_mode = FLY_BY_WIRE_A;
@@ -757,11 +757,11 @@ void Plane::update_flight_mode(void)
         nav_pitch_cd = constrain_int32(nav_pitch_cd, pitch_limit_min_cd, aparm.pitch_limit_max_cd.get());
         break;
     }
-        
+    case JUHdotVPhi:    
     case INITIALISING:
         // handled elsewhere
         break;
-    }
+    } 
 }
 
 void Plane::update_navigation()
@@ -834,6 +834,7 @@ void Plane::update_navigation()
     case QLAND:
     case QRTL:
         // nothing to do
+    case JUHdotVPhi:
         break;
     }
 }

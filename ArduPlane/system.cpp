@@ -474,6 +474,7 @@ void Plane::set_mode(enum FlightMode mode, mode_reason_t reason)
     case QHOVER:
     case QLOITER:
     case QLAND:
+    case JUHdotVPhi:
     case QRTL:
         auto_navigation_mode = false;
         if (!quadplane.init_mode()) {
@@ -524,6 +525,7 @@ bool Plane::mavlink_set_mode(uint8_t mode)
     case QHOVER:
     case QLOITER:
     case QLAND:
+    case JUHdotVPhi:
     case QRTL:
         set_mode((enum FlightMode)mode, MODE_REASON_GCS_COMMAND);
         return true;
@@ -736,6 +738,9 @@ void Plane::print_flight_mode(AP_HAL::BetterStream *port, uint8_t mode)
     case QRTL:
         port->print("QRTL");
         break;
+    case JUHdotVPhi:
+        port->print("JUHdotVPhi");
+        break;   
     default:
         port->printf("Mode(%u)", (unsigned)mode);
         break;

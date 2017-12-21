@@ -62,6 +62,7 @@ void Plane::send_heartbeat(mavlink_channel_t chan)
         // APM does in any mode, as that is defined as "system finds its own goal
         // positions", which APM does not currently do
         break;
+    case JUHdotVPhi:
     case INITIALISING:
         system_status = MAV_STATE_CALIBRATING;
         break;
@@ -220,7 +221,7 @@ void Plane::send_extended_status1(mavlink_channel_t chan)
         control_sensors_enabled |= MAV_SYS_STATUS_SENSOR_Z_ALTITUDE_CONTROL; // altitude control
         control_sensors_enabled |= MAV_SYS_STATUS_SENSOR_XY_POSITION_CONTROL; // X/Y position control
         break;
-
+    case JUHdotVPhi:
     case INITIALISING:
         break;
     }
