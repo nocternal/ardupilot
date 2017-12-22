@@ -302,6 +302,14 @@ void Plane::update_aux(void)
 
 void Plane::one_second_loop()
 {
+    // Temporary JU debug message
+    /*gcs_send_text_fmt(MAV_SEVERITY_INFO, "Hdotc=%.1f ,Vc=%.1f , Phic=%.1f ,rc=%.1f",
+                              (double)Ju_Joystick_Hdotc,
+                              (double)Ju_Joystick_Vc,
+                              (double)(Ju_Joystick_Phic*57.3f),
+                              (double)(Ju_Joystick_rc*57.3f));*/
+
+
     // send a heartbeat
     gcs_send_message(MSG_HEARTBEAT);
 
@@ -679,6 +687,28 @@ void Plane::update_flight_mode(void)
                 }
             }
         }
+
+///////////////////// Temporary!!!!!!!!
+        if (channel_pitch->norm_input()>=0) {
+        Ju_Joystick_Hdotc = channel_pitch->norm_input() * g.JU_Lim_Hdot_Max;   
+        } else {
+        Ju_Joystick_Hdotc = channel_pitch->norm_input() * ( - g.JU_Lim_Hdot_Min);   
+        }
+        Ju_Joystick_Hdotc = constrain_float(Ju_Joystick_Hdotc,g.JU_Lim_Hdot_Min,g.JU_Lim_Hdot_Max);
+         
+        // Vc [m/s]
+        Ju_Joystick_Vc    = g.JU_Lim_V_Air_Min + (g.JU_Lim_V_Air_Max - g.JU_Lim_V_Air_Min) * channel_throttle->get_control_in()/100;
+        Ju_Joystick_Vc    = constrain_float(Ju_Joystick_Vc,g.JU_Lim_V_Air_Min,g.JU_Lim_V_Air_Max);
+
+        // Phic [rad]
+        Ju_Joystick_Phic  = channel_roll->norm_input() * g.JU_Lim_Phi_Max/57.3f;   
+        Ju_Joystick_Phic  = constrain_float(Ju_Joystick_Phic, - g.JU_Lim_Phi_Max/57.3f,g.JU_Lim_Phi_Max/57.3f);
+          
+        // rc [rad/s]
+        Ju_Joystick_rc    = channel_rudder->norm_input() * g.JU_Lim_r_Air_Max/57.3f;
+        Ju_Joystick_rc    = constrain_float(Ju_Joystick_rc, - g.JU_Lim_r_Air_Max/57.3f,g.JU_Lim_r_Air_Max/57.3f);
+////////////////////// Need to delete!!!!!!!!!!!!!        
+ 
         break;
     }
 
@@ -757,7 +787,7 @@ void Plane::update_flight_mode(void)
         nav_pitch_cd = constrain_int32(nav_pitch_cd, pitch_limit_min_cd, aparm.pitch_limit_max_cd.get());
         break;
     }
-    case JUHdotVPhi:    
+    case JUHdotVPhi: {   
         // 各操纵杆对应的下沉率、滚转角、偏航角速度、速度指令
          
         // Hdotc [m/s]
@@ -769,20 +799,19 @@ void Plane::update_flight_mode(void)
         Ju_Joystick_Hdotc = constrain_float(Ju_Joystick_Hdotc,g.JU_Lim_Hdot_Min,g.JU_Lim_Hdot_Max);
          
         // Vc [m/s]
-        Ju_Joystick_Vc   = g.JU_Lim_V_Air_Min + (g.JU_Lim_V_Air_Max - g.JU_Lim_V_Air_Min) * channel_throttle->get_control_in()/100;
-        Ju_Joystick_Vc   = constrain_float(Ju_Joystick_Vc,g.JU_Lim_V_Air_Min,g.JU_Lim_V_Air_Max);
+        Ju_Joystick_Vc    = g.JU_Lim_V_Air_Min + (g.JU_Lim_V_Air_Max - g.JU_Lim_V_Air_Min) * channel_throttle->get_control_in()/100;
+        Ju_Joystick_Vc    = constrain_float(Ju_Joystick_Vc,g.JU_Lim_V_Air_Min,g.JU_Lim_V_Air_Max);
 
         // Phic [rad]
-        Ju_Joystick_Phic = channel_roll->norm_input() * g.JU_Lim_Phi_Max/57.3f;   
-        Ju_Joystick_Phic = constrain_float(Ju_Joystick_Phic, - g.JU_Lim_Phi_Max/57.3f,g.JU_Lim_Phi_Max/57.3f);
+        Ju_Joystick_Phic  = channel_roll->norm_input() * g.JU_Lim_Phi_Max/57.3f;   
+        Ju_Joystick_Phic  = constrain_float(Ju_Joystick_Phic, - g.JU_Lim_Phi_Max/57.3f,g.JU_Lim_Phi_Max/57.3f);
          
         // rc [rad/s]
-        Ju_Joystick_rc   = channel_rudder->norm_input() * g.JU_Lim_r_Air_Max/57.3f;
-        Ju_Joystick_rc   = constrain_float(Ju_Joystick_rc, - g.JU_Lim_r_Air_Max/57.3f,g.JU_Lim_r_Air_Max/57.3f);
+        Ju_Joystick_rc    = channel_rudder->norm_input() * g.JU_Lim_r_Air_Max/57.3f;
+        Ju_Joystick_rc    = constrain_float(Ju_Joystick_rc, - g.JU_Lim_r_Air_Max/57.3f,g.JU_Lim_r_Air_Max/57.3f);
         
         break;
-
-
+    }
 
 
     case INITIALISING:
