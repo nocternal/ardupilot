@@ -1085,6 +1085,50 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(crash_detection_enable,         "CRASH_DETECT",   0),
 
+
+    // @Param: JU_Lim_Hdot_Max
+    // @DisplayName: JU_Lim_Hdot_Max
+    // @Description: Max allowable climb rate [m/s] 
+    // @Values: 1 10
+    // @User: Advanced
+    GSCALAR(JU_Lim_Hdot_Max,         "JU_Lim_Hdot_Max",   4),
+
+
+    // @Param: JU_Lim_Hdot_Min
+    // @DisplayName: JU_Lim_Hdot_Min
+    // @Description: Min allowable descend rate (should be a minus value)[m/s] 
+    // @Values: -10 -1
+    // @User: Advanced
+    GSCALAR(JU_Lim_Hdot_Min,         "JU_Lim_Hdot_Min",   -4),
+
+    // @Param: JU_Lim_V_Air_Max
+    // @DisplayName: JU_Lim_V_Air_Max
+    // @Description: Max allowable velocity in air [m/s] 
+    // @Values: 0 100
+    // @User: Advanced
+    GSCALAR(JU_Lim_V_Air_Max,         "JU_Lim_V_Air_Max",  30),
+
+    // @Param: JU_Lim_V_Air_Min
+    // @DisplayName: JU_Lim_V_Air_Min
+    // @Description: Min allowable velocity in air [m/s] 
+    // @Values: -100 100
+    // @User: Advanced
+    GSCALAR(JU_Lim_V_Air_Min,         "JU_Lim_V_Air_Min",  -5),
+
+    // @Param: JU_Lim_Phi_Max
+    // @DisplayName: JU_Lim_Phi_Max
+    // @Description: Max allowable roll angle [deg] 
+    // @Values: 20 60
+    // @User: Advanced
+    GSCALAR(JU_Lim_Phi_Max,         "JU_Lim_Phi_Max",   45),
+
+    // @Param: JU_Lim_r_Air_Max
+    // @DisplayName: JU_Lim_r_Air_Max
+    // @Description: Max allowable yaw rate cmd from joystick [deg/s] 
+    // @Values: 30 180
+    // @User: Advanced
+    GSCALAR(JU_Lim_r_Air_Max,         "JU_Lim_r_Air_Max",   30),
+
     // barometer ground calibration. The GND_ prefix is chosen for
     // compatibility with previous releases of ArduPlane
     // @Group: GND_

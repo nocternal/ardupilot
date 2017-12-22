@@ -348,6 +348,12 @@ public:
 
         k_param_DataFlash = 253, // Logging Group
 
+        k_param_JU_Lim_Hdot_Max = 254, // JU Param Group
+        k_param_JU_Lim_Hdot_Min,
+        k_param_JU_Lim_V_Air_Max,
+        k_param_JU_Lim_V_Air_Min,
+        k_param_JU_Lim_Phi_Max,
+        k_param_JU_Lim_r_Air_Max,
         // 254,255: reserved
     };
 
@@ -487,6 +493,18 @@ public:
     AP_Int16 pitch_trim_cd;
     AP_Int16 FBWB_min_altitude_cm;
     AP_Int8  hil_servos;
+
+    // JU Param
+    //
+    AP_Float JU_Lim_Hdot_Max;  // [m/s]
+    AP_Float JU_Lim_Hdot_Min;
+    AP_Float JU_Lim_V_Air_Max;
+    AP_Float JU_Lim_V_Air_Min;
+    AP_Float JU_Lim_Phi_Max;   // [deg]
+    AP_Float JU_Lim_r_Air_Max; // [deg/s]
+    
+
+
 #if HIL_SUPPORT
     AP_Int8  hil_mode;
 #endif

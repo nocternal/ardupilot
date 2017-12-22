@@ -641,6 +641,12 @@ private:
     // a smoothed airspeed estimate, used for limiting roll angle
     float smoothed_airspeed;
 
+    // JU Variables
+    float Ju_Joystick_Hdotc;   // [m/s]
+    float Ju_Joystick_Vc;      // [m/s]
+    float Ju_Joystick_Phic;    // [rad]
+    float Ju_Joystick_rc;      // [rad/s]
+    
     // Mission library
     AP_Mission mission {ahrs, 
             FUNCTOR_BIND_MEMBER(&Plane::start_command_callback, bool, const AP_Mission::Mission_Command &),

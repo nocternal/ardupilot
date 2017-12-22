@@ -758,6 +758,33 @@ void Plane::update_flight_mode(void)
         break;
     }
     case JUHdotVPhi:    
+        // 各操纵杆对应的下沉率、滚转角、偏航角速度、速度指令
+         
+        // Hdotc [m/s]
+        if (channel_pitch->norm_input()>=0) {
+        Ju_Joystick_Hdotc = channel_pitch->norm_input() * g.JU_Lim_Hdot_Max;   
+        } else {
+        Ju_Joystick_Hdotc = channel_pitch->norm_input() * ( - g.JU_Lim_Hdot_Min);   
+        }
+        Ju_Joystick_Hdotc = constrain_float(Ju_Joystick_Hdotc,g.JU_Lim_Hdot_Min,g.JU_Lim_Hdot_Max);
+         
+        // Vc [m/s]
+        Ju_Joystick_Vc   = g.JU_Lim_V_Air_Min + (g.JU_Lim_V_Air_Max - g.JU_Lim_V_Air_Min) * channel_throttle->get_control_in()/100;
+        Ju_Joystick_Vc   = constrain_float(Ju_Joystick_Vc,g.JU_Lim_V_Air_Min,g.JU_Lim_V_Air_Max);
+
+        // Phic [rad]
+        Ju_Joystick_Phic = channel_roll->norm_input() * g.JU_Lim_Phi_Max/57.3f;   
+        Ju_Joystick_Phic = constrain_float(Ju_Joystick_Phic, - g.JU_Lim_Phi_Max/57.3f,g.JU_Lim_Phi_Max/57.3f);
+         
+        // rc [rad/s]
+        Ju_Joystick_rc   = channel_rudder->norm_input() * g.JU_Lim_r_Air_Max/57.3f;
+        Ju_Joystick_rc   = constrain_float(Ju_Joystick_rc, - g.JU_Lim_r_Air_Max/57.3f,g.JU_Lim_r_Air_Max/57.3f);
+        
+        break;
+
+
+
+
     case INITIALISING:
         // handled elsewhere
         break;
