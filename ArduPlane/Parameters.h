@@ -356,6 +356,7 @@ public:
         k_param_JU_Lim_V_Air_Min,
         k_param_JU_Lim_V_Avd0_Max,
         k_param_JU_Lim_V_Avd0_Min,
+        k_param_JU_Lim_Theta_Max,
         k_param_JU_Lim_Phi_Max,
         k_param_JU_Lim_Phidot_Max,
         k_param_JU_Lim_Phidotdot_Max,
@@ -377,8 +378,12 @@ public:
 
         k_param_JU_VAR_V_Smooth,
 
+        k_param_JU_Gain_Ref_FF_q,
+        k_param_JU_Gain_Ref_FF_Vdot,
         k_param_JU_Gain_Ref_FF_de,
-        k_param_JU_Gain_Ref_FF_da,
+        k_param_JU_Gain_Ref_FF_Phidot,
+        k_param_JU_Gain_Ref_FF_da
+
         // 254,255: reserved
     };
 
@@ -536,6 +541,7 @@ public:
     AP_Float JU_Lim_V_Air_Min;
     AP_Float JU_Lim_V_Avd0_Max;
     AP_Float JU_Lim_V_Avd0_Min;   
+    AP_Float JU_Lim_Theta_Max;    // [deg]
     AP_Float JU_Lim_Phi_Max;    // [deg]
     AP_Float JU_Lim_Phidot_Max; // [deg/s]
     AP_Float JU_Lim_Phidotdot_Max; // [deg/s^2]
@@ -549,7 +555,10 @@ public:
     AP_Float JU_Ref_Ksi_Phi;
     AP_Float JU_Ref_w0_Phi;
 
+    AP_Float JU_Gain_Ref_FF_q;
+    AP_Float JU_Gain_Ref_FF_Vdot;
     AP_Float JU_Gain_Ref_FF_de;
+    AP_Float JU_Gain_Ref_FF_Phidot;
     AP_Float JU_Gain_Ref_FF_da;
 
 #if HIL_SUPPORT

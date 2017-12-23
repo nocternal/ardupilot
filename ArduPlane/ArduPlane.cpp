@@ -1217,6 +1217,13 @@ void Plane::Ju_HdotV_Ctrl()
 {
     Ju_Ref_Hdot_Mdl();
     Ju_Ref_V_Mdl();
+    float V_Use    = constrain_float(Ju_V_A_MEAS , g.JU_Lim_V_Avd0_Min , g.JU_Lim_V_Avd0_Max);
+    float delta_Hdotc  = Ju_Ref_Hdot - Ju_Hdot_MEAS;
+    float delta_Gammac = delta_Hdotc / V_Use;
+    Ju_Thetac    = delta_Gammac + Ju_Theta_MEAS; // delta_Theta 约等于 delta_Gamma
+    Ju_Thetac    = constrain_float(Ju_Thetac , - g.JU_Lim_Theta_Max/57.3f , g.JU_Lim_Theta_Max/57.3f);
+    delta_Gammac = Ju_Thetac - Ju_Theta_MEAS;
+    
 }
 
 void Plane::Ju_Phi_Ctrl()
@@ -1245,7 +1252,7 @@ void Plane::Ju_Ref_Hdot_Mdl()
         Ju_Ref_de            = Ju_Ref_Hdotdotdot * g.JU_Gain_Ref_FF_de / ( V_Use * V_Use * V_Use ); // [rad] 
         Ju_Ref_Hdotdot       = Ju_Ref_Hdotdot + Ju_Ref_Hdotdotdot * jdelta_time;
         Ju_Ref_Hdotdot       = constrain_float(Ju_Ref_Hdotdot   , - g.JU_Lim_Delta_nz_Max * g_acc , g.JU_Lim_Delta_nz_Max * g_acc);
-        Ju_Ref_q             = Ju_Ref_Hdotdot / V_Use;
+        Ju_Ref_q             = Ju_Ref_Hdotdot / V_Use * g.JU_Gain_Ref_FF_q;
         Ju_Ref_Hdotdot       = Ju_Ref_Hdotdot * cosf(Phi_Use);
         Ju_Ref_Hdot          = Ju_Ref_Hdot + Ju_Ref_Hdotdot * jdelta_time;
         Ju_Ref_Hdot          = constrain_float(Ju_Ref_Hdot , - g.JU_Lim_Hdot_Max , g.JU_Lim_Hdot_Max);
@@ -1260,7 +1267,7 @@ void Plane::Ju_Ref_V_Mdl()
         Ju_Ref_Vdot   = 0;
     }
     else {
-        Ju_Ref_Vdot   = (Ju_Joystick_Vc - Ju_Ref_V) / g.JU_Ref_T_V;
+        Ju_Ref_Vdot   = (Ju_Joystick_Vc - Ju_Ref_V) / g.JU_Ref_T_V * g.JU_Gain_Ref_FF_Vdot;
         Ju_Ref_Vdot   = constrain_float(Ju_Ref_Vdot , - g.JU_Lim_Vdot_Max , g.JU_Lim_Vdot_Max);
         Ju_Ref_V      = Ju_Ref_V + Ju_Ref_Vdot * jdelta_time;
         Ju_Ref_V      = constrain_float(Ju_Ref_V , -g.JU_Lim_V_Air_Max,g.JU_Lim_V_Air_Max); //注意，此处其实并不对最小值作约束，因为切换的时候可能低于空中模式所设定的最小值
@@ -1281,7 +1288,7 @@ void Plane::Ju_Ref_Phi_Mdl()
         Ju_Ref_Phidotdot = (Ju_Joystick_Phic - Ju_Ref_Phi) * w0square - 2 * g.JU_Ref_w0_Phi * g.JU_Ref_Ksi_Phi * Ju_Ref_Phidot;
         Ju_Ref_Phidotdot = constrain_float(Ju_Ref_Phidotdot , - g.JU_Lim_Phidotdot_Max/57.3f, g.JU_Lim_Phidotdot_Max/57.3f);
         Ju_Ref_da        = Ju_Ref_Phidotdot  * g.JU_Gain_Ref_FF_da / ( V_Use * V_Use ); // [rad] 注意，这里是V平方
-        Ju_Ref_Phidot    = Ju_Ref_Phidot + Ju_Ref_Phidotdot * jdelta_time;
+        Ju_Ref_Phidot    = Ju_Ref_Phidot + Ju_Ref_Phidotdot * jdelta_time * g.JU_Gain_Ref_FF_Phidot;
         Ju_Ref_Phidot    = constrain_float(Ju_Ref_Phidot , - g.JU_Lim_Phidot_Max/57.3f, g.JU_Lim_Phidot_Max/57.3f);
         Ju_Ref_Phi       = Ju_Ref_Phi + Ju_Ref_Phidot * jdelta_time;
         Ju_Ref_Phi       = constrain_float(Ju_Ref_Phi , - g.JU_Lim_Phi_Max/57.3f, g.JU_Lim_Phi_Max/57.3f);

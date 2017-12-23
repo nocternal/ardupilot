@@ -1087,6 +1087,21 @@ const AP_Param::Info Plane::var_info[] = {
 ///
 /////////////////////注意，引号内的显示不要超过16个字符！！！！！///////////////////////////
 ///
+///
+    // @Param: JU_Gain_Ref_FF_q
+    // @DisplayName: JU_K_Ref_FF_q
+    // @Description: this parameter shold be 1 if aerodynamic model is good.It's a phisical gain already calculated.                    
+    // @Values: 0 3
+    // @User: Advanced
+    GSCALAR(JU_Gain_Ref_FF_q,         "JU_K_Ref_FF_q",   1),
+
+    // @Param: JU_Gain_Ref_FF_Vdot
+    // @DisplayName: JU_K_Ref_FF_Vdot
+    // @Description: this parameter shold be 1 if aerodynamic model is good.It's a phisical gain already calculated.                  
+    // @Values: 0 3
+    // @User: Advanced
+    GSCALAR(JU_Gain_Ref_FF_Vdot,         "JU_K_Ref_FF_Vdot",   1),
+
     // @Param: JU_Gain_Ref_FF_de
     // @DisplayName: JU_K_Ref_FF_de
     // @Description: It's a phisical gain parameter to calculate Ref_de, needn't change if aerodynamic model is good
@@ -1094,6 +1109,13 @@ const AP_Param::Info Plane::var_info[] = {
     // @Values: -100 0
     // @User: Advanced
     GSCALAR(JU_Gain_Ref_FF_de,         "JU_K_Ref_FF_de",   -10.67),
+
+    // @Param: JU_Gain_Ref_FF_Phidot
+    // @DisplayName: JU_K_Ref_FF_p
+    // @Description: this parameter shold be 1 if aerodynamic model is good.It's a phisical gain already calculated.                  
+    // @Values: 0 3
+    // @User: Advanced
+    GSCALAR(JU_Gain_Ref_FF_Phidot,         "JU_K_Ref_FF_p",   1),    
 
     // @Param: JU_Gain_Ref_FF_da
     // @DisplayName: JU_K_Ref_FF_da
@@ -1180,6 +1202,13 @@ const AP_Param::Info Plane::var_info[] = {
     // @Values: 1 100
     // @User: Advanced
     GSCALAR(JU_Lim_V_Avd0_Min,         "JU_Lim_VAvd0_Min",  20),
+
+    // @Param: JU_Lim_Theta_Max
+    // @DisplayName: JU_Lim_Theta_Max
+    // @Description: Max allowable pitch angle [deg] 
+    // @Values: 20 90
+    // @User: Advanced
+    GSCALAR(JU_Lim_Theta_Max,         "JU_Lim_Theta_Max",   45),
 
     // @Param: JU_Lim_Phi_Max
     // @DisplayName: JU_Lim_Phi_Max
