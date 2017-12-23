@@ -302,16 +302,22 @@ void Plane::update_aux(void)
 
 void Plane::one_second_loop()
 {
-    // Temporary JU debug message
-    gcs_send_text_fmt(MAV_SEVERITY_INFO, "Hdotc=%.1f ,Vc=%.1f , Phic=%.1f ,rc=%.1f",
+    /////////
+    //////////////////////////// Temporary JU debug message
+    /////////
+    /*gcs_send_text_fmt(MAV_SEVERITY_INFO, "Hdotc=%.1f ,Vc=%.1f , Phic=%.1f ,rc=%.1f",
                               (double)Ju_Joystick_Hdotc,
                               (double)Ju_Joystick_Vc,
                               (double)(Ju_Joystick_Phic*57.3f),
-                              (double)(Ju_Joystick_rc*57.3f));
+                              (double)(Ju_Joystick_rc*57.3f));*/
+
     /*gcs_send_text_fmt(MAV_SEVERITY_INFO, "Hdotc=%.1f ,HdotRM=%.1f",
                               (float)Ju_Joystick_Hdotc,
                               (float)Ju_Ref_Hdot);*/
-
+    /*gcs_send_text_fmt(MAV_SEVERITY_INFO, "dtime=%.6f s",(float)jdelta_time);*/
+    /////////
+    ////////////////////////////                   
+   
     // send a heartbeat
     gcs_send_message(MSG_HEARTBEAT);
 
@@ -741,6 +747,27 @@ void Plane::update_flight_mode(void)
             calc_nav_roll();
         }
         update_fbwb_speed_height();
+        ////////////////////////Temporary!!!!!
+///////////////////////////////////////////////////////////////////
+        jtnow= AP_HAL::millis();
+        jdt = jtnow - jlast_t;  // [ms]
+        if (jlast_t == 0 || jdt > 1000) {
+        jdt = 0;
+        }
+        jlast_t     = jtnow;  
+        jdelta_time = (float)jdt * 0.001f; // [s]
+        
+        Ju_Sensor_MEAS();  // 传感器估计
+        Ju_Joystick_CMD(); // 各操纵杆对应的下沉率、滚转角、偏航角速度、速度指令
+        Ju_HdotV_Ctrl();   // 纵向控制器 ,输出de[rad] dthr[%]
+
+        if (jinit_counter <= (g.JU_Init_Transtime*1000)) 
+        {
+            jinit_counter += jdt;   
+        }
+////////////////////////////////////////////////////////////////////////
+/////////////////////////////////
+
         break;
         
     case STABILIZE:
@@ -1203,7 +1230,7 @@ void Plane::Ju_Ref_Hdot_Mdl()
         Ju_Ref_Hdotdot       = Ju_Ref_Hdotdot + Ju_Ref_Hdotdotdot * jdelta_time;
         Ju_Ref_Hdotdot       = constrain_float(Ju_Ref_Hdotdot   , - g.JU_Lim_Delta_nz_Max * g_acc , g.JU_Lim_Delta_nz_Max * g_acc);
         Ju_Ref_q             = Ju_Ref_Hdotdot / V_Use;
-        Ju_Ref_Hdotdot       = Ju_Ref_Hdotdot * cos(Phi_Use);
+        Ju_Ref_Hdotdot       = Ju_Ref_Hdotdot * cosf(Phi_Use);
         Ju_Ref_Hdot          = Ju_Ref_Hdot + Ju_Ref_Hdotdot * jdelta_time;
     }
 }

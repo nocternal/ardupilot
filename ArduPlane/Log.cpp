@@ -275,13 +275,17 @@ void Plane::Log_Write_Control_Tuning()
 struct PACKED log_Nav_Tuning {
     LOG_PACKET_HEADER;
     uint64_t time_us;
-    float wp_distance;
+    float Hdot; 
+    float Hdotc_Stick;
+    float Hdot_Ref;
+    float Hdotdot_Ref;
+    /*float wp_distance;
     int16_t target_bearing_cd;
     int16_t nav_bearing_cd;
     int16_t altitude_error_cm;
     float   xtrack_error;
     float   xtrack_error_i;
-    float   airspeed_error;
+    float   airspeed_error;*/
 };
 
 // Write a navigation tuning packet
@@ -290,13 +294,17 @@ void Plane::Log_Write_Nav_Tuning()
     struct log_Nav_Tuning pkt = {
         LOG_PACKET_HEADER_INIT(LOG_NTUN_MSG),
         time_us             : AP_HAL::micros64(),
-        wp_distance         : auto_state.wp_distance,
+        Hdot                : Ju_Hdot_MEAS,
+        Hdotc_Stick         : Ju_Joystick_Hdotc,
+        Hdot_Ref            : Ju_Ref_Hdot,
+        Hdotdot_Ref         : Ju_Ref_Hdotdot
+/*        wp_distance         : auto_state.wp_distance,
         target_bearing_cd   : (int16_t)nav_controller->target_bearing_cd(),
         nav_bearing_cd      : (int16_t)nav_controller->nav_bearing_cd(),
         altitude_error_cm   : (int16_t)altitude_error_cm,
         xtrack_error        : nav_controller->crosstrack_error(),
         xtrack_error_i      : nav_controller->crosstrack_error_integrator(),
-        airspeed_error      : airspeed_error
+        airspeed_error      : airspeed_error*/
     };
     DataFlash.WriteBlock(&pkt, sizeof(pkt));
 }
@@ -482,7 +490,8 @@ const struct LogStructure Plane::log_structure[] = {
     { LOG_CTUN_MSG, sizeof(log_Control_Tuning),     
       "CTUN", "Qcccchhh",    "TimeUS,NavRoll,Roll,NavPitch,Pitch,ThrOut,RdrOut,ThrDem" },
     { LOG_NTUN_MSG, sizeof(log_Nav_Tuning),         
-      "NTUN", "Qfcccfff",  "TimeUS,WpDist,TargBrg,NavBrg,AltErr,XT,XTi,ArspdErr" },
+      //"NTUN", "Qfcccfff",  "TimeUS,WpDist,TargBrg,NavBrg,AltErr,XT,XTi,ArspdErr" },
+      "NTUN", "Qffff",  "TimeUS,Hdot,Hdotc,HdotRef,HdotdotRef" },
     { LOG_SONAR_MSG, sizeof(log_Sonar),             
       "SONR", "QffBf",   "TimeUS,Dist,Volt,Cnt,Corr" },
     { LOG_ARM_DISARM_MSG, sizeof(log_Arm_Disarm),
