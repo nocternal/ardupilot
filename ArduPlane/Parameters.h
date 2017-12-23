@@ -352,8 +352,25 @@ public:
         k_param_JU_Lim_Hdot_Min,
         k_param_JU_Lim_V_Air_Max,
         k_param_JU_Lim_V_Air_Min,
+        k_param_JU_Lim_V_Avd0_Max,
+        k_param_JU_Lim_V_Avd0_Min,
         k_param_JU_Lim_Phi_Max,
         k_param_JU_Lim_r_Air_Max,
+        k_param_JU_Lim_Delta_nz_Max,
+
+        k_param_JU_Rev_Gain_Hdotc,
+        k_param_JU_Rev_Gain_Vc,
+        k_param_JU_Rev_Gain_Phic,
+        k_param_JU_Rev_Gain_rc,
+
+        k_param_JU_Init_Transtime,
+
+        k_param_JU_Ref_T_Hdot,
+        k_param_JU_Ref_T_Hdotdot,
+
+        k_param_JU_VAR_V_Smooth,
+
+        k_param_JU_Gain_Ref_FF_de,
         // 254,255: reserved
     };
 
@@ -496,14 +513,28 @@ public:
 
     // JU Param
     //
+    AP_Int8  JU_VAR_V_Smooth; 
+
+    AP_Int8  JU_Rev_Gain_Hdotc;
+    AP_Int8  JU_Rev_Gain_Vc;
+    AP_Int8  JU_Rev_Gain_Phic;
+    AP_Int8  JU_Rev_Gain_rc;
+    
     AP_Float JU_Lim_Hdot_Max;  // [m/s]
     AP_Float JU_Lim_Hdot_Min;
     AP_Float JU_Lim_V_Air_Max;
     AP_Float JU_Lim_V_Air_Min;
+    AP_Float JU_Lim_V_Avd0_Max;
+    AP_Float JU_Lim_V_Avd0_Min;   
     AP_Float JU_Lim_Phi_Max;   // [deg]
     AP_Float JU_Lim_r_Air_Max; // [deg/s]
-    
+    AP_Float JU_Lim_Delta_nz_Max;
+    AP_Float JU_Init_Transtime;// [s]
 
+    AP_Float JU_Ref_T_Hdot;
+    AP_Float JU_Ref_T_Hdotdot;
+
+    AP_Float JU_Gain_Ref_FF_de;
 
 #if HIL_SUPPORT
     AP_Int8  hil_mode;

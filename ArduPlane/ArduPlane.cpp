@@ -687,28 +687,6 @@ void Plane::update_flight_mode(void)
                 }
             }
         }
-
-///////////////////// Temporary!!!!!!!!
-        if (channel_pitch->norm_input()>=0) {
-        Ju_Joystick_Hdotc = channel_pitch->norm_input() * g.JU_Lim_Hdot_Max;   
-        } else {
-        Ju_Joystick_Hdotc = channel_pitch->norm_input() * ( - g.JU_Lim_Hdot_Min);   
-        }
-        Ju_Joystick_Hdotc = constrain_float(Ju_Joystick_Hdotc,g.JU_Lim_Hdot_Min,g.JU_Lim_Hdot_Max);
-         
-        // Vc [m/s]
-        Ju_Joystick_Vc    = g.JU_Lim_V_Air_Min + (g.JU_Lim_V_Air_Max - g.JU_Lim_V_Air_Min) * channel_throttle->get_control_in()/100;
-        Ju_Joystick_Vc    = constrain_float(Ju_Joystick_Vc,g.JU_Lim_V_Air_Min,g.JU_Lim_V_Air_Max);
-
-        // Phic [rad]
-        Ju_Joystick_Phic  = channel_roll->norm_input() * g.JU_Lim_Phi_Max/57.3f;   
-        Ju_Joystick_Phic  = constrain_float(Ju_Joystick_Phic, - g.JU_Lim_Phi_Max/57.3f,g.JU_Lim_Phi_Max/57.3f);
-          
-        // rc [rad/s]
-        Ju_Joystick_rc    = channel_rudder->norm_input() * g.JU_Lim_r_Air_Max/57.3f;
-        Ju_Joystick_rc    = constrain_float(Ju_Joystick_rc, - g.JU_Lim_r_Air_Max/57.3f,g.JU_Lim_r_Air_Max/57.3f);
-////////////////////// Need to delete!!!!!!!!!!!!!        
- 
         break;
     }
 
@@ -791,26 +769,111 @@ void Plane::update_flight_mode(void)
         // 各操纵杆对应的下沉率、滚转角、偏航角速度、速度指令
          
         // Hdotc [m/s]
-        if (channel_pitch->norm_input()>=0) {
-        Ju_Joystick_Hdotc = channel_pitch->norm_input() * g.JU_Lim_Hdot_Max;   
+        float channel_pitch_norm_input = channel_pitch->norm_input();   // [-1 1]
+        if (g.JU_Rev_Gain_Hdotc==-1) {
+        channel_pitch_norm_input = -channel_pitch->norm_input();
+        }
+        if (channel_pitch_norm_input>=0) {
+            Ju_Joystick_Hdotc = channel_pitch_norm_input * g.JU_Lim_Hdot_Max;   
         } else {
-        Ju_Joystick_Hdotc = channel_pitch->norm_input() * ( - g.JU_Lim_Hdot_Min);   
+            Ju_Joystick_Hdotc = channel_pitch_norm_input * ( - g.JU_Lim_Hdot_Min);   
         }
         Ju_Joystick_Hdotc = constrain_float(Ju_Joystick_Hdotc,g.JU_Lim_Hdot_Min,g.JU_Lim_Hdot_Max);
+
          
         // Vc [m/s]
-        Ju_Joystick_Vc    = g.JU_Lim_V_Air_Min + (g.JU_Lim_V_Air_Max - g.JU_Lim_V_Air_Min) * channel_throttle->get_control_in()/100;
+        float channel_throttle_norm_input = channel_throttle->get_control_in()/100.0f; // [0 1]
+        if (g.JU_Rev_Gain_Vc==-1) {
+            channel_throttle_norm_input = 1 - channel_throttle->get_control_in()/100.0f;
+        }
+        Ju_Joystick_Vc    = g.JU_Lim_V_Air_Min + (g.JU_Lim_V_Air_Max - g.JU_Lim_V_Air_Min) * channel_throttle_norm_input;
         Ju_Joystick_Vc    = constrain_float(Ju_Joystick_Vc,g.JU_Lim_V_Air_Min,g.JU_Lim_V_Air_Max);
 
         // Phic [rad]
-        Ju_Joystick_Phic  = channel_roll->norm_input() * g.JU_Lim_Phi_Max/57.3f;   
+        float channel_roll_norm_input = channel_roll->norm_input(); // [-1 1]
+        if (g.JU_Rev_Gain_Phic==-1) {
+            channel_roll_norm_input = - channel_roll->norm_input();
+        }
+        Ju_Joystick_Phic  = channel_roll_norm_input * g.JU_Lim_Phi_Max/57.3f;   
         Ju_Joystick_Phic  = constrain_float(Ju_Joystick_Phic, - g.JU_Lim_Phi_Max/57.3f,g.JU_Lim_Phi_Max/57.3f);
          
         // rc [rad/s]
-        Ju_Joystick_rc    = channel_rudder->norm_input() * g.JU_Lim_r_Air_Max/57.3f;
+        float channel_rudder_norm_input = channel_rudder->norm_input(); // [-1 1]
+        if (g.JU_Rev_Gain_rc==-1) {
+            channel_rudder_norm_input = - channel_rudder->norm_input();
+        }        
+        Ju_Joystick_rc    = channel_rudder_norm_input * g.JU_Lim_r_Air_Max/57.3f;
         Ju_Joystick_rc    = constrain_float(Ju_Joystick_rc, - g.JU_Lim_r_Air_Max/57.3f,g.JU_Lim_r_Air_Max/57.3f);
+
+        // 淡化时间
+        jtnow= AP_HAL::millis();
+        jdt = jtnow - jlast_t;  // [ms]
+        if (jlast_t == 0 || jdt > 1000) {
+        jdt = 0;
+        }
+        jlast_t     = jtnow;  
+        jdelta_time = (float)jdt * 0.001f; // [s]
+
+        // 下沉率估计
+        Vector3f vel;
+        if(ahrs.get_velocity_NED(vel)) {
+        Ju_Hdot_MEAS = vel.z;
+        } else if (gps.status() >= AP_GPS::GPS_OK_FIX_3D && gps.have_vertical_velocity()) {
+        Ju_Hdot_MEAS = gps.velocity().z;
+        } else 
+        {
+            /*
+            use a complimentary filter to calculate climb_rate. This is
+            designed to minimise lag
+            */
+            float baro_alt = ahrs.get_baro().get_altitude();
+            // Get height acceleration
+            float hgt_ddot_mea = -(ahrs.get_accel_ef().z + GRAVITY_MSS);
+            // Perform filter calculation using backwards Euler integration
+            // Coefficients selected to place all three filter poles at omega
+            float _hgtCompFiltOmega = 3;
+            float omega2 = _hgtCompFiltOmega*_hgtCompFiltOmega;
+            float hgt_err = baro_alt - _height_filter_height;
+            float integ1_input = hgt_err * omega2 * _hgtCompFiltOmega;
+            _height_filter_dd_height += integ1_input * jdelta_time ;
+            float integ2_input = _height_filter_dd_height + hgt_ddot_mea + hgt_err * omega2 * 3.0f;
+            _jclimb_rate_temp += integ2_input * jdelta_time ;
+            Ju_Hdot_MEAS = - _jclimb_rate_temp;
+            float integ3_input = _jclimb_rate_temp + hgt_err * _hgtCompFiltOmega * 3.0f;
+            // If more than 1 second has elapsed since last update then reset the integrator state
+            // to the measured height
+            if (jdelta_time > 1.0f) 
+            {
+            _height_filter_height = height_from_home;
+            } 
+            else 
+            {
+            _height_filter_height += integ3_input*jdelta_time;
+            }
+        }
         
+        // 速度估计
+        float EAS2TAS = 1; //暂时还是用当量空速EAS好了。。。毕竟地面站/数据记录等都还是记录的当量空速EAS，当然在这个里面控TAS也不影响，因为指令与实际值都乘了EAS2TAS。
+        if (!ahrs.airspeed_sensor_enabled() || !ahrs.airspeed_estimate(&jEAS)) {
+        // If no airspeed available use average of min and max
+        jEAS = 0.5f * (aparm.airspeed_min.get() + (float)aparm.airspeed_max.get());
+        }
+        Ju_V_A_MEAS = jEAS * EAS2TAS;
+        if (g.JU_VAR_V_Smooth == 1) {
+        Ju_V_A_MEAS = smoothed_airspeed;    
+        }
+        
+        // 滚转角估计
+        Ju_Phi_MEAS = ahrs.roll_sensor/100.0f/57.3f;  // ahrs.roll_sensor: centidegree  Ju_Phi_MEAS：[rad]
+
+        if (jinit_counter <= (g.JU_Init_Transtime*1000)) 
+        {
+            jinit_counter += jdt;   
+        }
+
+
         break;
+
     }
 
 
@@ -1080,5 +1143,32 @@ void Plane::update_optical_flow(void)
     }
 }
 #endif
+
+void Plane::Ju_Ref_Hdot_Mdl() 
+//  计算 Ju_Ref_Hdot Ju_Ref_q Ju_Ref_de 
+{
+    if (jinit_counter == 0) 
+    {
+        Ju_Ref_Hdot    = Ju_Hdot_MEAS;
+        Ju_Ref_Hdotdot = 0; // 这个加速度就不跟着一块初始为当前时刻的加速度了，因为当前时刻的加速度计示数可能不太准
+        Ju_Ref_q       = 0;
+        Ju_Ref_de      = 0;
+    }
+    else
+    {   
+        
+        float Phi_Use  = constrain_float(Ju_Phi_MEAS,-g.JU_Lim_Phi_Max/57.3f,g.JU_Lim_Phi_Max/57.3f); // [rad]
+        float V_Use    = constrain_float(Ju_V_A_MEAS , g.JU_Lim_V_Avd0_Min , g.JU_Lim_V_Avd0_Max);
+        float hdotdot_ref_temp = (Ju_Joystick_Hdotc - Ju_Ref_Hdot) / g.JU_Ref_T_Hdot / cosf(Phi_Use);
+        hdotdot_ref_temp     = constrain_float(hdotdot_ref_temp , - g.JU_Lim_Delta_nz_Max * g_acc , g.JU_Lim_Delta_nz_Max * g_acc);
+        Ju_Ref_Hdotdotdot    = (hdotdot_ref_temp - Ju_Ref_Hdotdot) / g.JU_Ref_T_Hdotdot;
+        Ju_Ref_de            = Ju_Ref_Hdotdotdot * g.JU_Gain_Ref_FF_de / ( V_Use * V_Use * V_Use ); // [rad] 
+        Ju_Ref_Hdotdot       = Ju_Ref_Hdotdot + Ju_Ref_Hdotdotdot * jdelta_time;
+        Ju_Ref_Hdotdot       = constrain_float(Ju_Ref_Hdotdot   , - g.JU_Lim_Delta_nz_Max * g_acc , g.JU_Lim_Delta_nz_Max * g_acc);
+        Ju_Ref_q             = Ju_Ref_Hdotdot / V_Use;
+        Ju_Ref_Hdotdot       = Ju_Ref_Hdotdot * cos(Phi_Use);
+        Ju_Ref_Hdot          = Ju_Ref_Hdot + Ju_Ref_Hdotdot * jdelta_time;
+    }
+}
 
 AP_HAL_MAIN_CALLBACKS(&plane);

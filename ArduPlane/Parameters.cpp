@@ -1086,6 +1086,42 @@ const AP_Param::Info Plane::var_info[] = {
     GSCALAR(crash_detection_enable,         "CRASH_DETECT",   0),
 
 
+    // @Param: JU_Gain_Ref_FF_de
+    // @DisplayName: JU_Gain_Ref_FF_de
+    // @Description: It's a phisical gain parameter to calculate Ref_de, needn't change if aerodynamic model is good
+    //               KF_Ref_de = 1/(cmde*0.5*rho*S*c/ Iyy;                    
+    // @Values: -100 0
+    // @User: Advanced
+    GSCALAR(JU_Gain_Ref_FF_de,         "JU_Gain_Ref_FF_de",   -10.67),
+
+    // @Param: JU_Rev_Gain_Hdotc
+    // @DisplayName: JU_Rev_Gain_Hdotc
+    // @Description: -1: RC_channel_pitch_norm_input = -channel_pitch->norm_input() 1: No channel input reverse
+    // @Values: -1, 1
+    // @User: Advanced
+    GSCALAR(JU_Rev_Gain_Hdotc,         "JU_Rev_Gain_Hdotc",   1),
+
+    // @Param: JU_Rev_Gain_Vc
+    // @DisplayName: JU_Rev_Gain_Vc
+    // @Description: -1: do RC_channnel_throttle input reverse 1: No channel input reverse
+    // @Values: -1, 1
+    // @User: Advanced
+    GSCALAR(JU_Rev_Gain_Vc,         "JU_Rev_Gain_Vc",   1),
+
+    // @Param: JU_Rev_Gain_Phic
+    // @DisplayName: JU_Rev_Gain_Phic
+    // @Description: -1: do RC_channnel_roll input reverse 1: No channel input reverse
+    // @Values: -1, 1
+    // @User: Advanced
+    GSCALAR(JU_Rev_Gain_Phic,         "JU_Rev_Gain_Phic",   1),
+
+    // @Param: JU_Rev_Gain_rc
+    // @DisplayName: JU_Rev_Gain_rc
+    // @Description: -1: do RC_channnel_rudder input reverse 1: No channel input reverse
+    // @Values: -1, 1
+    // @User: Advanced
+    GSCALAR(JU_Rev_Gain_rc,         "JU_Rev_Gain_rc",   1),
+
     // @Param: JU_Lim_Hdot_Max
     // @DisplayName: JU_Lim_Hdot_Max
     // @Description: Max allowable climb rate [m/s] 
@@ -1115,6 +1151,20 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(JU_Lim_V_Air_Min,         "JU_Lim_V_Air_Min",  -5),
 
+    // @Param: JU_Lim_V_Avd0_Max
+    // @DisplayName: JU_Lim_V_Avd0_Max
+    // @Description: 用的除以速度的防除0模块的速度限制最大值[m/s] 
+    // @Values: 0 100
+    // @User: Advanced
+    GSCALAR(JU_Lim_V_Avd0_Max,         "JU_Lim_V_Avd0_Max",  30),
+
+    // @Param: JU_Lim_V_Avd0_Min
+    // @DisplayName: JU_Lim_V_Avd0_Min
+    // @Description: 用的除以速度的防除0模块的速度限制最小值[m/s] 
+    // @Values: 1 100
+    // @User: Advanced
+    GSCALAR(JU_Lim_V_Avd0_Min,         "JU_Lim_V_Avd0_Min",  20),
+
     // @Param: JU_Lim_Phi_Max
     // @DisplayName: JU_Lim_Phi_Max
     // @Description: Max allowable roll angle [deg] 
@@ -1128,6 +1178,42 @@ const AP_Param::Info Plane::var_info[] = {
     // @Values: 30 180
     // @User: Advanced
     GSCALAR(JU_Lim_r_Air_Max,         "JU_Lim_r_Air_Max",   30),
+
+    // @Param: JU_Lim_Delta_nz_Max
+    // @DisplayName: JU_Lim_Delta_nz_Max
+    // @Description: Max allowable delta load factor, for example when flight level Delta_nz = 0;
+    // @Values: 1 10
+    // @User: Advanced
+    GSCALAR(JU_Lim_Delta_nz_Max,         "JU_Lim_Delta_nz_Max",   2),
+
+    // @Param: JU_Init_Transtime
+    // @DisplayName: JU_Init_Transtime
+    // @Description: JUHdotVPhi Mode Init transferorm time [s] 
+    // @Values: 0.1 1
+    // @User: Advanced
+    GSCALAR(JU_Init_Transtime,         "JU_Init_Transtime",   0.5),
+
+    // @Param: JU_Ref_T_Hdot
+    // @DisplayName: JU_Ref_T_Hdot
+    // @Description: JUHdotVPhi Mode Hdot Referemce Model's time constant of hdot[s] 
+    // @Values: 0.1 5
+    // @User: Advanced
+    GSCALAR(JU_Ref_T_Hdot,         "JU_Ref_T_Hdot",   0.95),
+
+    // @Param: JU_Ref_T_Hdotdot
+    // @DisplayName: JU_Ref_T_Hdotdot
+    // @Description: JUHdotVPhi Mode Hdot Referemce Model's time constant of hdotdot[s] 
+    // @Values: 0.1 5
+    // @User: Advanced
+    GSCALAR(JU_Ref_T_Hdotdot,         "JU_Ref_T_Hdotdot",   0.06),
+
+    // @Param: JU_VAR_V_Smooth
+    // @DisplayName: JU_VAR_V_Smooth
+    // @Description: 1: Smooth Velocity measure value , 0: No smooth
+    // @Values: 0, 1
+    // @User: Advanced
+    GSCALAR(JU_VAR_V_Smooth,         "JU_VAR_V_Smooth",   1),
+
 
     // barometer ground calibration. The GND_ prefix is chosen for
     // compatibility with previous releases of ArduPlane

@@ -646,7 +646,31 @@ private:
     float Ju_Joystick_Vc;      // [m/s]
     float Ju_Joystick_Phic;    // [rad]
     float Ju_Joystick_rc;      // [rad/s]
+
+    float Ju_Ref_Hdot;         // [m/s]
+    float Ju_Ref_Hdotdot;      // [m/s^2]
+    float Ju_Ref_Hdotdotdot;   // [m/s^3]
+    float Ju_Ref_q;            // [rad/s]
+    float Ju_Ref_de;           // [rad]
+
+    float Ju_Hdot_MEAS;        // [m/s]
+    float Ju_V_A_MEAS;         // [m/s] 空速测量值
+    float Ju_Phi_MEAS;         // [rad]
+
     
+    uint32_t jinit_counter;    // [ms] 空中模式切入淡化相关参数
+    uint32_t jtnow;
+    uint32_t jdt;              // [ms]
+    uint32_t jlast_t;
+    uint32_t slast_t;   
+    float jdelta_time;         // [s]
+    float _jclimb_rate_temp;
+    float jEAS;
+    float _height_filter_height;
+    float _height_filter_dd_height;
+    float height_from_home;
+    float g_acc = 9.80665f;    // [m/s^2] gravity acceleration 
+
     // Mission library
     AP_Mission mission {ahrs, 
             FUNCTOR_BIND_MEMBER(&Plane::start_command_callback, bool, const AP_Mission::Mission_Command &),
@@ -1059,6 +1083,11 @@ private:
     void calc_nav_roll();
     void calc_nav_pitch();
     void update_flight_stage();
+
+    // JU Functions
+    void Ju_Ref_Hdot_Mdl(); // 计算 Ju_Ref_Hdot[m/s],Ju_Ref_q[rad/s],Ju_Ref_de[rad]
+
+
     void update_navigation();
     void set_flight_stage(AP_SpdHgtControl::FlightStage fs);
     bool is_flying(void);
