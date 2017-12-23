@@ -1085,6 +1085,10 @@ private:
     void update_flight_stage();
 
     // JU Functions
+    void Ju_Joystick_CMD(); // 计算 操纵杆对应指令
+    void Ju_Sensor_MEAS();  // 计算 用到的传感器指令
+    void Ju_HdotV_Ctrl();   // 纵向控制器 ,输出de[rad] dthr[%]
+    void Ju_Phi_Ctrl();     // 横航向控制器，输出da[rad] dr[rad]
     void Ju_Ref_Hdot_Mdl(); // 计算 Ju_Ref_Hdot[m/s],Ju_Ref_q[rad/s],Ju_Ref_de[rad]
 
 
