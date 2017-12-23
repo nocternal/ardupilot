@@ -612,6 +612,7 @@ void Plane::update_flight_mode(void)
         Ju_Sensor_MEAS();  // 传感器估计
         Ju_Joystick_CMD(); // 各操纵杆对应的下沉率、滚转角、偏航角速度、速度指令
         Ju_HdotV_Ctrl();   // 纵向控制器 ,输出de[rad] dthr[%]
+        Ju_Phi_Ctrl();     // 横航向控制器，输出da[rad],dr[rad]
 
         if (jinit_counter <= (g.JU_Init_Transtime*1000)) 
         {
@@ -760,6 +761,7 @@ void Plane::update_flight_mode(void)
         Ju_Sensor_MEAS();  // 传感器估计
         Ju_Joystick_CMD(); // 各操纵杆对应的下沉率、滚转角、偏航角速度、速度指令
         Ju_HdotV_Ctrl();   // 纵向控制器 ,输出de[rad] dthr[%]
+        Ju_Phi_Ctrl();     // 横航向控制器，输出da[rad],dr[rad]
 
         if (jinit_counter <= (g.JU_Init_Transtime*1000)) 
         {
@@ -828,6 +830,7 @@ void Plane::update_flight_mode(void)
         Ju_Sensor_MEAS();  // 传感器估计
         Ju_Joystick_CMD(); // 各操纵杆对应的下沉率、滚转角、偏航角速度、速度指令
         Ju_HdotV_Ctrl();   // 纵向控制器 ,输出de[rad] dthr[%]
+        Ju_Phi_Ctrl();     // 横航向控制器，输出da[rad],dr[rad]
 
         if (jinit_counter <= (g.JU_Init_Transtime*1000)) 
         {
@@ -1150,7 +1153,7 @@ void Plane::Ju_Joystick_CMD()
 
 void Plane::Ju_Sensor_MEAS()
 {
-    // 下沉率估计
+    // 下沉率估计 从自带的TECS控制处摘过来的代码
         Vector3f vel;
         if(ahrs.get_velocity_NED(vel)) {
         Ju_Hdot_MEAS = vel.z;
@@ -1206,11 +1209,17 @@ void Plane::Ju_Sensor_MEAS()
 void Plane::Ju_HdotV_Ctrl()
 {
     Ju_Ref_Hdot_Mdl();
+    Ju_Ref_V_Mdl();
+}
+
+void Plane::Ju_Phi_Ctrl()
+{
+    Ju_Ref_Phi_Mdl();
 }
 
 void Plane::Ju_Ref_Hdot_Mdl() 
-//  计算 Ju_Ref_Hdot Ju_Ref_q Ju_Ref_de 
-{
+{   
+    //  计算 Ju_Ref_Hdot Ju_Ref_q Ju_Ref_de 
     if (jinit_counter == 0) 
     {
         Ju_Ref_Hdot    = Ju_Hdot_MEAS;
@@ -1221,7 +1230,7 @@ void Plane::Ju_Ref_Hdot_Mdl()
     else
     {   
         
-        float Phi_Use  = constrain_float(Ju_Phi_MEAS,-g.JU_Lim_Phi_Max/57.3f,g.JU_Lim_Phi_Max/57.3f); // [rad]
+        float Phi_Use  = constrain_float(Ju_Phi_MEAS ,-g.JU_Lim_Phi_Max/57.3f,g.JU_Lim_Phi_Max/57.3f); // [rad]
         float V_Use    = constrain_float(Ju_V_A_MEAS , g.JU_Lim_V_Avd0_Min , g.JU_Lim_V_Avd0_Max);
         float hdotdot_ref_temp = (Ju_Joystick_Hdotc - Ju_Ref_Hdot) / g.JU_Ref_T_Hdot / cosf(Phi_Use);
         hdotdot_ref_temp     = constrain_float(hdotdot_ref_temp , - g.JU_Lim_Delta_nz_Max * g_acc , g.JU_Lim_Delta_nz_Max * g_acc);
@@ -1232,7 +1241,46 @@ void Plane::Ju_Ref_Hdot_Mdl()
         Ju_Ref_q             = Ju_Ref_Hdotdot / V_Use;
         Ju_Ref_Hdotdot       = Ju_Ref_Hdotdot * cosf(Phi_Use);
         Ju_Ref_Hdot          = Ju_Ref_Hdot + Ju_Ref_Hdotdot * jdelta_time;
+        Ju_Ref_Hdot          = constrain_float(Ju_Ref_Hdot , - g.JU_Lim_Hdot_Max , g.JU_Lim_Hdot_Max);
     }
 }
+
+void Plane::Ju_Ref_V_Mdl()
+{
+    //  计算 Ju_Ref_V Ju_Ref_Vdot
+    if (jinit_counter == 0) {
+        Ju_Ref_V      = Ju_V_A_MEAS;
+        Ju_Ref_Vdot   = 0;
+    }
+    else {
+        Ju_Ref_Vdot   = (Ju_Joystick_Vc - Ju_Ref_V) / g.JU_Ref_T_V;
+        Ju_Ref_Vdot   = constrain_float(Ju_Ref_Vdot , - g.JU_Lim_Vdot_Max , g.JU_Lim_Vdot_Max);
+        Ju_Ref_V      = Ju_Ref_V + Ju_Ref_Vdot * jdelta_time;
+        Ju_Ref_V      = constrain_float(Ju_Ref_V , -g.JU_Lim_V_Air_Max,g.JU_Lim_V_Air_Max); //注意，此处其实并不对最小值作约束，因为切换的时候可能低于空中模式所设定的最小值
+    }
+
+}
+
+void Plane::Ju_Ref_Phi_Mdl()
+{   //  计算 Ju_Ref_V Ju_Ref_Vdot
+    if (jinit_counter == 0) {
+        Ju_Ref_Phi    = Ju_Phi_MEAS;
+        Ju_Ref_Phidot = 0;
+        Ju_Ref_da     = 0;
+    }
+    else {
+        float w0square = g.JU_Ref_w0_Phi * g.JU_Ref_w0_Phi;
+        float V_Use    = constrain_float(Ju_V_A_MEAS , g.JU_Lim_V_Avd0_Min , g.JU_Lim_V_Avd0_Max);
+        Ju_Ref_Phidotdot = (Ju_Joystick_Phic - Ju_Ref_Phi) * w0square - 2 * g.JU_Ref_w0_Phi * g.JU_Ref_Ksi_Phi * Ju_Ref_Phidot;
+        Ju_Ref_Phidotdot = constrain_float(Ju_Ref_Phidotdot , - g.JU_Lim_Phidotdot_Max/57.3f, g.JU_Lim_Phidotdot_Max/57.3f);
+        Ju_Ref_da        = Ju_Ref_Phidotdot  * g.JU_Gain_Ref_FF_da / ( V_Use * V_Use ); // [rad] 注意，这里是V平方
+        Ju_Ref_Phidot    = Ju_Ref_Phidot + Ju_Ref_Phidotdot * jdelta_time;
+        Ju_Ref_Phidot    = constrain_float(Ju_Ref_Phidot , - g.JU_Lim_Phidot_Max/57.3f, g.JU_Lim_Phidot_Max/57.3f);
+        Ju_Ref_Phi       = Ju_Ref_Phi + Ju_Ref_Phidot * jdelta_time;
+        Ju_Ref_Phi       = constrain_float(Ju_Ref_Phi , - g.JU_Lim_Phi_Max/57.3f, g.JU_Lim_Phi_Max/57.3f);
+    }
+
+}
+
 
 AP_HAL_MAIN_CALLBACKS(&plane);

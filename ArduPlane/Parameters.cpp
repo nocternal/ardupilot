@@ -1090,10 +1090,18 @@ const AP_Param::Info Plane::var_info[] = {
     // @Param: JU_Gain_Ref_FF_de
     // @DisplayName: JU_K_Ref_FF_de
     // @Description: It's a phisical gain parameter to calculate Ref_de, needn't change if aerodynamic model is good
-    //               KF_Ref_de = 1/(cmde*0.5*rho*S*c/ Iyy;                    
+    //               KF_Ref_de = 1/(cmde*0.5*rho*S*c/Iyy);                    
     // @Values: -100 0
     // @User: Advanced
     GSCALAR(JU_Gain_Ref_FF_de,         "JU_K_Ref_FF_de",   -10.67),
+
+    // @Param: JU_Gain_Ref_FF_da
+    // @DisplayName: JU_K_Ref_FF_da
+    // @Description: It's a phisical gain parameter to calculate Ref_da, needn't change if aerodynamic model is good
+    //               KF_Ref_da = 1/(cmde*0.5*rho*S*b/Ixx);                    
+    // @Values: -100 0
+    // @User: Advanced
+    GSCALAR(JU_Gain_Ref_FF_da,         "JU_K_Ref_FF_da",   -10.74),
 
     // @Param: JU_Rev_Gain_Hdotc
     // @DisplayName: JU_Rev_K_Hdotc
@@ -1138,6 +1146,13 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(JU_Lim_Hdot_Min,         "JU_Lim_Hdot_Min",   -4),
 
+    // @Param: JU_Lim_Vdot_Max
+    // @DisplayName: JU_Lim_Vdot_Max
+    // @Description: Max allowable acceleration rate [m/s^2] 
+    // @Values: 1 10
+    // @User: Advanced
+    GSCALAR(JU_Lim_Vdot_Max,         "JU_Lim_Vdot_Max",   3),
+
     // @Param: JU_Lim_V_Air_Max
     // @DisplayName: JU_Lim_V_Air_Max
     // @Description: Max allowable velocity in air [m/s] 
@@ -1173,6 +1188,20 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(JU_Lim_Phi_Max,         "JU_Lim_Phi_Max",   45),
 
+    // @Param: JU_Lim_Phidot_Max
+    // @DisplayName: JU_Lim_PhidotMax
+    // @Description: Max allowable roll angle rate [deg/s] 
+    // @Values: 30 90
+    // @User: Advanced
+    GSCALAR(JU_Lim_Phidot_Max,         "JU_Lim_PhidotMax",   90),
+
+    // @Param: JU_Lim_Phidotdot_Max
+    // @DisplayName: JU_Lim_PhiddtMax
+    // @Description: Max allowable roll angle acceleration [deg/s^2] 
+    // @Values: 60 360
+    // @User: Advanced
+    GSCALAR(JU_Lim_Phidotdot_Max,         "JU_Lim_PhiddtMax",   360),
+
     // @Param: JU_Lim_r_Air_Max
     // @DisplayName: JU_Lim_r_Air_Max
     // @Description: Max allowable yaw rate cmd from joystick [deg/s] 
@@ -1207,6 +1236,27 @@ const AP_Param::Info Plane::var_info[] = {
     // @Values: 0.1 5
     // @User: Advanced
     GSCALAR(JU_Ref_T_Hdotdot,         "JU_Ref_T_Hdotdot",   0.06),
+
+    // @Param: JU_Ref_T_V
+    // @DisplayName: JU_Ref_T_V
+    // @Description: JUHdotVPhi Mode V Referemce Model's time constant of V[s] 
+    // @Values: 0.1 10
+    // @User: Advanced
+    GSCALAR(JU_Ref_T_V,         "JU_Ref_T_V",   1),    
+
+    // @Param: JU_Ref_Ksi_Phi
+    // @DisplayName: JU_Ref_Ksi_Phi
+    // @Description: JUHdotVPhi Mode Phi Referemce Model's damp ratio of Phi
+    // @Values: 0.1 5
+    // @User: Advanced
+    GSCALAR(JU_Ref_Ksi_Phi,         "JU_Ref_Ksi_Phi",   1),  
+
+    // @Param: JU_Ref_w0_Phi
+    // @DisplayName: JU_Ref_w0_Phi
+    // @Description: JUHdotVPhi Mode Phi Referemce Model's natural frequency of Phi [rad/s]
+    // @Values: 0.1 10
+    // @User: Advanced
+    GSCALAR(JU_Ref_w0_Phi,         "JU_Ref_w0_Phi",   3),  
 
     // @Param: JU_VAR_V_Smooth
     // @DisplayName: JU_VAR_V_Smooth

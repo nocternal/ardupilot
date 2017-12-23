@@ -652,6 +652,12 @@ private:
     float Ju_Ref_Hdotdotdot;   // [m/s^3]
     float Ju_Ref_q;            // [rad/s]
     float Ju_Ref_de;           // [rad]
+    float Ju_Ref_V;            // [m/s]
+    float Ju_Ref_Vdot;         // [m/s^2]
+    float Ju_Ref_Phi;          // [rad]
+    float Ju_Ref_Phidot;       // [rad/s]
+    float Ju_Ref_Phidotdot;    // [rad/s^2]
+    float Ju_Ref_da;           // [rad]
 
     float Ju_Hdot_MEAS;        // [m/s]
     float Ju_V_A_MEAS;         // [m/s] 空速测量值
@@ -1090,7 +1096,8 @@ private:
     void Ju_HdotV_Ctrl();   // 纵向控制器 ,输出de[rad] dthr[%]
     void Ju_Phi_Ctrl();     // 横航向控制器，输出da[rad] dr[rad]
     void Ju_Ref_Hdot_Mdl(); // 计算 Ju_Ref_Hdot[m/s],Ju_Ref_q[rad/s],Ju_Ref_de[rad]
-
+    void Ju_Ref_V_Mdl();
+    void Ju_Ref_Phi_Mdl();
 
     void update_navigation();
     void set_flight_stage(AP_SpdHgtControl::FlightStage fs);
