@@ -1153,7 +1153,7 @@ void Plane::Ju_Joystick_CMD()
 
 void Plane::Ju_Sensor_MEAS()
 {
-    // 下沉率估计 从自带的TECS控制处摘过来的代码
+        // 下沉率估计 从自带的TECS控制处摘过来的代码
         Vector3f vel;
         if(ahrs.get_velocity_NED(vel)) {
         Ju_Hdot_MEAS = vel.z;
@@ -1202,8 +1202,15 @@ void Plane::Ju_Sensor_MEAS()
         Ju_V_A_MEAS = smoothed_airspeed;    
         }
         
-        // 滚转角估计
-        Ju_Phi_MEAS = ahrs.roll_sensor/100.0f/57.3f;  // ahrs.roll_sensor: centidegree  Ju_Phi_MEAS：[rad]
+        // 姿态角估计
+        Ju_Phi_MEAS   = ahrs.roll_sensor/100.0f/57.3f;  // ahrs.roll_sensor: centidegree   Ju_Phi_MEAS：[rad]
+        Ju_Theta_MEAS = ahrs.pitch_sensor/100.0f/57.3f; // ahrs.pitch_sensor: centidegree  Ju_Theta_MEAS：[rad]       
+        Ju_Psi_MEAS   = ahrs.yaw_sensor/100.0f/57.3f;   // ahrs.yaw_sensor: centidegree    Ju_Psi_MEAS：[rad]
+
+        // 角速度估计
+        Ju_p_MEAS     = ahrs.get_gyro().x; // [rad/s]
+        Ju_q_MEAS     = ahrs.get_gyro().y; // [rad/s]
+        Ju_r_MEAS     = ahrs.get_gyro().z; // [rad/s]
 }
 
 void Plane::Ju_HdotV_Ctrl()
@@ -1279,7 +1286,6 @@ void Plane::Ju_Ref_Phi_Mdl()
         Ju_Ref_Phi       = Ju_Ref_Phi + Ju_Ref_Phidot * jdelta_time;
         Ju_Ref_Phi       = constrain_float(Ju_Ref_Phi , - g.JU_Lim_Phi_Max/57.3f, g.JU_Lim_Phi_Max/57.3f);
     }
-
 }
 
 

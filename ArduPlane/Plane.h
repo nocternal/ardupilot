@@ -661,9 +661,13 @@ private:
 
     float Ju_Hdot_MEAS;        // [m/s]
     float Ju_V_A_MEAS;         // [m/s] 空速测量值
+    float Ju_Theta_MEAS;       // [rad]
     float Ju_Phi_MEAS;         // [rad]
+    float Ju_Psi_MEAS;         // [rad] 
+    float Ju_p_MEAS;           // [rad/s]
+    float Ju_q_MEAS;           // [rad/s]
+    float Ju_r_MEAS;           // [rad/s]
 
-    
     uint32_t jinit_counter;    // [ms] 空中模式切入淡化相关参数
     uint32_t jtnow;
     uint32_t jdt;              // [ms]
