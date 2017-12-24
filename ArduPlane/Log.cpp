@@ -278,12 +278,16 @@ struct PACKED log_Nav_Tuning {
     float Hdot; 
     float Hdotc_Stick;
     float Hdot_Ref;
+    float qJu;
+    float qcJu;
+    float decJu;
     float VJu;
     float Vc_Stick;
     float V_Ref;
     float PhiJu;
     float Phic_Stick;
     float Phi_Ref;
+
     /*float wp_distance;
     int16_t target_bearing_cd;
     int16_t nav_bearing_cd;
@@ -302,6 +306,9 @@ void Plane::Log_Write_Nav_Tuning()
         Hdot                : Ju_Hdot_MEAS,
         Hdotc_Stick         : Ju_Joystick_Hdotc,
         Hdot_Ref            : Ju_Ref_Hdot,
+        qJu                 : Ju_q_MEAS * 57.3f,
+        qcJu                : Ju_qc * 57.3f,
+        decJu               : Ju_dec * 57.3f,
         VJu                 : Ju_V_A_MEAS,
         Vc_Stick            : Ju_Joystick_Vc,
         V_Ref               : Ju_Ref_V,
@@ -501,7 +508,7 @@ const struct LogStructure Plane::log_structure[] = {
       "CTUN", "Qcccchhh",    "TimeUS,NavRoll,Roll,NavPitch,Pitch,ThrOut,RdrOut,ThrDem" },
     { LOG_NTUN_MSG, sizeof(log_Nav_Tuning),         
       //"NTUN", "Qfcccfff",  "TimeUS,WpDist,TargBrg,NavBrg,AltErr,XT,XTi,ArspdErr" },
-      "NTUN", "Qfffffffff",  "TimeUS,Hdot,Hdotc,HdotRef,V,Vc,VRef,Phi,Phic,PhiRef" },
+      "NTUN", "Qffffffffffff",  "TimeUS,Hdot,Hdotc,HdotRef,q,qc,dec,V,Vc,VRef,Phi,Phic,PhiRef" },
     { LOG_SONAR_MSG, sizeof(log_Sonar),             
       "SONR", "QffBf",   "TimeUS,Dist,Volt,Cnt,Corr" },
     { LOG_ARM_DISARM_MSG, sizeof(log_Arm_Disarm),
