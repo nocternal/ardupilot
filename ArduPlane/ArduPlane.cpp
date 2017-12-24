@@ -1218,12 +1218,23 @@ void Plane::Ju_HdotV_Ctrl()
     Ju_Ref_Hdot_Mdl();
     Ju_Ref_V_Mdl();
     float V_Use    = constrain_float(Ju_V_A_MEAS , g.JU_Lim_V_Avd0_Min , g.JU_Lim_V_Avd0_Max);
+    float Phi_Use  = constrain_float(Ju_Phi_MEAS ,-g.JU_Lim_Phi_Max/57.3f,g.JU_Lim_Phi_Max/57.3f); // [rad]
     float delta_Hdotc  = Ju_Ref_Hdot - Ju_Hdot_MEAS;
     float delta_Gammac = delta_Hdotc / V_Use;
-    Ju_Thetac    = delta_Gammac + Ju_Theta_MEAS; // delta_Theta 约等于 delta_Gamma
-    Ju_Thetac    = constrain_float(Ju_Thetac , - g.JU_Lim_Theta_Max/57.3f , g.JU_Lim_Theta_Max/57.3f);
-    delta_Gammac = Ju_Thetac - Ju_Theta_MEAS;
-    
+    Ju_Thetac          = delta_Gammac + Ju_Theta_MEAS; // delta_Theta 约等于 delta_Gamma
+    Ju_Thetac          = constrain_float(Ju_Thetac , - g.JU_Lim_Theta_Max/57.3f , g.JU_Lim_Theta_Max/57.3f);
+    delta_Gammac       = Ju_Thetac - Ju_Theta_MEAS;
+    float gammadotc    = delta_Gammac * g.JU_Gain_P_Pgamma;
+    float delta_loadfactor = gammadotc * V_Use / g_acc / cosf(Phi_Use);
+    delta_loadfactor   = constrain_float(delta_loadfactor , - g.JU_Lim_Delta_nz_Max , g.JU_Lim_Delta_nz_Max);
+    Ju_qc_FB           = delta_loadfactor * g_acc / V_Use;
+    Ju_qc_RollComp     = Ju_Get_q_Rollcomp();
+    Ju_qc              = Ju_qc_FB + Ju_qc_RollComp + Ju_Ref_q;
+    Ju_qc              = constrain_float(Ju_qc , - g.JU_Lim_q_Max/57.3f , g.JU_Lim_q_Max/57.3f);
+    float dec_FB       = Ju_q_Ctrl();
+    float dec_Trim     = Ju_de_Trim();
+    Ju_dec             = dec_FB + dec_Trim + Ju_Ref_de;
+    Ju_dec             = constrain_float(Ju_dec , - g.JU_DEF_de_Max/57.3f , g.JU_DEF_de_Max/57.3f);
 }
 
 void Plane::Ju_Phi_Ctrl()
@@ -1293,6 +1304,45 @@ void Plane::Ju_Ref_Phi_Mdl()
         Ju_Ref_Phi       = Ju_Ref_Phi + Ju_Ref_Phidot * jdelta_time;
         Ju_Ref_Phi       = constrain_float(Ju_Ref_Phi , - g.JU_Lim_Phi_Max/57.3f, g.JU_Lim_Phi_Max/57.3f);
     }
+}
+
+float Plane::Ju_Get_q_Rollcomp(void)
+{  // 计算滚转时的俯仰角速度补偿量 [rad/s]
+    float Phi_Use    = constrain_float(Ju_Phi_MEAS   ,-g.JU_Lim_Phi_Max/57.3f  , g.JU_Lim_Phi_Max/57.3f); // [rad]
+    float Theta_Use  = constrain_float(Ju_Theta_MEAS ,-g.JU_Lim_Theta_Max/57.3f, g.JU_Lim_Theta_Max/57.3f); // [rad]
+    float V_Use      = constrain_float(Ju_V_A_MEAS   , g.JU_Lim_V_Avd0_Min     , g.JU_Lim_V_Avd0_Max);
+    float q_roll_comp    =  g_acc / V_Use * tanf(Phi_Use) * sinf(Phi_Use) * cosf(Theta_Use);
+    return q_roll_comp;
+}
+
+float Plane::Ju_q_Ctrl(void)
+{   // q控制器， 计算升降舵偏量,下偏为正 [rad]
+    float Ju_de_F =   Ju_qc     * g.JU_Gain_P_Fq;
+    float Ju_de_P = - Ju_q_MEAS * g.JU_Gain_P_Pq;
+    if (jinit_counter == 0) {
+          Ju_de_I = 0;
+    }
+    else 
+    {
+        if (jdt>0) 
+        {
+            Ju_de_I = Ju_de_I + (Ju_qc - Ju_q_MEAS) * g.JU_Gain_P_Iq * jdelta_time;
+            Ju_de_I = constrain_float(Ju_de_I , - g.JU_Lim_de_I_Max/57.3f , g.JU_Lim_de_I_Max/57.3f);
+        }
+        else
+        {
+            Ju_de_I = 0;
+        }
+    }
+    float  dec = -(Ju_de_P + Ju_de_I + Ju_de_F);  
+    return dec;
+}
+
+float Plane::Ju_de_Trim(void)
+{
+    float  de_trimdeg = linear_interpolate(g.JU_Trim_de_Low , g.JU_Trim_de_High, Ju_V_A_MEAS, g.JU_Trim_V_Low , g.JU_Trim_V_High);
+    float  de_trim    = de_trimdeg/57.3f;
+    return de_trim;
 }
 
 

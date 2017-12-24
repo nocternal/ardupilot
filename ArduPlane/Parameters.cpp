@@ -1125,6 +1125,153 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(JU_Gain_Ref_FF_da,         "JU_K_Ref_FF_da",   -10.74),
 
+    // @Param: JU_Gain_P_Pgamma
+    // @DisplayName: JU_KP_Pgamma
+    // @Description: KP means gain of pitch axis; gammadotc = Pgamma * deltagammac                   
+    // @Values: 0 20
+    // @User: Advanced
+    GSCALAR(JU_Gain_P_Pgamma,         "JU_KP_Pgamma",   1.029),
+
+    // @Param: JU_Gain_P_Pq
+    // @DisplayName: JU_KP_Pq
+    // @Description: damp gain of pitch rate ctrl                   
+    // @Values: 0 20
+    // @User: Advanced
+    GSCALAR(JU_Gain_P_Pq,         "JU_KP_Pq",   0.114),
+
+    // @Param: JU_Gain_P_Iq
+    // @DisplayName: JU_KP_iq
+    // @Description: integrator gain of pitch rate ctrl                   
+    // @Values: 0 20
+    // @User: Advanced
+    GSCALAR(JU_Gain_P_Iq,         "JU_KP_Iq",   1.788),
+
+    // @Param: JU_Gain_P_Fq
+    // @DisplayName: JU_KP_Fq
+    // @Description: Feed forword gain of pitch rate ctrl,                
+    // @Values: 0 20
+    // @User: Advanced
+    GSCALAR(JU_Gain_P_Fq,         "JU_KP_Fq",   0.409),
+
+    // @Param: JU_Gain_P_PV
+    // @DisplayName: JU_KP_PV
+    // @Description: proportional gain of velocity ctrl, Vdotc = deltaVc * PV                  
+    // @Values: 0 20
+    // @User: Advanced
+    GSCALAR(JU_Gain_P_PV,         "JU_KP_PV",   3.419),
+
+    // @Param: JU_Gain_P_IV
+    // @DisplayName: JU_KP_IV
+    // @Description: integrator gain of velocity ctrl                   
+    // @Values: 0 20
+    // @User: Advanced
+    GSCALAR(JU_Gain_P_IV,         "JU_KP_IV",   0.62),
+
+    // @Param: JU_Gain_P_LeadTzVdot
+    // @DisplayName: JU_KP_LeadTzVdot
+    // @Description: Used to lead Hdot cmd to Vdot , Filter(s) = (LeadTz *s + 1) / (LeadTp *s + 1) , LeadTp < LeadTz  , if set this value to 0, then do no lead          
+    // @Values: 0 10
+    // @User: Advanced
+    GSCALAR(JU_Gain_P_LeadTzVdot,         "JU_KP_LeadTzVdot",   0.3),
+
+    // @Param: JU_Gain_P_LeadTzVdot
+    // @DisplayName: JU_KP_LeadTzVdot
+    // @Description: Used to lead Hdot cmd to Vdot , Filter(s) = (LeadTz *s + 1) / (LeadTp *s + 1) , LeadTp < LeadTz              
+    // @Values: 0 10
+    // @User: Advanced
+    GSCALAR(JU_Gain_P_LeadTpVdot,         "JU_KP_LeadTpVdot",   0.06),
+
+    // @Param: JU_Gain_RY_Pphi
+    // @DisplayName: JU_KRY_Pphi
+    // @Description: KRY means gain of roll&yaw axis; phidotc = Pphi * deltaphic                   
+    // @Values: 0 20
+    // @User: Advanced
+    GSCALAR(JU_Gain_RY_Pphi,         "JU_KRY_Pphi",   1.544),
+
+    // @Param: JU_Gain_RY_Pp
+    // @DisplayName: JU_RY_Pp
+    // @Description: damp gain of roll rate ctrl                   
+    // @Values: 0 20
+    // @User: Advanced
+    GSCALAR(JU_Gain_RY_Pp,         "JU_RY_Pp",   0.235),
+
+    // @Param: JU_Gain_RY_Ip
+    // @DisplayName: JU_RY_Ip
+    // @Description: integrator gain of roll rate ctrl                   
+    // @Values: 0 20
+    // @User: Advanced
+    GSCALAR(JU_Gain_RY_Ip,         "JU_RY_Ip",   1.053),
+
+    // @Param: JU_Gain_RY_Fp
+    // @DisplayName: JU_RY_Fp
+    // @Description: Feedforward gain of roll rate ctrl                   
+    // @Values: 0 20
+    // @User: Advanced
+    GSCALAR(JU_Gain_RY_Fp,         "JU_RY_Fp",   0.529),
+
+    // @Param: JU_Gain_RY_Pr
+    // @DisplayName: JU_RY_Pr
+    // @Description: proportional gain of yaw rate ctrl,               
+    // @Values: 0 20
+    // @User: Advanced
+    GSCALAR(JU_Gain_RY_Pr,         "JU_RY_Pr",   1.63),
+
+    // @Param: JU_Gain_RY_ARI
+    // @DisplayName: JU_RY_ARI 
+    // @Description: interconnect gain of da and dr,  dr = KARI * da, under normal condition Nda>0 then KARI > 0              
+    // @Values: -2 2
+    // @User: Advanced
+    GSCALAR(JU_Gain_RY_ARI,         "JU_RY_ARI",   0),
+
+    // @Param: JU_Gain_RY_rWashTau
+    // @DisplayName: JU_RY_rWashTau
+    // @Description: r wash filter, used for phi sensor bias problem , wash(s) = Tau*s / (Tau*s + 1) , if set this value to 0, then do no wash      
+    // @Values: 0.5 20
+    // @User: Advanced
+    GSCALAR(JU_Gain_RY_rWashTau,         "JU_RY_rWashTau",   5),
+
+    // @Param: JU_Trim_V_Low
+    // @DisplayName: JU_Trim_V_Low
+    // @Description: Linear Trim table(2 Points) , the low velocity [m/s]     
+    // @Values: 10 50
+    // @User: Advanced
+    GSCALAR(JU_Trim_V_Low,         "JU_Trim_V_Low",   20),
+
+    // @Param: JU_Trim_V_High
+    // @DisplayName: JU_Trim_V_High
+    // @Description: Trim table , the High velocity [m/s]     
+    // @Values: 10 50
+    // @User: Advanced
+    GSCALAR(JU_Trim_V_High,         "JU_Trim_V_High",   30),
+
+    // @Param: JU_Trim_de_Low
+    // @DisplayName: JU_Trim_de_Low
+    // @Description: Trim table , the Low velocity's elevator (positive elevator deflection generate negative pitch moment)[deg]     
+    // @Values: -30 30
+    // @User: Advanced
+    GSCALAR(JU_Trim_de_Low,         "JU_Trim_de_Low",   -5),
+
+    // @Param: JU_Trim_de_High
+    // @DisplayName: JU_Trim_de_High
+    // @Description: Trim table , the High velocity's elevator (positive elevator deflection generate negative pitch moment)[deg]     
+    // @Values: -30 30
+    // @User: Advanced
+    GSCALAR(JU_Trim_de_High,         "JU_Trim_de_High",   -1.5),
+
+    // @Param: JU_Trim_dthr_Low
+    // @DisplayName: JU_Trim_dthr_Low
+    // @Description: Trim table , the Low velocity's throttle [%]     
+    // @Values: 0 100
+    // @User: Advanced
+    GSCALAR(JU_Trim_dthr_Low,         "JU_Trim_dthr_Low",   29),
+
+    // @Param: JU_Trim_dthr_High
+    // @DisplayName: JU_Trim_dthr_High
+    // @Description: Trim table , the High velocity's throttle [%]     
+    // @Values: 0 100
+    // @User: Advanced
+    GSCALAR(JU_Trim_dthr_High,         "JU_Trim_dthr_High",   55),
+    
     // @Param: JU_Rev_Gain_Hdotc
     // @DisplayName: JU_Rev_K_Hdotc
     // @Description: -1: RC_channel_pitch_norm_input = -channel_pitch->norm_input() 1: No channel input reverse
@@ -1174,6 +1321,13 @@ const AP_Param::Info Plane::var_info[] = {
     // @Values: 1 10
     // @User: Advanced
     GSCALAR(JU_Lim_Vdot_Max,         "JU_Lim_Vdot_Max",   3),
+
+    // @Param: JU_Lim_q_Max
+    // @DisplayName: JU_Lim_q_Max
+    // @Description: Max allowable pitch rate [deg/s] 
+    // @Values: 30 90
+    // @User: Advanced  
+    GSCALAR(JU_Lim_q_Max,           "JU_Lim_q_Max",   90),
 
     // @Param: JU_Lim_V_Air_Max
     // @DisplayName: JU_Lim_V_Air_Max
@@ -1244,6 +1398,41 @@ const AP_Param::Info Plane::var_info[] = {
     // @Values: 1 10
     // @User: Advanced
     GSCALAR(JU_Lim_Delta_nz_Max,         "JU_Lim_dnz_Max",   2),
+
+    // @Param: JU_Lim_de_I_Max
+    // @DisplayName: JU_Lim_de_I_Max
+    // @Description: [deg] 允许升降舵积分器的舵面权限
+    // @Values: 0 20
+    // @User: Advanced
+    GSCALAR(JU_Lim_de_I_Max,         "JU_Lim_de_I_Max",   10),
+
+    // @Param: JU_Lim_da_I_Max
+    // @DisplayName: JU_Lim_da_I_Max
+    // @Description: [deg] 允许副翼积分器的舵面权限
+    // @Values: 0 20
+    // @User: Advanced
+    GSCALAR(JU_Lim_da_I_Max,         "JU_Lim_da_I_Max",   10),
+
+    // @Param: JU_DEF_de_Max
+    // @DisplayName: JU_DEF_de_Max
+    // @Description: [deg] 升降舵偏转限制,要与实际舵面的偏转范围一致！！
+    // @Values: 10 90
+    // @User: Advanced
+    GSCALAR(JU_DEF_de_Max,         "JU_DEF_de_Max",   30),
+
+    // @Param: JU_DEF_da_Max
+    // @DisplayName: JU_DEF_da_Max
+    // @Description: [deg] 副翼偏转限制,要与实际舵面的偏转范围一致！！
+    // @Values: 10 90
+    // @User: Advanced
+    GSCALAR(JU_DEF_da_Max,         "JU_DEF_da_Max",   30),
+
+    // @Param: JU_DEF_dr_Max
+    // @DisplayName: JU_DEF_dr_Max
+    // @Description: [deg] 方向舵偏转限制,要与实际舵面的偏转范围一致！！
+    // @Values: 10 90
+    // @User: Advanced
+    GSCALAR(JU_DEF_dr_Max,         "JU_DEF_dr_Max",   20),
 
     // @Param: JU_Init_Transtime
     // @DisplayName: JU_Init_TransT

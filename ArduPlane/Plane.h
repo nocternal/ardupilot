@@ -669,6 +669,16 @@ private:
     float Ju_r_MEAS;           // [rad/s]
 
     float Ju_Thetac;           // [rad]
+    float Ju_qc_FB;
+    float Ju_qc_RollComp;
+    float Ju_qc;
+    float Ju_dec;
+    float Ju_de_I;
+    float Ju_pc;
+    float Ju_dac;
+    float Ju_da_I;
+
+
 
     uint32_t jinit_counter;    // [ms] 空中模式切入淡化相关参数
     uint32_t jtnow;
@@ -1096,6 +1106,7 @@ private:
     void calc_nav_pitch();
     void update_flight_stage();
 
+
     // JU Functions
     void Ju_Joystick_CMD(); // 计算 操纵杆对应指令
     void Ju_Sensor_MEAS();  // 计算 用到的传感器指令
@@ -1104,6 +1115,11 @@ private:
     void Ju_Ref_Hdot_Mdl(); // 计算 Ju_Ref_Hdot[m/s],Ju_Ref_q[rad/s],Ju_Ref_de[rad]
     void Ju_Ref_V_Mdl();
     void Ju_Ref_Phi_Mdl();
+    float Ju_Get_q_Rollcomp(void); // 计算滚转时的q补偿量       [rad]
+    float Ju_q_Ctrl(void);         // q控制器，输出dec 下偏为正 [rad]
+    float Ju_p_Ctrl(void);         // p控制器，输出dac 正偏产生左滚力矩 [rad]
+    float Ju_de_Trim(void);
+
 
     void update_navigation();
     void set_flight_stage(AP_SpdHgtControl::FlightStage fs);
