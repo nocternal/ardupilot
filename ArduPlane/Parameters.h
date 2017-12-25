@@ -352,19 +352,22 @@ public:
         k_param_JU_Lim_Hdot_Min,
         k_param_JU_Lim_Vdot_Max,
         k_param_JU_Lim_q_Max,
-
         k_param_JU_Lim_V_Air_Max,
         k_param_JU_Lim_V_Air_Min,
         k_param_JU_Lim_V_Avd0_Max,
         k_param_JU_Lim_V_Avd0_Min,
         k_param_JU_Lim_Theta_Max,
+        k_param_JU_Lim_Hdot2Vdot_Max,
         k_param_JU_Lim_Phi_Max,
         k_param_JU_Lim_Phidot_Max,
         k_param_JU_Lim_Phidotdot_Max,
         k_param_JU_Lim_r_Air_Max,
         k_param_JU_Lim_Delta_nz_Max,
-        k_param_JU_Lim_de_I_Max,     
-        k_param_JU_Lim_da_I_Max,  
+        k_param_JU_Lim_V_I_Max,
+        k_param_JU_Lim_q_I_Max,     
+        k_param_JU_Lim_p_I_Max,
+        k_param_JU_Lim_Thr_Max, //[%]
+        k_param_JU_Lim_Thr_Min,  
 
         k_param_JU_DEF_de_Max,        
         k_param_JU_DEF_da_Max,        
@@ -398,6 +401,7 @@ public:
         k_param_JU_Gain_P_IV,
         k_param_JU_Gain_P_LeadTzVdot,
         k_param_JU_Gain_P_LeadTpVdot,
+        k_param_JU_Gain_P_ThrPerVdot,
         k_param_JU_Gain_RY_Pphi,
         k_param_JU_Gain_RY_Pp,
         k_param_JU_Gain_RY_Ip,
@@ -571,13 +575,17 @@ public:
     AP_Float JU_Lim_V_Avd0_Max;
     AP_Float JU_Lim_V_Avd0_Min;   
     AP_Float JU_Lim_Theta_Max;     // [deg]
+    AP_Float JU_Lim_Hdot2Vdot_Max;
     AP_Float JU_Lim_Phi_Max;       // [deg]
     AP_Float JU_Lim_Phidot_Max;    // [deg/s]
     AP_Float JU_Lim_Phidotdot_Max; // [deg/s^2]
     AP_Float JU_Lim_r_Air_Max;     // [deg/s]
     AP_Float JU_Lim_Delta_nz_Max;
-    AP_Float JU_Lim_de_I_Max;      // [deg] 允许升降舵积分器的舵面权限
-    AP_Float JU_Lim_da_I_Max;      // [deg] 允许副翼积分器的舵面权限
+    AP_Float JU_Lim_V_I_Max;
+    AP_Float JU_Lim_q_I_Max;       // [deg] 允许升降舵积分器的舵面权限
+    AP_Float JU_Lim_p_I_Max;       // [deg] 允许副翼积分器的舵面权限
+    AP_Float JU_Lim_Thr_Max;       // [%]   允许使用的最大油门量
+    AP_Float JU_Lim_Thr_Min;
     AP_Float JU_DEF_de_Max;        // [deg] 升降舵偏转限制,要与实际舵面的偏转范围一致！！
     AP_Float JU_DEF_da_Max;        // [deg] 副翼偏转限制,要与实际舵面的偏转范围一致！！
     AP_Float JU_DEF_dr_Max;        // [deg] 方向舵偏转限制,要与实际舵面的偏转范围一致！！
@@ -604,6 +612,7 @@ public:
     AP_Float JU_Gain_P_IV;
     AP_Float JU_Gain_P_LeadTzVdot;
     AP_Float JU_Gain_P_LeadTpVdot;
+    AP_Float JU_Gain_P_ThrPerVdot;
 
     AP_Float JU_Gain_RY_Pphi;
     AP_Float JU_Gain_RY_Pp;

@@ -672,8 +672,21 @@ private:
     float Ju_qc_FB;
     float Ju_qc_RollComp;
     float Ju_qc;
+    float Ju_dec_FB;
+    float Ju_dec_Trim; 
     float Ju_dec;
+    float Ju_Thrc_FB;
+    float Ju_Thrc_Trim;
+    float Ju_Thrc;
+    float Ju_de_P;
     float Ju_de_I;
+    float Ju_de_F;
+    float Ju_V_P;
+    float Ju_V_I;
+    float Ju_Vdotc;
+    float Ju_Hdot2Vdot;
+    float Ju_Hdot2Vdotc_Last;
+    float Ju_Hdot2Vdotc_Lead_Last;
     float Ju_pc;
     float Ju_dac;
     float Ju_da_I;
@@ -1119,6 +1132,7 @@ private:
     float Ju_q_Ctrl(void);         // q控制器，输出dec 下偏为正 [rad]
     float Ju_p_Ctrl(void);         // p控制器，输出dac 正偏产生左滚力矩 [rad]
     float Ju_de_Trim(void);
+    float Ju_Hdot2Vdot_LeadFilter(void);
 
 
     void update_navigation();

@@ -1181,6 +1181,13 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(JU_Gain_P_LeadTpVdot,         "JU_KP_LeadTpVdot",   0.06),
 
+    // @Param: JU_Gain_P_ThrPerVdot
+    // @DisplayName: JU_KP_LeadTzVdot
+    // @Description: [%/(m/s^2)] 可计算的物理意义 1m/s^2加速度需要的油门量。ThrPerVdot = m*a / ThrustperThr; ThrustperThr:1%油门产生的推力 ；a =1m/s^2          
+    // @Values: 0 10
+    // @User: Advanced
+    GSCALAR(JU_Gain_P_ThrPerVdot,         "JU_KP_ThrPerVdot",   16),
+
     // @Param: JU_Gain_RY_Pphi
     // @DisplayName: JU_KRY_Pphi
     // @Description: KRY means gain of roll&yaw axis; phidotc = Pphi * deltaphic                   
@@ -1364,6 +1371,27 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(JU_Lim_Theta_Max,         "JU_Lim_Theta_Max",   45),
 
+    // @Param: JU_Lim_Hdot2Vdot_Max
+    // @DisplayName: JU_Lim_Hdot2Vdot_Max
+    // @Description: [m/s^2] Hdotc指令给的Vdotc补偿，Vdotc = g * Hdot_Ref / V, 另外还经过一超前滤波器。 当JU_Lim_Hdot2Vdot_Max = 0， 相当于禁用该增益
+    // @Values: 1 10
+    // @User: Advanced
+    GSCALAR(JU_Lim_Hdot2Vdot_Max,         "JU_Lim_Hdot2Vdot_Max",   2),
+
+    // @Param:JU_Lim_Thr_Max
+    // @DisplayName: JU_Lim_Thr_Max
+    // @Description: [%] 允许使用的最大油门量
+    // @Values: 50 100
+    // @User: Advanced
+    GSCALAR(JU_Lim_Thr_Max,         "JU_Lim_Thr_Max",   100),
+
+    // @Param:JU_Lim_Thr_Min
+    // @DisplayName: JU_Lim_Thr_Min
+    // @Description: [%] 允许使用的最小油门量
+    // @Values: 0 20
+    // @User: Advanced
+    GSCALAR(JU_Lim_Thr_Min,         "JU_Lim_Thr_Min",   0),
+
     // @Param: JU_Lim_Phi_Max
     // @DisplayName: JU_Lim_Phi_Max
     // @Description: Max allowable roll angle [deg] 
@@ -1399,19 +1427,26 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(JU_Lim_Delta_nz_Max,         "JU_Lim_dnz_Max",   2),
 
-    // @Param: JU_Lim_de_I_Max
-    // @DisplayName: JU_Lim_de_I_Max
-    // @Description: [deg] 允许升降舵积分器的舵面权限
-    // @Values: 0 20
+    // @Param: JU_Lim_V_I_Max
+    // @DisplayName: JU_Lim_V_I_Max
+    // @Description: [m/s^2] 允许速度积分器的输出最大加速度指令
+    // @Values: 0 10
     // @User: Advanced
-    GSCALAR(JU_Lim_de_I_Max,         "JU_Lim_de_I_Max",   10),
+    GSCALAR(JU_Lim_V_I_Max,         "JU_Lim_V_I_Max",   2),    
 
-    // @Param: JU_Lim_da_I_Max
-    // @DisplayName: JU_Lim_da_I_Max
-    // @Description: [deg] 允许副翼积分器的舵面权限
+    // @Param: JU_Lim_q_I_Max
+    // @DisplayName: JU_Lim_q_I_Max
+    // @Description: [deg] 允许角速度积分器的输出舵面权限
     // @Values: 0 20
     // @User: Advanced
-    GSCALAR(JU_Lim_da_I_Max,         "JU_Lim_da_I_Max",   10),
+    GSCALAR(JU_Lim_q_I_Max,         "JU_Lim_q_I_Max",   10),
+
+    // @Param: JU_Lim_p_I_Max
+    // @DisplayName: JU_Lim_p_I_Max
+    // @Description: [deg] 允许角速度积分器的输出舵面权限
+    // @Values: 0 20
+    // @User: Advanced
+    GSCALAR(JU_Lim_p_I_Max,         "JU_Lim_p_I_Max",   10),
 
     // @Param: JU_DEF_de_Max
     // @DisplayName: JU_DEF_de_Max

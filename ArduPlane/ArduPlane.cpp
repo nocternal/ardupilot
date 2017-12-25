@@ -1217,6 +1217,8 @@ void Plane::Ju_HdotV_Ctrl()
 {
     Ju_Ref_Hdot_Mdl();
     Ju_Ref_V_Mdl();
+
+    // Hdot Control
     float V_Use    = constrain_float(Ju_V_A_MEAS , g.JU_Lim_V_Avd0_Min , g.JU_Lim_V_Avd0_Max);
     float Phi_Use  = constrain_float(Ju_Phi_MEAS ,-g.JU_Lim_Phi_Max/57.3f,g.JU_Lim_Phi_Max/57.3f); // [rad]
     float delta_Hdotc  = Ju_Ref_Hdot - Ju_Hdot_MEAS;
@@ -1231,10 +1233,35 @@ void Plane::Ju_HdotV_Ctrl()
     Ju_qc_RollComp     = Ju_Get_q_Rollcomp();
     Ju_qc              = Ju_qc_FB + Ju_qc_RollComp + Ju_Ref_q;
     Ju_qc              = constrain_float(Ju_qc , - g.JU_Lim_q_Max/57.3f , g.JU_Lim_q_Max/57.3f);
-    float dec_FB       = Ju_q_Ctrl();
-    float dec_Trim     = Ju_de_Trim();
-    Ju_dec             = dec_FB + dec_Trim + Ju_Ref_de;
-    Ju_dec             = constrain_float(Ju_dec , - g.JU_DEF_de_Max/57.3f , g.JU_DEF_de_Max/57.3f);
+    Ju_dec_FB          = Ju_q_Ctrl();
+    Ju_dec_Trim        = Ju_de_Trim();
+    Ju_dec             = Ju_dec_FB + Ju_dec_Trim + Ju_Ref_de;
+    Ju_dec             = constrain_float(Ju_dec , - g.JU_DEF_de_Max/57.3f , g.JU_DEF_de_Max/57.3f); // [rad] 
+
+    // V Control
+    float delta_Vc     = Ju_Ref_V - Ju_V_A_MEAS;
+    Ju_V_P             = delta_Vc * g.JU_Gain_P_PV;
+    if (jinit_counter == 0) {
+        Ju_V_I = 0;
+    }
+    else 
+    {
+        if (jdt>0) 
+        {
+            Ju_V_I = Ju_V_I + delta_Vc * g.JU_Gain_P_IV * jdelta_time;
+            Ju_V_I = constrain_float(Ju_V_I , - g.JU_Lim_V_I_Max , g.JU_Lim_V_I_Max);
+        }
+        else
+        {
+            Ju_V_I = 0;
+        }
+    }
+    Ju_Hdot2Vdot = Ju_Hdot2Vdot_LeadFilter();
+    Ju_Vdotc     = Ju_V_P + Ju_V_I + Ju_Ref_Vdot + Ju_Hdot2Vdot;
+    Ju_Thrc_FB   = Ju_Vdotc * g.JU_Gain_P_ThrPerVdot;//[%]
+    Ju_Thrc_Trim = linear_interpolate(g.JU_Trim_dthr_Low , g.JU_Trim_dthr_High, Ju_V_A_MEAS, g.JU_Trim_V_Low , g.JU_Trim_V_High);
+    Ju_Thrc      = Ju_Thrc_FB + Ju_Thrc_Trim;
+    Ju_Thrc      = constrain_float(Ju_Thrc, g.JU_Lim_Thr_Min , g.JU_Lim_Thr_Max); // [%] 0-100
 }
 
 void Plane::Ju_Phi_Ctrl()
@@ -1317,17 +1344,17 @@ float Plane::Ju_Get_q_Rollcomp(void)
 
 float Plane::Ju_q_Ctrl(void)
 {   // q控制器， 计算升降舵偏量,下偏为正 [rad]
-    float Ju_de_F =   Ju_qc     * g.JU_Gain_P_Fq;
-    float Ju_de_P = - Ju_q_MEAS * g.JU_Gain_P_Pq;
+    Ju_de_F =   Ju_qc     * g.JU_Gain_P_Fq;
+    Ju_de_P = - Ju_q_MEAS * g.JU_Gain_P_Pq;
     if (jinit_counter == 0) {
-          Ju_de_I = 0;
+        Ju_de_I = 0;
     }
     else 
     {
         if (jdt>0) 
         {
             Ju_de_I = Ju_de_I + (Ju_qc - Ju_q_MEAS) * g.JU_Gain_P_Iq * jdelta_time;
-            Ju_de_I = constrain_float(Ju_de_I , - g.JU_Lim_de_I_Max/57.3f , g.JU_Lim_de_I_Max/57.3f);
+            Ju_de_I = constrain_float(Ju_de_I , - g.JU_Lim_q_I_Max/57.3f , g.JU_Lim_q_I_Max/57.3f);
         }
         else
         {
@@ -1343,6 +1370,33 @@ float Plane::Ju_de_Trim(void)
     float  de_trimdeg = linear_interpolate(g.JU_Trim_de_Low , g.JU_Trim_de_High, Ju_V_A_MEAS, g.JU_Trim_V_Low , g.JU_Trim_V_High);
     float  de_trim    = de_trimdeg/57.3f;
     return de_trim;
+}
+
+float Plane::Ju_Hdot2Vdot_LeadFilter(void)
+{
+    float V_Use      = constrain_float(Ju_V_A_MEAS   , g.JU_Lim_V_Avd0_Min     , g.JU_Lim_V_Avd0_Max);
+    float Vdotc = Ju_Ref_Hdot * g_acc / V_Use;
+    float Vdotc_Lead = Vdotc;
+
+    if (g.JU_Gain_P_LeadTzVdot > 0.01)  // 进行超前的情况
+    {
+        if (jinit_counter == 0)
+        {
+            Ju_Hdot2Vdotc_Last = 0;
+            Ju_Hdot2Vdotc_Lead_Last = 0;     
+        }
+        float wn   = 1 / g.JU_Gain_P_LeadTzVdot;
+        float wd   = 1 / g.JU_Gain_P_LeadTpVdot;
+        float Ts   = jdelta_time;
+        float c1   = (Ts*wn*wd+2*wd)/(Ts*wn*wd+2*wn);
+        float c2   = (Ts*wn*wd-2*wd)/(Ts*wn*wd+2*wn);
+        float c3   = (2-Ts*wd)/(2+Ts*wd);
+        Vdotc_Lead = c1 * Vdotc + c2 * Ju_Hdot2Vdotc_Last + c3 * Ju_Hdot2Vdotc_Lead_Last;
+        Ju_Hdot2Vdotc_Last = Vdotc;
+        Ju_Hdot2Vdotc_Lead_Last = Vdotc_Lead;
+    }
+    Vdotc_Lead = constrain_float(Vdotc_Lead , - g.JU_Lim_Hdot2Vdot_Max , g.JU_Lim_Hdot2Vdot_Max);
+    return Vdotc_Lead;
 }
 
 
