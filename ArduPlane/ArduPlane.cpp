@@ -826,7 +826,7 @@ void Plane::update_flight_mode(void)
         }
         jlast_t     = jtnow;  
         jdelta_time = (float)jdt * 0.001f; // [s]
-        
+
         Ju_Sensor_MEAS();  // 传感器估计
         Ju_Joystick_CMD(); // 各操纵杆对应的下沉率、滚转角、偏航角速度、速度指令
         Ju_HdotV_Ctrl();   // 纵向控制器 ,输出de[rad] dthr[%]
@@ -1211,6 +1211,12 @@ void Plane::Ju_Sensor_MEAS()
         Ju_p_MEAS     = ahrs.get_gyro().x; // [rad/s]
         Ju_q_MEAS     = ahrs.get_gyro().y; // [rad/s]
         Ju_r_MEAS     = ahrs.get_gyro().z; // [rad/s]
+
+
+        // 有些地方将用到除V、Phi的操作，这种地方需要进行防除零保护，另外，插值等也需要限制范围
+        Ju_V_Use      = constrain_float(Ju_V_A_MEAS , g.JU_Lim_V_Avd0_Min   , g.JU_Lim_V_Avd0_Max); 
+        Ju_Phi_Use    = Ju_Phi_Use_With_Deadzone();
+        Ju_Theta_Use  = constrain_float(Ju_Theta_MEAS ,-g.JU_Lim_Theta_Max/57.3f, g.JU_Lim_Theta_Max/57.3f); // [rad]
 }
 
 void Plane::Ju_HdotV_Ctrl()
@@ -1219,17 +1225,16 @@ void Plane::Ju_HdotV_Ctrl()
     Ju_Ref_V_Mdl();
 
     // Hdot Control
-    float V_Use    = constrain_float(Ju_V_A_MEAS , g.JU_Lim_V_Avd0_Min , g.JU_Lim_V_Avd0_Max);
-    float Phi_Use  = constrain_float(Ju_Phi_MEAS ,-g.JU_Lim_Phi_Max/57.3f,g.JU_Lim_Phi_Max/57.3f); // [rad]
+
     float delta_Hdotc  = Ju_Ref_Hdot - Ju_Hdot_MEAS;
-    float delta_Gammac = delta_Hdotc / V_Use;
+    float delta_Gammac = delta_Hdotc / Ju_V_Use;
     Ju_Thetac          = delta_Gammac + Ju_Theta_MEAS; // delta_Theta 约等于 delta_Gamma
     Ju_Thetac          = constrain_float(Ju_Thetac , - g.JU_Lim_Theta_Max/57.3f , g.JU_Lim_Theta_Max/57.3f);
     delta_Gammac       = Ju_Thetac - Ju_Theta_MEAS;
     float gammadotc    = delta_Gammac * g.JU_Gain_P_Pgamma;
-    float delta_loadfactor = gammadotc * V_Use / g_acc / cosf(Phi_Use);
+    float delta_loadfactor = gammadotc * Ju_V_Use / g_acc / cosf(Ju_Phi_Use);
     delta_loadfactor   = constrain_float(delta_loadfactor , - g.JU_Lim_Delta_nz_Max , g.JU_Lim_Delta_nz_Max);
-    Ju_qc_FB           = delta_loadfactor * g_acc / V_Use;
+    Ju_qc_FB           = delta_loadfactor * g_acc / Ju_V_Use;
     Ju_qc_RollComp     = Ju_Get_q_Rollcomp();
     Ju_qc              = Ju_qc_FB + Ju_qc_RollComp + Ju_Ref_q;
     Ju_qc              = constrain_float(Ju_qc , - g.JU_Lim_q_Max/57.3f , g.JU_Lim_q_Max/57.3f);
@@ -1267,6 +1272,23 @@ void Plane::Ju_HdotV_Ctrl()
 void Plane::Ju_Phi_Ctrl()
 {
     Ju_Ref_Phi_Mdl();
+
+    // Phi Ctrl
+    float delta_Phic   = Ju_Ref_Phi - Ju_Phi_MEAS;
+    Ju_Phidotc_FB      = delta_Phic * g.JU_Gain_RY_Pphi;
+    Ju_Phidotc         = Ju_Phidotc_FB + Ju_Ref_Phidot;
+    Ju_pc              = Ju_Calc_Phidot2p();
+    Ju_dac_FB          = Ju_p_Ctrl();
+    Ju_dac             = Ju_dac_FB + Ju_Ref_da;
+    Ju_dac             = constrain_float(Ju_dac , - g.JU_DEF_da_Max/57.3f , g.JU_DEF_da_Max/57.3f); // [rad] 
+
+    // r Ctrl
+    Ju_rc_Coordinate   = Ju_Calc_r_Coordinate();
+    float delta_rc     = Ju_rc_Coordinate - Ju_r_MEAS;
+    float delta_rcWash = Ju_Calc_rWashFilter(delta_rc); 
+    Ju_drc             = - (delta_rcWash + Ju_Joystick_rc) * g.JU_Gain_RY_Pr;
+    Ju_drc             = Ju_drc + Ju_dac * g.JU_Gain_RY_ARI;
+    Ju_drc             = constrain_float(Ju_drc , - g.JU_DEF_dr_Max/57.3f , g.JU_DEF_dr_Max/57.3f); // [rad] )
 }
 
 void Plane::Ju_Ref_Hdot_Mdl() 
@@ -1281,17 +1303,14 @@ void Plane::Ju_Ref_Hdot_Mdl()
     }
     else
     {   
-        
-        float Phi_Use  = constrain_float(Ju_Phi_MEAS ,-g.JU_Lim_Phi_Max/57.3f,g.JU_Lim_Phi_Max/57.3f); // [rad]
-        float V_Use    = constrain_float(Ju_V_A_MEAS , g.JU_Lim_V_Avd0_Min , g.JU_Lim_V_Avd0_Max);
-        float hdotdot_ref_temp = (Ju_Joystick_Hdotc - Ju_Ref_Hdot) / g.JU_Ref_T_Hdot / cosf(Phi_Use);
+        float hdotdot_ref_temp = (Ju_Joystick_Hdotc - Ju_Ref_Hdot) / g.JU_Ref_T_Hdot / cosf(Ju_Phi_Use);
         hdotdot_ref_temp     = constrain_float(hdotdot_ref_temp , - g.JU_Lim_Delta_nz_Max * g_acc , g.JU_Lim_Delta_nz_Max * g_acc);
         Ju_Ref_Hdotdotdot    = (hdotdot_ref_temp - Ju_Ref_Hdotdot) / g.JU_Ref_T_Hdotdot;
-        Ju_Ref_de            = Ju_Ref_Hdotdotdot * g.JU_Gain_Ref_FF_de / ( V_Use * V_Use * V_Use ); // [rad] 
+        Ju_Ref_de            = Ju_Ref_Hdotdotdot * g.JU_Gain_Ref_FF_de / ( Ju_V_Use * Ju_V_Use * Ju_V_Use ); // [rad] 
         Ju_Ref_Hdotdot       = Ju_Ref_Hdotdot + Ju_Ref_Hdotdotdot * jdelta_time;
         Ju_Ref_Hdotdot       = constrain_float(Ju_Ref_Hdotdot   , - g.JU_Lim_Delta_nz_Max * g_acc , g.JU_Lim_Delta_nz_Max * g_acc);
-        Ju_Ref_q             = Ju_Ref_Hdotdot / V_Use * g.JU_Gain_Ref_FF_q;
-        Ju_Ref_Hdotdot       = Ju_Ref_Hdotdot * cosf(Phi_Use);
+        Ju_Ref_q             = Ju_Ref_Hdotdot / Ju_V_Use * g.JU_Gain_Ref_FF_q;
+        Ju_Ref_Hdotdot       = Ju_Ref_Hdotdot * cosf(Ju_Phi_Use);
         Ju_Ref_Hdot          = Ju_Ref_Hdot + Ju_Ref_Hdotdot * jdelta_time;
         Ju_Ref_Hdot          = constrain_float(Ju_Ref_Hdot , - g.JU_Lim_Hdot_Max , g.JU_Lim_Hdot_Max);
     }
@@ -1322,10 +1341,9 @@ void Plane::Ju_Ref_Phi_Mdl()
     }
     else {
         float w0square = g.JU_Ref_w0_Phi * g.JU_Ref_w0_Phi;
-        float V_Use    = constrain_float(Ju_V_A_MEAS , g.JU_Lim_V_Avd0_Min , g.JU_Lim_V_Avd0_Max);
         Ju_Ref_Phidotdot = (Ju_Joystick_Phic - Ju_Ref_Phi) * w0square - 2 * g.JU_Ref_w0_Phi * g.JU_Ref_Ksi_Phi * Ju_Ref_Phidot;
         Ju_Ref_Phidotdot = constrain_float(Ju_Ref_Phidotdot , - g.JU_Lim_Phidotdot_Max/57.3f, g.JU_Lim_Phidotdot_Max/57.3f);
-        Ju_Ref_da        = Ju_Ref_Phidotdot  * g.JU_Gain_Ref_FF_da / ( V_Use * V_Use ); // [rad] 注意，这里是V平方
+        Ju_Ref_da        = Ju_Ref_Phidotdot  * g.JU_Gain_Ref_FF_da / ( Ju_V_Use * Ju_V_Use ); // [rad] 注意，这里是V平方
         Ju_Ref_Phidot    = Ju_Ref_Phidot + Ju_Ref_Phidotdot * jdelta_time * g.JU_Gain_Ref_FF_Phidot;
         Ju_Ref_Phidot    = constrain_float(Ju_Ref_Phidot , - g.JU_Lim_Phidot_Max/57.3f, g.JU_Lim_Phidot_Max/57.3f);
         Ju_Ref_Phi       = Ju_Ref_Phi + Ju_Ref_Phidot * jdelta_time;
@@ -1335,10 +1353,7 @@ void Plane::Ju_Ref_Phi_Mdl()
 
 float Plane::Ju_Get_q_Rollcomp(void)
 {  // 计算滚转时的俯仰角速度补偿量 [rad/s]
-    float Phi_Use    = constrain_float(Ju_Phi_MEAS   ,-g.JU_Lim_Phi_Max/57.3f  , g.JU_Lim_Phi_Max/57.3f); // [rad]
-    float Theta_Use  = constrain_float(Ju_Theta_MEAS ,-g.JU_Lim_Theta_Max/57.3f, g.JU_Lim_Theta_Max/57.3f); // [rad]
-    float V_Use      = constrain_float(Ju_V_A_MEAS   , g.JU_Lim_V_Avd0_Min     , g.JU_Lim_V_Avd0_Max);
-    float q_roll_comp    =  g_acc / V_Use * tanf(Phi_Use) * sinf(Phi_Use) * cosf(Theta_Use);
+    float q_roll_comp    =  g_acc / Ju_V_Use * tanf(Ju_Phi_Use) * sinf(Ju_Phi_Use) * cosf(Ju_Theta_Use);
     return q_roll_comp;
 }
 
@@ -1361,8 +1376,31 @@ float Plane::Ju_q_Ctrl(void)
             Ju_de_I = 0;
         }
     }
-    float  dec = -(Ju_de_P + Ju_de_I + Ju_de_F);  
+    float  dec = - (Ju_de_P + Ju_de_I + Ju_de_F);  
     return dec;
+}
+
+float Plane::Ju_p_Ctrl(void)
+{   // p控制器， 计算副翼偏量,产生左滚力矩为正 [rad]
+    Ju_da_F =   Ju_pc     * g.JU_Gain_RY_Fp;
+    Ju_da_P = - Ju_p_MEAS * g.JU_Gain_RY_Pp;
+    if (jinit_counter == 0) {
+        Ju_da_I = 0;
+    }
+    else 
+    {
+        if (jdt>0) 
+        {
+            Ju_da_I = Ju_da_I + (Ju_pc - Ju_p_MEAS) * g.JU_Gain_RY_Ip * jdelta_time;
+            Ju_da_I = constrain_float(Ju_da_I , - g.JU_Lim_p_I_Max/57.3f , g.JU_Lim_p_I_Max/57.3f);
+        }
+        else
+        {
+            Ju_da_I = 0;
+        }
+    }
+    float  dac = - (Ju_da_P + Ju_da_I + Ju_da_F);  
+    return dac;
 }
 
 float Plane::Ju_de_Trim(void)
@@ -1374,8 +1412,7 @@ float Plane::Ju_de_Trim(void)
 
 float Plane::Ju_Hdot2Vdot_LeadFilter(void)
 {
-    float V_Use      = constrain_float(Ju_V_A_MEAS   , g.JU_Lim_V_Avd0_Min     , g.JU_Lim_V_Avd0_Max);
-    float Vdotc = Ju_Ref_Hdot * g_acc / V_Use;
+    float Vdotc = Ju_Ref_Hdot * g_acc / Ju_V_Use;
     float Vdotc_Lead = Vdotc;
 
     if (g.JU_Gain_P_LeadTzVdot > 0.01)  // 进行超前的情况
@@ -1399,5 +1436,73 @@ float Plane::Ju_Hdot2Vdot_LeadFilter(void)
     return Vdotc_Lead;
 }
 
+float Plane::Ju_Calc_rWashFilter(float rc)
+{
+    float  rcWash = rc;
+    if (g.JU_Gain_RY_rWashTau>=0.1)
+    {
+        if (jinit_counter == 0)
+        {
+            rclast = 0;
+            rcwashlast = 0;     
+        }
+        float w    = 1 / g.JU_Gain_RY_rWashTau;
+        float Ts   = jdelta_time;
+        float c1   = 2 / (2 + w * Ts);
+        float c2   = (2 - w * Ts)/(2 + w * Ts);
+        rcWash     = c1 * (rc - rclast) + c2 * rcwashlast;
+        rclast     = rc;
+        rcwashlast = rcWash;
+    }
+    return rcWash;
+}
+
+float Plane::Ju_Calc_Phidot2p(void)
+{
+    float pc = Ju_Phidotc;
+    if (g.JU_VAR_Phidot2p==1) {
+        pc   = Ju_Phidotc - g_acc / Ju_V_Use * sinf(Ju_Theta_Use) * tanf(Ju_Phi_Use); 
+    }
+    pc = constrain_float(pc , - g.JU_Lim_Phidot_Max/57.3f , g.JU_Lim_Phidot_Max/57.3f);
+    return pc;
+}
+
+float Plane::Ju_Phi_Use_With_Deadzone(void)
+{
+    float Phi_Use = Ju_Phi_MEAS;
+    if (g.JU_DeadZone_Phi_Use>0.5)
+    {
+        if (fabsf(Ju_Phi_MEAS)<=(g.JU_DeadZone_Phi_Use/57.3f/2.0f)) {
+            Phi_Use = 0;
+        }
+        else
+        {
+            if(fabsf(Ju_Phi_MEAS)<=(g.JU_DeadZone_Phi_Use/57.3f))
+            {
+                if (Ju_Phi_MEAS>0)
+                {
+                    Phi_Use = (Ju_Phi_MEAS - g.JU_DeadZone_Phi_Use/57.3f/2.0f) * 2;
+                }
+                else 
+                {
+                    Phi_Use = (Ju_Phi_MEAS + g.JU_DeadZone_Phi_Use/57.3f/2.0f) * 2;
+                }
+            }
+            else
+            {
+                Phi_Use = Ju_Phi_MEAS;
+            }
+        }
+
+    }
+    Phi_Use    = constrain_float(Phi_Use,-g.JU_Lim_Phi_Max/57.3f,g.JU_Lim_Phi_Max/57.3f); // [rad]
+    return Phi_Use;
+}
+
+float Plane::Ju_Calc_r_Coordinate(void)
+{
+    float  rc = sinf(Ju_Phi_Use) * cosf(Ju_Theta_Use) * g_acc / Ju_V_Use;
+    return rc;
+}
 
 AP_HAL_MAIN_CALLBACKS(&plane);

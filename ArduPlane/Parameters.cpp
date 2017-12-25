@@ -1448,6 +1448,13 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(JU_Lim_p_I_Max,         "JU_Lim_p_I_Max",   10),
 
+    // @Param: JU_DeadZone_Phi_Use
+    // @DisplayName: JU_DeadZone_Phi
+    // @Description: [deg] 部分用到Phi进行计算的量将在Phi比较小时视为Phi = 0，削弱平飞时传感器噪声影响，设置为0时将不带DeadZone直接将Phi的测量值纳入计算
+    // @Values: 0 90
+    // @User: Advanced
+    GSCALAR(JU_DeadZone_Phi_Use,    "JU_DeadZone_Phi",   10),
+
     // @Param: JU_DEF_de_Max
     // @DisplayName: JU_DEF_de_Max
     // @Description: [deg] 升降舵偏转限制,要与实际舵面的偏转范围一致！！
@@ -1467,7 +1474,7 @@ const AP_Param::Info Plane::var_info[] = {
     // @Description: [deg] 方向舵偏转限制,要与实际舵面的偏转范围一致！！
     // @Values: 10 90
     // @User: Advanced
-    GSCALAR(JU_DEF_dr_Max,         "JU_DEF_dr_Max",   20),
+    GSCALAR(JU_DEF_dr_Max,         "JU_DEF_dr_Max",   30),
 
     // @Param: JU_Init_Transtime
     // @DisplayName: JU_Init_TransT
@@ -1517,6 +1524,14 @@ const AP_Param::Info Plane::var_info[] = {
     // @Values: 0, 1
     // @User: Advanced
     GSCALAR(JU_VAR_V_Smooth,         "JU_VAR_V_Smooth",   1),
+
+    // @Param: JU_VAR_Phidot2p
+    // @DisplayName: JU_VAR_Phidot2p
+    // @Description: 1: 进行Phidotc到pc的指令转换,      0: Phidotc视为pc指令
+    // @Values: 0, 1
+    // @User: Advanced
+    GSCALAR(JU_VAR_Phidot2p,         "JU_VAR_Phidot2p",   1),
+
 
 
     // barometer ground calibration. The GND_ prefix is chosen for

@@ -368,6 +368,7 @@ public:
         k_param_JU_Lim_p_I_Max,
         k_param_JU_Lim_Thr_Max, //[%]
         k_param_JU_Lim_Thr_Min,  
+        k_param_JU_DeadZone_Phi_Use,
 
         k_param_JU_DEF_de_Max,        
         k_param_JU_DEF_da_Max,        
@@ -387,6 +388,7 @@ public:
         k_param_JU_Ref_w0_Phi,
 
         k_param_JU_VAR_V_Smooth,
+        k_param_JU_VAR_Phidot2p,
 
         k_param_JU_Gain_Ref_FF_q,
         k_param_JU_Gain_Ref_FF_Vdot,
@@ -559,12 +561,13 @@ public:
 
     // JU Param
     //
-    AP_Int8  JU_VAR_V_Smooth; 
+    AP_Int8 JU_VAR_V_Smooth; 
+    AP_Int8 JU_VAR_Phidot2p;
 
-    AP_Int8  JU_Rev_Gain_Hdotc;
-    AP_Int8  JU_Rev_Gain_Vc;
-    AP_Int8  JU_Rev_Gain_Phic;
-    AP_Int8  JU_Rev_Gain_rc;
+    AP_Int8 JU_Rev_Gain_Hdotc;
+    AP_Int8 JU_Rev_Gain_Vc;
+    AP_Int8 JU_Rev_Gain_Phic;
+    AP_Int8 JU_Rev_Gain_rc;
     
     AP_Float JU_Lim_Hdot_Max;      // [m/s]
     AP_Float JU_Lim_Hdot_Min;
@@ -586,6 +589,7 @@ public:
     AP_Float JU_Lim_p_I_Max;       // [deg] 允许副翼积分器的舵面权限
     AP_Float JU_Lim_Thr_Max;       // [%]   允许使用的最大油门量
     AP_Float JU_Lim_Thr_Min;
+    AP_Float JU_DeadZone_Phi_Use;  // [deg]
     AP_Float JU_DEF_de_Max;        // [deg] 升降舵偏转限制,要与实际舵面的偏转范围一致！！
     AP_Float JU_DEF_da_Max;        // [deg] 副翼偏转限制,要与实际舵面的偏转范围一致！！
     AP_Float JU_DEF_dr_Max;        // [deg] 方向舵偏转限制,要与实际舵面的偏转范围一致！！

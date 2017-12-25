@@ -647,6 +647,10 @@ private:
     float Ju_Joystick_Phic;    // [rad]
     float Ju_Joystick_rc;      // [rad/s]
 
+    float Ju_V_Use;
+    float Ju_Phi_Use;
+    float Ju_Theta_Use;
+
     float Ju_Ref_Hdot;         // [m/s]
     float Ju_Ref_Hdotdot;      // [m/s^2]
     float Ju_Ref_Hdotdotdot;   // [m/s^3]
@@ -687,9 +691,19 @@ private:
     float Ju_Hdot2Vdot;
     float Ju_Hdot2Vdotc_Last;
     float Ju_Hdot2Vdotc_Lead_Last;
+    float rclast;      //用于r高通滤波
+    float rcwashlast; // 用于r高通滤波
+    float Ju_Phidotc;
+    float Ju_Phidotc_FB; //[rad]
     float Ju_pc;
     float Ju_dac;
+    float Ju_da_P;
     float Ju_da_I;
+    float Ju_da_F;
+    float Ju_dac_FB;
+    float Ju_drc;
+    float Ju_rc;
+    float Ju_rc_Coordinate;
 
 
 
@@ -1133,6 +1147,10 @@ private:
     float Ju_p_Ctrl(void);         // p控制器，输出dac 正偏产生左滚力矩 [rad]
     float Ju_de_Trim(void);
     float Ju_Hdot2Vdot_LeadFilter(void);
+    float Ju_Calc_Phidot2p(void);
+    float Ju_Calc_r_Coordinate(void);
+    float Ju_Phi_Use_With_Deadzone(void);
+    float Ju_Calc_rWashFilter(float rc);
 
 
     void update_navigation();
