@@ -704,6 +704,15 @@ private:
     float Ju_drc;
     float Ju_rc;
     float Ju_rc_Coordinate;
+    int16_t Ju_da_servo_out;  // [-4500 4500]
+    int16_t Ju_de_servo_out;  // [-4500 4500]
+    int16_t Ju_dthr_servo_out;// [0 100]
+    int16_t Ju_dr_servo_out;  // [-4500 4500]
+    int16_t Ju_da_radio_out;  // [PWM]
+    int16_t Ju_de_radio_out;
+    int16_t Ju_dthr_radio_out;
+    int16_t Ju_dr_radio_out;
+
 
 
 
@@ -1135,11 +1144,11 @@ private:
 
 
     // JU Functions
-    void Ju_Joystick_CMD(); // 计算 操纵杆对应指令
-    void Ju_Sensor_MEAS();  // 计算 用到的传感器指令
-    void Ju_HdotV_Ctrl();   // 纵向控制器 ,输出de[rad] dthr[%]
-    void Ju_Phi_Ctrl();     // 横航向控制器，输出da[rad] dr[rad]
-    void Ju_Ref_Hdot_Mdl(); // 计算 Ju_Ref_Hdot[m/s],Ju_Ref_q[rad/s],Ju_Ref_de[rad]
+    void Ju_Joystick_CMD();  // 计算 操纵杆对应指令
+    void Ju_Sensor_MEAS();   // 计算 用到的传感器指令
+    void Ju_HdotV_Ctrl();    // 纵向控制器 ,输出de[rad] dthr[%]
+    void Ju_Phi_Ctrl();      // 横航向控制器，输出da[rad] dr[rad]
+    void Ju_Ref_Hdot_Mdl();  // 计算 Ju_Ref_Hdot[m/s],Ju_Ref_q[rad/s],Ju_Ref_de[rad]
     void Ju_Ref_V_Mdl();
     void Ju_Ref_Phi_Mdl();
     float Ju_Get_q_Rollcomp(void); // 计算滚转时的q补偿量       [rad]
@@ -1151,6 +1160,9 @@ private:
     float Ju_Calc_r_Coordinate(void);
     float Ju_Phi_Use_With_Deadzone(void);
     float Ju_Calc_rWashFilter(float rc);
+    void Ju_set_servo_out(); //  计算 channel_pitch、roll、throttle、rudder以及steer的servo_out
+    void Ju_set_servos();
+    void Ju_Calc_Channel_Radio_out(); // 计算主通道channel_pitch、roll、throttle、rudder的radio_out
 
 
     void update_navigation();

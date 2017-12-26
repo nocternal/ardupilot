@@ -1505,4 +1505,5 @@ float Plane::Ju_Calc_r_Coordinate(void)
     return rc;
 }
 
+
 AP_HAL_MAIN_CALLBACKS(&plane);

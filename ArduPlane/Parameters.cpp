@@ -1532,7 +1532,145 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(JU_VAR_Phidot2p,         "JU_VAR_Phidot2p",   1),
 
+    // @Param: JU_RCout_Da_MIN
+    // @DisplayName: JU_RC_Da_MIN
+    // @Description: 副翼输出通道的最小值，之所以不用APM自带的，是因为其主通道输入输出共用一套参数，有问题
+    // @Values: 900, 2100
+    // @User: Advanced
+    GSCALAR(JU_RCout_Da_MIN,         "JU_RC_Da_MIN",   1100),
 
+    // @Param: JU_RCout_Da_TRIM
+    // @DisplayName: JU_RC_Da_TRIM
+    // @Description: 副翼输出通道的中立值
+    // @Values: 900, 2100
+    // @User: Advanced
+    GSCALAR(JU_RCout_Da_TRIM,         "JU_RC_Da_TRIM",   1500),
+
+    // @Param: JU_RCout_Da_MAX
+    // @DisplayName: JU_RC_Da_MAX
+    // @Description: 副翼输出通道的最大值
+    // @Values: 900, 2100
+    // @User: Advanced
+    GSCALAR(JU_RCout_Da_MAX,         "JU_RC_Da_MAX",   1900),
+
+    // @Param: JU_RCout_Da_REV
+    // @DisplayName: JU_RC_Da_REV
+    // @Description: Reverse servo operation. Set to 1 for normal (forward) operation. Set to -1 to reverse this channel.
+    // @Values: -1:Reversed,1:Normal
+    // @User: Advanced
+    GSCALAR(JU_RCout_Da_REV,         "JU_RC_Da_REV",   1),
+
+    // @Param: JU_RCout_Da_DZ
+    // @DisplayName: JU_RC_Da_DZ
+    // @Description: 副翼输出通道的死区
+    // @Values: 0, 200
+    // @User: Advanced
+    GSCALAR(JU_RCout_Da_DZ,         "JU_RC_Da_DZ",   0),
+
+    // @Param: JU_RCout_De_MIN
+    // @DisplayName: JU_RC_De_MIN
+    // @Description: 升降舵输出通道的最小值，之所以不用APM自带的，是因为其主通道输入输出共用一套参数，有问题
+    // @Values: 900, 2100
+    // @User: Advanced
+    GSCALAR(JU_RCout_De_MIN,         "JU_RC_De_MIN",   1100),
+
+    // @Param: JU_RCout_De_TRIM
+    // @DisplayName: JU_RC_De_TRIM
+    // @Description: 升降舵输出通道的中立值
+    // @Values: 900, 2100
+    // @User: Advanced
+    GSCALAR(JU_RCout_De_TRIM,         "JU_RC_De_TRIM",   1500),
+
+    // @Param: JU_RCout_De_MAX
+    // @DisplayName: JU_RC_De_MAX
+    // @Description: 升降舵输出通道的最大值
+    // @Values: 900, 2100
+    // @User: Advanced
+    GSCALAR(JU_RCout_De_MAX,         "JU_RC_De_MAX",   1900),
+
+    // @Param: JU_RCout_De_REV
+    // @DisplayName: JU_RC_De_REV
+    // @Description: Reverse servo operation. Set to 1 for normal (forward) operation. Set to -1 to reverse this channel.
+    // @Values: -1:Reversed,1:Normal
+    // @User: Advanced
+    GSCALAR(JU_RCout_De_REV,         "JU_RC_De_REV",   1),
+
+    // @Param: JU_RCout_De_DZ
+    // @DisplayName: JU_RC_De_DZ
+    // @Description: 升降舵输出通道的死区
+    // @Values: 0, 200
+    // @User: Advanced
+    GSCALAR(JU_RCout_De_DZ,         "JU_RC_De_DZ",   0),
+
+    // @Param: JU_RCout_Dr_MIN
+    // @DisplayName: JU_RC_Dr_MIN
+    // @Description: 方向舵输出通道的最小值，之所以不用APM自带的，是因为其主通道输入输出共用一套参数，有问题
+    // @Values: 900, 2100
+    // @User: Advanced
+    GSCALAR(JU_RCout_Dr_MIN,         "JU_RC_Dr_MIN",   1100),
+
+    // @Param: JU_RCout_Dr_TRIM
+    // @DisplayName: JU_RC_Dr_TRIM
+    // @Description: 方向舵输出通道的中立值
+    // @Values: 900, 2100
+    // @User: Advanced
+    GSCALAR(JU_RCout_Dr_TRIM,         "JU_RC_Dr_TRIM",   1500),
+
+    // @Param: JU_RCout_Dr_MAX
+    // @DisplayName: JU_RC_Dr_MAX
+    // @Description: 方向舵输出通道的最大值
+    // @Values: 900, 2100
+    // @User: Advanced
+    GSCALAR(JU_RCout_Dr_MAX,         "JU_RC_Dr_MAX",   1900),
+
+    // @Param: JU_RCout_Dr_REV
+    // @DisplayName: JU_RC_Dr_REV
+    // @Description: Reverse servo operation. Set to 1 for normal (forward) operation. Set to -1 to reverse this channel.
+    // @Values: -1:Reversed,1:Normal
+    // @User: Advanced
+    GSCALAR(JU_RCout_Dr_REV,         "JU_RC_Dr_REV",   1),
+
+    // @Param: JU_RCout_Dr_DZ
+    // @DisplayName: JU_RC_Dr_DZ
+    // @Description: 方向舵输出通道的死区
+    // @Values: 0, 200
+    // @User: Advanced
+    GSCALAR(JU_RCout_Dr_DZ,         "JU_RC_Dr_DZ",   0),
+
+    // @Param: JU_RCout_Dthr_MIN
+    // @DisplayName: JU_RC_Dthr_MIN
+    // @Description: 方向舵输出通道的最小值，之所以不用APM自带的，是因为其主通道输入输出共用一套参数，有问题
+    // @Values: 900, 2100
+    // @User: Advanced
+    GSCALAR(JU_RCout_Dthr_MIN,         "JU_RC_Dthr_MIN",   1100),
+
+    // @Param: JU_RCout_Dthr_TRIM
+    // @DisplayName: JU_RC_Dthr_TRIM
+    // @Description: 方向舵输出通道的中立值
+    // @Values: 900, 2100
+    // @User: Advanced
+    GSCALAR(JU_RCout_Dthr_TRIM,         "JU_RC_Dthr_TRIM",   1100),
+
+    // @Param: JU_RCout_Dthr_MAX
+    // @DisplayName: JU_RC_Dthr_MAX
+    // @Description: 方向舵输出通道的最大值
+    // @Values: 900, 2100
+    // @User: Advanced
+    GSCALAR(JU_RCout_Dthr_MAX,         "JU_RC_Dthr_MAX",   1900),
+
+    // @Param: JU_RCout_Dthr_REV
+    // @DisplayName: JU_RC_Dthr_REV
+    // @Description: Reverse servo operation. Set to 1 for normal (forward) operation. Set to -1 to reverse this channel.
+    // @Values: -1:Reversed,1:Normal
+    // @User: Advanced
+    GSCALAR(JU_RCout_Dthr_REV,         "JU_RC_Dthr_REV",   1),
+
+    // @Param: JU_RCout_Dthr_DZ
+    // @DisplayName: JU_RC_Dthr_DZ
+    // @Description: 方向舵输出通道的死区
+    // @Values: 0, 200
+    // @User: Advanced
+    GSCALAR(JU_RCout_Dthr_DZ,         "JU_RC_Dthr_DZ",   0),
 
     // barometer ground calibration. The GND_ prefix is chosen for
     // compatibility with previous releases of ArduPlane

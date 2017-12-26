@@ -417,8 +417,28 @@ public:
         k_param_JU_Trim_de_Low,    // [deg]
         k_param_JU_Trim_de_High,
         k_param_JU_Trim_dthr_Low,  // [%]
-        k_param_JU_Trim_dthr_High 
+        k_param_JU_Trim_dthr_High,
 
+        k_param_JU_RCout_Da_MIN,
+        k_param_JU_RCout_Da_TRIM,
+        k_param_JU_RCout_Da_MAX,
+        k_param_JU_RCout_Da_REV,
+        k_param_JU_RCout_Da_DZ,
+        k_param_JU_RCout_De_MIN,
+        k_param_JU_RCout_De_TRIM,
+        k_param_JU_RCout_De_MAX,
+        k_param_JU_RCout_De_REV,
+        k_param_JU_RCout_De_DZ,
+        k_param_JU_RCout_Dr_MIN,
+        k_param_JU_RCout_Dr_TRIM,
+        k_param_JU_RCout_Dr_MAX,
+        k_param_JU_RCout_Dr_REV,
+        k_param_JU_RCout_Dr_DZ,
+        k_param_JU_RCout_Dthr_MIN,
+        k_param_JU_RCout_Dthr_TRIM,
+        k_param_JU_RCout_Dthr_MAX,
+        k_param_JU_RCout_Dthr_REV,
+        k_param_JU_RCout_Dthr_DZ         
         // 254,255: reserved
     };
 
@@ -632,6 +652,27 @@ public:
     AP_Float JU_Trim_de_High;
     AP_Float JU_Trim_dthr_Low;  // [%]
     AP_Float JU_Trim_dthr_High; 
+
+    AP_Int16 JU_RCout_Da_MIN;
+    AP_Int16 JU_RCout_Da_TRIM;
+    AP_Int16 JU_RCout_Da_MAX;
+    AP_Int8  JU_RCout_Da_REV;
+    AP_Int16 JU_RCout_Da_DZ;
+    AP_Int16 JU_RCout_De_MIN;
+    AP_Int16 JU_RCout_De_TRIM;
+    AP_Int16 JU_RCout_De_MAX;
+    AP_Int8  JU_RCout_De_REV;
+    AP_Int16 JU_RCout_De_DZ;
+    AP_Int16 JU_RCout_Dr_MIN;
+    AP_Int16 JU_RCout_Dr_TRIM;
+    AP_Int16 JU_RCout_Dr_MAX;
+    AP_Int8  JU_RCout_Dr_REV;
+    AP_Int16 JU_RCout_Dr_DZ;
+    AP_Int16 JU_RCout_Dthr_MIN;
+    AP_Int16 JU_RCout_Dthr_TRIM;
+    AP_Int16 JU_RCout_Dthr_MAX;
+    AP_Int8  JU_RCout_Dthr_REV;
+    AP_Int16 JU_RCout_Dthr_DZ;
 
 #if HIL_SUPPORT
     AP_Int8  hil_mode;
