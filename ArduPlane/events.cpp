@@ -55,6 +55,7 @@ void Plane::failsafe_short_on_event(enum failsafe_state fstype, mode_reason_t re
     case QLAND:
     case QRTL:
     case JUHdotVPhi:
+    case JUGround:
     default:
         break;
     }
@@ -115,6 +116,7 @@ void Plane::failsafe_long_on_event(enum failsafe_state fstype, mode_reason_t rea
     case QLAND:
     case QRTL:
     case JUHdotVPhi:
+    case JUGround:
     default:
         break;
     }

@@ -182,6 +182,7 @@ void Plane::stabilize_stick_mixing_fbw()
         control_mode == QRTL ||
         control_mode == TRAINING ||
         control_mode == JUHdotVPhi ||
+        control_mode == JUGround ||
         (control_mode == AUTO && g.auto_fbw_steer == 42)) {
         return;
     }
@@ -371,7 +372,8 @@ void Plane::stabilize_acro(float speed_scaler)
 void Plane::stabilize()
 {
     float speed_scaler = get_speed_scaler();
-    if (control_mode == JUHdotVPhi) 
+    if (control_mode == JUHdotVPhi ||
+        control_mode == JUGround) 
     {
         Ju_set_servo_out();
     }
@@ -986,6 +988,12 @@ void Plane::Ju_set_servos()
     RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_rudder, channel_rudder->get_servo_out());
     RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_steering, steering_control.steering);
 
+    if (control_mode == JUGround) {
+        channel_throttle->set_radio_out(channel_throttle->get_radio_in());
+        channel_throttle->set_servo_out(channel_throttle->get_control_in());
+        RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_throttle, channel_throttle->get_servo_out());
+    }
+
     #if HIL_SUPPORT
         if (g.hil_mode == 1) {
             // get the servos to the GCS immediately for HIL
@@ -1012,7 +1020,8 @@ void Plane::Ju_set_servos()
 *****************************************/
 void Plane::set_servos(void)
 {
-    if (control_mode == JUHdotVPhi) 
+    if (control_mode == JUHdotVPhi ||
+        control_mode == JUGround) 
     {
         Ju_set_servos();
     } 

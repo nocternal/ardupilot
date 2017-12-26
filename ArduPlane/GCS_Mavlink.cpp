@@ -63,6 +63,7 @@ void Plane::send_heartbeat(mavlink_channel_t chan)
         // positions", which APM does not currently do
         break;
     case JUHdotVPhi:
+    case JUGround:
     case INITIALISING:
         system_status = MAV_STATE_CALIBRATING;
         break;
@@ -222,6 +223,7 @@ void Plane::send_extended_status1(mavlink_channel_t chan)
         control_sensors_enabled |= MAV_SYS_STATUS_SENSOR_XY_POSITION_CONTROL; // X/Y position control
         break;
     case JUHdotVPhi:
+    case JUGround:
     case INITIALISING:
         break;
     }

@@ -836,9 +836,28 @@ void Plane::update_flight_mode(void)
         {
             jinit_counter += jdt;   
         }
-
         break;
+    }
+    case JUGround: {   
+        // 计时器，用于积分、淡化等
+        jtnow= AP_HAL::millis();
+        jdt = jtnow - jlast_t;  // [ms]
+        if (jlast_t == 0 || jdt > 1000) {
+        jdt = 0;
+        }
+        jlast_t     = jtnow;  
+        jdelta_time = (float)jdt * 0.001f; // [s]
 
+        Ju_Sensor_MEAS();  // 传感器估计
+        Ju_Joystick_CMD(); // 各操纵杆对应的下沉率、滚转角、偏航角速度、速度指令
+        Ju_HdotV_Ctrl();   // 纵向控制器 ,输出de[rad] dthr[%]
+        Ju_Phi_Ctrl();     // 横航向控制器，输出da[rad],dr[rad]
+
+        if (jinit_counter <= (g.JU_Init_Transtime*1000)) 
+        {
+            jinit_counter += jdt;   
+        }
+        break;
     }
 
 
@@ -919,6 +938,7 @@ void Plane::update_navigation()
     case QRTL:
         // nothing to do
     case JUHdotVPhi:
+    case JUGround:
         break;
     }
 }
@@ -1376,6 +1396,9 @@ float Plane::Ju_q_Ctrl(void)
             Ju_de_I = 0;
         }
     }
+    if (control_mode==JUGround) {
+        Ju_de_I = 0;
+    }
     float  dec = - (Ju_de_P + Ju_de_I + Ju_de_F);  
     return dec;
 }
@@ -1398,6 +1421,9 @@ float Plane::Ju_p_Ctrl(void)
         {
             Ju_da_I = 0;
         }
+    }
+    if (control_mode==JUGround) {
+        Ju_da_I = 0;
     }
     float  dac = - (Ju_da_P + Ju_da_I + Ju_da_F);  
     return dac;
