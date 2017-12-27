@@ -1266,18 +1266,18 @@ const AP_Param::Info Plane::var_info[] = {
     GSCALAR(JU_Trim_de_High,         "JU_Trim_de_High",   -1.5),
 
     // @Param: JU_Trim_dthr_Low
-    // @DisplayName: JU_Trim_dthr_Low
+    // @DisplayName: JU_Trim_Thr_Low
     // @Description: Trim table , the Low velocity's throttle [%]     
     // @Values: 0 100
     // @User: Advanced
-    GSCALAR(JU_Trim_dthr_Low,         "JU_Trim_dthr_Low",   29),
+    GSCALAR(JU_Trim_dthr_Low,         "JU_Trim_Thr_Low",   29),
 
     // @Param: JU_Trim_dthr_High
-    // @DisplayName: JU_Trim_dthr_High
+    // @DisplayName: JU_Trim_Thr_High
     // @Description: Trim table , the High velocity's throttle [%]     
     // @Values: 0 100
     // @User: Advanced
-    GSCALAR(JU_Trim_dthr_High,         "JU_Trim_dthr_High",   55),
+    GSCALAR(JU_Trim_dthr_High,         "JU_Trim_Thr_High",   55),
     
     // @Param: JU_Rev_Gain_Hdotc
     // @DisplayName: JU_Rev_K_Hdotc
@@ -1537,7 +1537,7 @@ const AP_Param::Info Plane::var_info[] = {
     // @Description: 副翼输出通道的最小值，之所以不用APM自带的，是因为其主通道输入输出共用一套参数，有问题
     // @Values: 900, 2100
     // @User: Advanced
-    GSCALAR(JU_RCout_Da_MIN,         "JU_RC_Da_MIN",   1100),
+    GSCALAR(JU_RCout_Da_MIN,         "JU_RC_Da_MIN",   1000),
 
     // @Param: JU_RCout_Da_TRIM
     // @DisplayName: JU_RC_Da_TRIM
@@ -1551,7 +1551,7 @@ const AP_Param::Info Plane::var_info[] = {
     // @Description: 副翼输出通道的最大值
     // @Values: 900, 2100
     // @User: Advanced
-    GSCALAR(JU_RCout_Da_MAX,         "JU_RC_Da_MAX",   1900),
+    GSCALAR(JU_RCout_Da_MAX,         "JU_RC_Da_MAX",   2000),
 
     // @Param: JU_RCout_Da_REV
     // @DisplayName: JU_RC_Da_REV
@@ -1572,7 +1572,7 @@ const AP_Param::Info Plane::var_info[] = {
     // @Description: 升降舵输出通道的最小值，之所以不用APM自带的，是因为其主通道输入输出共用一套参数，有问题
     // @Values: 900, 2100
     // @User: Advanced
-    GSCALAR(JU_RCout_De_MIN,         "JU_RC_De_MIN",   1100),
+    GSCALAR(JU_RCout_De_MIN,         "JU_RC_De_MIN",   1000),
 
     // @Param: JU_RCout_De_TRIM
     // @DisplayName: JU_RC_De_TRIM
@@ -1586,7 +1586,7 @@ const AP_Param::Info Plane::var_info[] = {
     // @Description: 升降舵输出通道的最大值
     // @Values: 900, 2100
     // @User: Advanced
-    GSCALAR(JU_RCout_De_MAX,         "JU_RC_De_MAX",   1900),
+    GSCALAR(JU_RCout_De_MAX,         "JU_RC_De_MAX",   2000),
 
     // @Param: JU_RCout_De_REV
     // @DisplayName: JU_RC_De_REV
@@ -1607,7 +1607,7 @@ const AP_Param::Info Plane::var_info[] = {
     // @Description: 方向舵输出通道的最小值，之所以不用APM自带的，是因为其主通道输入输出共用一套参数，有问题
     // @Values: 900, 2100
     // @User: Advanced
-    GSCALAR(JU_RCout_Dr_MIN,         "JU_RC_Dr_MIN",   1100),
+    GSCALAR(JU_RCout_Dr_MIN,         "JU_RC_Dr_MIN",   1000),
 
     // @Param: JU_RCout_Dr_TRIM
     // @DisplayName: JU_RC_Dr_TRIM
@@ -1621,7 +1621,7 @@ const AP_Param::Info Plane::var_info[] = {
     // @Description: 方向舵输出通道的最大值
     // @Values: 900, 2100
     // @User: Advanced
-    GSCALAR(JU_RCout_Dr_MAX,         "JU_RC_Dr_MAX",   1900),
+    GSCALAR(JU_RCout_Dr_MAX,         "JU_RC_Dr_MAX",   2000),
 
     // @Param: JU_RCout_Dr_REV
     // @DisplayName: JU_RC_Dr_REV
@@ -1642,21 +1642,21 @@ const AP_Param::Info Plane::var_info[] = {
     // @Description: 方向舵输出通道的最小值，之所以不用APM自带的，是因为其主通道输入输出共用一套参数，有问题
     // @Values: 900, 2100
     // @User: Advanced
-    GSCALAR(JU_RCout_Dthr_MIN,         "JU_RC_Dthr_MIN",   1100),
+    GSCALAR(JU_RCout_Dthr_MIN,         "JU_RC_Dthr_MIN",   1000),
 
     // @Param: JU_RCout_Dthr_TRIM
     // @DisplayName: JU_RC_Dthr_TRIM
     // @Description: 方向舵输出通道的中立值
     // @Values: 900, 2100
     // @User: Advanced
-    GSCALAR(JU_RCout_Dthr_TRIM,         "JU_RC_Dthr_TRIM",   1100),
+    GSCALAR(JU_RCout_Dthr_TRIM,         "JU_RC_Dthr_TRIM",   1000),
 
     // @Param: JU_RCout_Dthr_MAX
     // @DisplayName: JU_RC_Dthr_MAX
     // @Description: 方向舵输出通道的最大值
     // @Values: 900, 2100
     // @User: Advanced
-    GSCALAR(JU_RCout_Dthr_MAX,         "JU_RC_Dthr_MAX",   1900),
+    GSCALAR(JU_RCout_Dthr_MAX,         "JU_RC_Dthr_MAX",   2000),
 
     // @Param: JU_RCout_Dthr_REV
     // @DisplayName: JU_RC_Dthr_REV

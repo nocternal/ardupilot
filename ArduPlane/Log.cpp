@@ -246,7 +246,14 @@ void Plane::Log_Write_Startup(uint8_t type)
 struct PACKED log_Control_Tuning {
     LOG_PACKET_HEADER;
     uint64_t time_us;
-    float ThetaJu;
+    float decJ;
+    float de_servo_outJ;
+    float de_servo_out;
+    float de_pwmJ;
+    float de_pwm;
+    float de_I;
+    float de_Ref;
+    float q_Ref;
     //float ThetacJu;
     //float rJu;
     //float rcJu;
@@ -274,7 +281,15 @@ void Plane::Log_Write_Control_Tuning()
     struct log_Control_Tuning pkt = {
         LOG_PACKET_HEADER_INIT(LOG_CTUN_MSG),
         time_us         : AP_HAL::micros64(),
-        ThetaJu         : Ju_Theta_MEAS*57.3f
+        decJ           : Ju_dec*57.3,
+        de_servo_outJ  : Ju_de_servo_out,
+        de_servo_out    : channel_pitch->get_servo_out(),
+        de_pwmJ        :Ju_de_radio_out,
+        de_pwm   : channel_pitch->get_radio_out(),
+        de_I : Ju_de_I*57.3f,
+        de_Ref: Ju_Ref_de*57.3f,
+        q_Ref:Ju_Ref_q*57.3f
+
         //ThetacJu        : Ju_Thetac*57.3f,
         //rJu             : Ju_r_MEAS*57.3f,
         //rcJu            : Ju_rc_Coordinate*57.3f,
@@ -301,21 +316,14 @@ struct PACKED log_Nav_Tuning {
     // 最多记录13个变量！！！！！
     LOG_PACKET_HEADER;
     uint64_t time_us;
-    float jdt;
     float Hdot;
-    float V;
-    float phi;
-    float theta;
-    float psi;
-    float p;
+    float Hdotc;
+    float HdotR;
+    float Theta;
+    float Thetac;
     float q;
-    float r;
-
-
-    //float Hdotc_Stick;
-    //float Hdot_Ref;
-    //float qJu;
-    //float qcJu;
+    float qc;
+    float dec;
     //float VJu;
     //float Vc_Stick;
     //float V_Ref;
@@ -340,15 +348,15 @@ void Plane::Log_Write_Nav_Tuning()
     struct log_Nav_Tuning pkt = {
         LOG_PACKET_HEADER_INIT(LOG_NTUN_MSG),
         time_us    : AP_HAL::micros64(),
-        jdt        : jdelta_time*50.0f,
-        Hdot       : Ju_Hdot_MEAS,
-        V          : Ju_V_A_MEAS,
-        phi        : Ju_Phi_MEAS*57.3f,
-        theta      : Ju_Theta_MEAS*57.3f,
-        psi        : Ju_Psi_MEAS*57.3f,
-        p          : Ju_p_MEAS*57.3f,
-        q          : Ju_q_MEAS*57.3f,
-        r          : Ju_r_MEAS*57.3f
+        Hdot:Ju_Hdot_MEAS,
+        Hdotc:Ju_Joystick_Hdotc,
+        HdotR:Ju_Ref_Hdot,
+        Theta:Ju_Theta_MEAS*57.3f,
+        Thetac:Ju_Thetac*57.3f, 
+        q:Ju_q_MEAS*57.3f,
+        qc:Ju_qc*57.3f,
+        dec:Ju_dec*57.3f
+
         //Hdotc_Stick         : Ju_Joystick_Hdotc,
         //Hdot_Ref            : Ju_Ref_Hdot,
         //qJu                 : Ju_q_MEAS * 57.3f,
@@ -564,11 +572,11 @@ const struct LogStructure Plane::log_structure[] = {
     { LOG_CTUN_MSG, sizeof(log_Control_Tuning),     
       //"CTUN", "Qcccchhh",    "TimeUS,NavRoll,Roll,NavPitch,Pitch,ThrOut,RdrOut,ThrDem" },
       //"CTUN", "Qfffffffffff",    "T,Ptch,Ptchc,r,rc,rMan,dac,dec,thrc,drc,daelc,daerc"},  
-      "CTUN", "Qf",    "T,Ptch"},
+      "CTUN", "Qffffffff",    "TimeUS,deJ,deservoJ,deservo,dePWMJ,dePWM,eI,eR,qR"}, // 字符串允许长度有限，尽量简洁着写，但是不要把TimeUS省略成更短的！
     { LOG_NTUN_MSG, sizeof(log_Nav_Tuning),         
       //"NTUN", "Qfcccfff",  "TimeUS,WpDist,TargBrg,NavBrg,AltErr,XT,XTi,ArspdErr" },
       //"NTUN", "Qfffffffffffff",  "T,Hd,Hdc,HdR,q,qc,V,Vc,VR,Phi,Phic,PhiR,p,pc"},
-      "NTUN", "Qfffffffff",  "TimeUS,jdt,Hdot,V,Phi,Thta,Psi,p,q,r"},
+      "NTUN", "Qffffffff",  "TimeUS,Hd,Hdc,HdR,Ptch,Ptchc,q,qc,dec"},
     { LOG_SONAR_MSG, sizeof(log_Sonar),             
       "SONR", "QffBf",   "TimeUS,Dist,Volt,Cnt,Corr" },
     { LOG_ARM_DISARM_MSG, sizeof(log_Arm_Disarm),

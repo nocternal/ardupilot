@@ -308,7 +308,7 @@ void Plane::one_second_loop()
     /*gcs_send_text_fmt(MAV_SEVERITY_INFO, "Hdotc=%.1f ,HdotRM=%.1f",
                               (float)Ju_Joystick_Hdotc,
                               (float)Ju_Ref_Hdot);*/
-        gcs_send_text_fmt(MAV_SEVERITY_INFO, "dtime=%.6f s",(float)jdelta_time);
+    //gcs_send_text_fmt(MAV_SEVERITY_INFO, "dtime=%.6f s",(float)jdelta_time);
         gcs_send_text_fmt(MAV_SEVERITY_INFO, "Flight mode = %u", (unsigned)control_mode);
     if (control_mode==JUHdotVPhi) {
         gcs_send_text_fmt(MAV_SEVERITY_INFO, "HdotRef=%.1fm/s Hdot=%.1fm/s \n PhiRef=%.1fdeg","Phi=%.1fdeg",
@@ -614,7 +614,10 @@ void Plane::update_flight_mode(void)
         Ju_Joystick_CMD(); // 各操纵杆对应的下沉率、滚转角、偏航角速度、速度指令
         Ju_HdotV_Ctrl();   // 纵向控制器 ,输出de[rad] dthr[%]
         Ju_Phi_Ctrl();     // 横航向控制器，输出da[rad],dr[rad]
-
+         
+        // 临时放在这里看数的，实际应该在attitude.cpp中
+        Ju_set_servo_out();
+        Ju_set_servos();
         if (jinit_counter <= (g.JU_Init_Transtime*1000)) 
         {
             jinit_counter += jdt;   
@@ -728,7 +731,32 @@ void Plane::update_flight_mode(void)
         update_load_factor();
         update_fbwb_speed_height();
         break;
+
+    /////////////////////////////////////////Temp
+        // 计时器，用于积分、淡化等
+        jtnow= AP_HAL::millis();
+        jdt = jtnow - jlast_t;  // [ms]
+        if (jlast_t == 0 || jdt > 1000) {
+        jdt = 0;
+        }
+        jlast_t     = jtnow;  
+        jdelta_time = (float)jdt * 0.001f; // [s]
         
+        Ju_Sensor_MEAS();  // 传感器估计
+        Ju_Joystick_CMD(); // 各操纵杆对应的下沉率、滚转角、偏航角速度、速度指令
+        Ju_HdotV_Ctrl();   // 纵向控制器 ,输出de[rad] dthr[%]
+        Ju_Phi_Ctrl();     // 横航向控制器，输出da[rad],dr[rad]
+         
+        // 临时放在这里看数的，实际应该在attitude.cpp中
+        Ju_set_servo_out();
+        Ju_set_servos();
+        if (jinit_counter <= (g.JU_Init_Transtime*1000)) 
+        {
+            jinit_counter += jdt;   
+        }
+    ///////////////////////////////////////////////
+    ///
+    ///
     case CRUISE:
         /*
           in CRUISE mode we use the navigation code to control
