@@ -36,14 +36,14 @@ void Plane::send_heartbeat(mavlink_channel_t chan)
     case MANUAL:
     case TRAINING:
     case ACRO:
+    case JUHdotVPhi:
+    case JUGround:
         base_mode = MAV_MODE_FLAG_MANUAL_INPUT_ENABLED;
         break;
     case STABILIZE:
     case FLY_BY_WIRE_A:
     case AUTOTUNE:
     case FLY_BY_WIRE_B:
-    case JUHdotVPhi:
-    case JUGround:
     case QSTABILIZE:
     case QHOVER:
     case QLOITER:
@@ -187,6 +187,8 @@ void Plane::send_extended_status1(mavlink_channel_t chan)
 
     case STABILIZE:
     case FLY_BY_WIRE_A:
+    case JUHdotVPhi:
+    case JUGround:
     case AUTOTUNE:
     case QSTABILIZE:
     case QHOVER:
@@ -195,10 +197,7 @@ void Plane::send_extended_status1(mavlink_channel_t chan)
         control_sensors_enabled |= MAV_SYS_STATUS_SENSOR_ANGULAR_RATE_CONTROL; // 3D angular rate control
         control_sensors_enabled |= MAV_SYS_STATUS_SENSOR_ATTITUDE_STABILIZATION; // attitude stabilisation
         break;
-
     case FLY_BY_WIRE_B:
-    case JUHdotVPhi:
-    case JUGround:
     case CRUISE:
         control_sensors_enabled |= MAV_SYS_STATUS_SENSOR_ANGULAR_RATE_CONTROL; // 3D angular rate control
         control_sensors_enabled |= MAV_SYS_STATUS_SENSOR_ATTITUDE_STABILIZATION; // attitude stabilisation
