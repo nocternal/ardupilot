@@ -980,6 +980,8 @@ void Plane::Ju_set_servos()
 
     // 除了前四个主通道Channel。 剩下的Channel_aux通道也需指定输出信号
     // both types of secondary elevator are slaved to the pitch servo out
+    
+
     RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_aileron, channel_roll->get_servo_out());
     RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_aileron_with_input, channel_roll->get_servo_out());
     RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_elevator, channel_pitch->get_servo_out());
