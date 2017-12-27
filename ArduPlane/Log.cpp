@@ -247,16 +247,16 @@ struct PACKED log_Control_Tuning {
     LOG_PACKET_HEADER;
     uint64_t time_us;
     float ThetaJu;
-    float ThetacJu;
-    float rJu;
-    float rcJu;
-    float rcpilotJu;
-    float dacJu;
-    float decJu;
-    float dthrcJu;
-    float drcJu;
-    float daelJu;
-    float daerJu;
+    //float ThetacJu;
+    //float rJu;
+    //float rcJu;
+    //float rcpilotJu;
+    //float dacJu;
+    //float decJu;
+    //float dthrcJu;
+    //float drcJu;
+    //float daelJu;
+    //float daerJu;
 
     /*int16_t nav_roll_cd;
     int16_t roll;
@@ -274,17 +274,17 @@ void Plane::Log_Write_Control_Tuning()
     struct log_Control_Tuning pkt = {
         LOG_PACKET_HEADER_INIT(LOG_CTUN_MSG),
         time_us         : AP_HAL::micros64(),
-        ThetaJu         : Ju_Theta_MEAS,
-        ThetacJu        : Ju_Thetac*57.3f,
-        rJu             : Ju_r_MEAS*57.3f,
-        rcJu            : Ju_rc_Coordinate*57.3f,
-        rcpilotJu       : Ju_Joystick_rc*57.3f,
-        dacJu           : Ju_dac*57.3f,
-        decJu           : Ju_dec*57.3f,
-        dthrcJu         : Ju_Thrc,
-        drcJu           : Ju_drc*57.3f,
-        daelJu          : Ju_log_daelc*57.3f,
-        daerJu          : Ju_log_daerc*57.3f
+        ThetaJu         : Ju_Theta_MEAS*57.3f
+        //ThetacJu        : Ju_Thetac*57.3f,
+        //rJu             : Ju_r_MEAS*57.3f,
+        //rcJu            : Ju_rc_Coordinate*57.3f,
+        //rcpilotJu       : Ju_Joystick_rc*57.3f,
+        //dacJu           : Ju_dac*57.3f,
+        //decJu           : Ju_dec*57.3f,
+        //dthrcJu         : Ju_Thrc,
+        //drcJu           : Ju_drc*57.3f,
+        //daelJu          : Ju_log_daelc*57.3f,
+        //daerJu          : Ju_log_daerc*57.3f
 
         /*nav_roll_cd     : (int16_t)nav_roll_cd,
         roll            : (int16_t)ahrs.roll_sensor,
@@ -302,7 +302,7 @@ struct PACKED log_Nav_Tuning {
     LOG_PACKET_HEADER;
     uint64_t time_us;
     float jdt;
-    //float Hdot; 
+    float Hdot; 
     //float Hdotc_Stick;
     //float Hdot_Ref;
     //float qJu;
@@ -331,8 +331,8 @@ void Plane::Log_Write_Nav_Tuning()
     struct log_Nav_Tuning pkt = {
         LOG_PACKET_HEADER_INIT(LOG_NTUN_MSG),
         time_us             : AP_HAL::micros64(),
-        jdt                 : jdelta_time*50.0f
-        //Hdot                : Ju_Hdot_MEAS,
+        jdt                 : jdelta_time*50.0f,
+        Hdot                : Ju_Hdot_MEAS
         //Hdotc_Stick         : Ju_Joystick_Hdotc,
         //Hdot_Ref            : Ju_Ref_Hdot,
         //qJu                 : Ju_q_MEAS * 57.3f,
@@ -547,11 +547,12 @@ const struct LogStructure Plane::log_structure[] = {
       "STRT", "QBH",         "TimeUS,SType,CTot" },
     { LOG_CTUN_MSG, sizeof(log_Control_Tuning),     
       //"CTUN", "Qcccchhh",    "TimeUS,NavRoll,Roll,NavPitch,Pitch,ThrOut,RdrOut,ThrDem" },
-      "CTUN", "Q",    "T,Ptch,Ptchc,r,rc,rMan,dac,dec,thrc,drc,daelc,daerc"},
+      //"CTUN", "Qfffffffffff",    "T,Ptch,Ptchc,r,rc,rMan,dac,dec,thrc,drc,daelc,daerc"},  
+      "CTUN", "Qf",    "T,Ptch"},
     { LOG_NTUN_MSG, sizeof(log_Nav_Tuning),         
       //"NTUN", "Qfcccfff",  "TimeUS,WpDist,TargBrg,NavBrg,AltErr,XT,XTi,ArspdErr" },
       //"NTUN", "Qfffffffffffff",  "T,Hd,Hdc,HdR,q,qc,V,Vc,VR,Phi,Phic,PhiR,p,pc"},
-      "NTUN", "Qf",  "T,jdt"},
+      "NTUN", "Qff",  "T,jdt,Hdot"},
     { LOG_SONAR_MSG, sizeof(log_Sonar),             
       "SONR", "QffBf",   "TimeUS,Dist,Volt,Cnt,Corr" },
     { LOG_ARM_DISARM_MSG, sizeof(log_Arm_Disarm),
