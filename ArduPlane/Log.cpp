@@ -246,13 +246,26 @@ void Plane::Log_Write_Startup(uint8_t type)
 struct PACKED log_Control_Tuning {
     LOG_PACKET_HEADER;
     uint64_t time_us;
-    int16_t nav_roll_cd;
+    float ThetaJu;
+    float ThetacJu;
+    float rJu;
+    float rcJu;
+    float rcpilotJu;
+    float dacJu;
+    float decJu;
+    float dthrcJu;
+    float drcJu;
+    float daelJu;
+    float daerJu;
+
+    /*int16_t nav_roll_cd;
     int16_t roll;
     int16_t nav_pitch_cd;
     int16_t pitch;
     int16_t throttle_out;
     int16_t rudder_out;
-    int16_t throttle_dem;
+    int16_t throttle_dem;*/
+
 };
 
 // Write a control tuning packet. Total length : 22 bytes
@@ -261,18 +274,31 @@ void Plane::Log_Write_Control_Tuning()
     struct log_Control_Tuning pkt = {
         LOG_PACKET_HEADER_INIT(LOG_CTUN_MSG),
         time_us         : AP_HAL::micros64(),
-        nav_roll_cd     : (int16_t)nav_roll_cd,
+        ThetaJu         : Ju_Theta_MEAS,
+        ThetacJu        : Ju_Thetac*57.3f,
+        rJu             : Ju_r_MEAS*57.3f,
+        rcJu            : Ju_rc_Coordinate*57.3f,
+        rcpilotJu       : Ju_Joystick_rc*57.3f,
+        dacJu           : Ju_dac*57.3f,
+        decJu           : Ju_dec*57.3f,
+        dthrcJu         : Ju_Thrc,
+        drcJu           : Ju_drc*57.3f,
+        daelJu          : Ju_log_daelc*57.3f,
+        daerJu          : Ju_log_daerc*57.3f
+
+        /*nav_roll_cd     : (int16_t)nav_roll_cd,
         roll            : (int16_t)ahrs.roll_sensor,
         nav_pitch_cd    : (int16_t)nav_pitch_cd,
         pitch           : (int16_t)ahrs.pitch_sensor,
         throttle_out    : (int16_t)channel_throttle->get_servo_out(),
         rudder_out      : (int16_t)channel_rudder->get_servo_out(),
-        throttle_dem    : (int16_t)SpdHgt_Controller->get_throttle_demand()
+        throttle_dem    : (int16_t)SpdHgt_Controller->get_throttle_demand()*/
     };
     DataFlash.WriteBlock(&pkt, sizeof(pkt));
 }
 
 struct PACKED log_Nav_Tuning {
+    // 最多记录13个变量！！！！！
     LOG_PACKET_HEADER;
     uint64_t time_us;
     float Hdot; 
@@ -280,13 +306,14 @@ struct PACKED log_Nav_Tuning {
     float Hdot_Ref;
     float qJu;
     float qcJu;
-    float decJu;
     float VJu;
     float Vc_Stick;
     float V_Ref;
     float PhiJu;
     float Phic_Stick;
     float Phi_Ref;
+    float pJu;
+    float pcJu;   
 
     /*float wp_distance;
     int16_t target_bearing_cd;
@@ -308,13 +335,24 @@ void Plane::Log_Write_Nav_Tuning()
         Hdot_Ref            : Ju_Ref_Hdot,
         qJu                 : Ju_q_MEAS * 57.3f,
         qcJu                : Ju_qc * 57.3f,
-        decJu               : Ju_dec * 57.3f,
+        //decJu               : Ju_dec * 57.3f,
         VJu                 : Ju_V_A_MEAS,
         Vc_Stick            : Ju_Joystick_Vc,
         V_Ref               : Ju_Ref_V,
+        //ThrcJu              : Ju_Thrc,
         PhiJu               : Ju_Phi_MEAS*57.3f,
         Phic_Stick          : Ju_Joystick_Phic*57.3f,
-        Phi_Ref             : Ju_Ref_Phi*57.3f
+        Phi_Ref             : Ju_Ref_Phi*57.3f,
+        pJu                 : Ju_p_MEAS*57.3f,
+        pcJu                : Ju_pc*57.3f
+ //       dacJu               : Ju_dac*57.3f,
+        //rJu                 : Ju_r_MEAS*57.3f,
+        //rcCoord             : Ju_rc_Coordinate*57.3f,
+        //rc_Stick            : Ju_Joystick_rc*57.3f
+
+
+ //       drcJu               : Ju_drc*57.3f
+        
 /*        wp_distance         : auto_state.wp_distance,
         target_bearing_cd   : (int16_t)nav_controller->target_bearing_cd(),
         nav_bearing_cd      : (int16_t)nav_controller->nav_bearing_cd(),
@@ -505,10 +543,11 @@ const struct LogStructure Plane::log_structure[] = {
     { LOG_STARTUP_MSG, sizeof(log_Startup),         
       "STRT", "QBH",         "TimeUS,SType,CTot" },
     { LOG_CTUN_MSG, sizeof(log_Control_Tuning),     
-      "CTUN", "Qcccchhh",    "TimeUS,NavRoll,Roll,NavPitch,Pitch,ThrOut,RdrOut,ThrDem" },
+      //"CTUN", "Qcccchhh",    "TimeUS,NavRoll,Roll,NavPitch,Pitch,ThrOut,RdrOut,ThrDem" },
+      "CTUN", "Q",    "T,Ptch,Ptchc,r,rc,rMan,dac,dec,thrc,drc,daelc,daerc"},
     { LOG_NTUN_MSG, sizeof(log_Nav_Tuning),         
       //"NTUN", "Qfcccfff",  "TimeUS,WpDist,TargBrg,NavBrg,AltErr,XT,XTi,ArspdErr" },
-      "NTUN", "Qffffffffffff",  "TimeUS,Hdot,Hdotc,HdotRef,q,qc,dec,V,Vc,VRef,Phi,Phic,PhiRef" },
+      "NTUN", "Qfffffffffffff",  "T,Hd,Hdc,HdR,q,qc,V,Vc,VR,Phi,Phic,PhiR,p,pc"},
     { LOG_SONAR_MSG, sizeof(log_Sonar),             
       "SONR", "QffBf",   "TimeUS,Dist,Volt,Cnt,Corr" },
     { LOG_ARM_DISARM_MSG, sizeof(log_Arm_Disarm),

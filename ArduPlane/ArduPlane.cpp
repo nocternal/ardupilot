@@ -268,9 +268,6 @@ void Plane::update_logging1(void)
  */
 void Plane::update_logging2(void)
 {
-    if (should_log(MASK_LOG_CTUN))
-        Log_Write_Control_Tuning();
-
     if (should_log(MASK_LOG_RC))
         Log_Write_RC();
 
@@ -312,6 +309,13 @@ void Plane::one_second_loop()
                               (float)Ju_Joystick_Hdotc,
                               (float)Ju_Ref_Hdot);*/
     /*gcs_send_text_fmt(MAV_SEVERITY_INFO, "dtime=%.6f s",(float)jdelta_time);*/
+    if (control_mode==JUHdotVPhi) {
+        gcs_send_text_fmt(MAV_SEVERITY_INFO, "HdotRef=%.1fm/s","Hdot=%.1fm/s\n",
+                                             "PhiRef=%.1fdeg","Phi=%.1fdeg",
+                                              (float)Ju_Ref_Hdot, (float)Ju_Hdot_MEAS,
+                                              (float)(Ju_Ref_Phi*57.3f), (float)(Ju_Phi_MEAS*57.3f));
+    }
+    
     /////////
     ////////////////////////////                   
    
@@ -829,6 +833,11 @@ void Plane::update_flight_mode(void)
         Ju_HdotV_Ctrl();   // 纵向控制器 ,输出de[rad] dthr[%]
         Ju_Phi_Ctrl();     // 横航向控制器，输出da[rad],dr[rad]
 
+        Ju_log_daelc = Ju_dec - Ju_dac; // 这并不是在用的的混空指令，只是记录用
+        Ju_log_daerc = Ju_dec + Ju_dac;
+        Ju_log_daelc = constrain_float(Ju_log_daelc,-g.JU_DEF_de_Max/57.3f,g.JU_DEF_de_Max/57.3f);
+        Ju_log_daerc = constrain_float(Ju_log_daerc,-g.JU_DEF_de_Max/57.3f,g.JU_DEF_de_Max/57.3f);
+
         if (jinit_counter <= (g.JU_Init_Transtime*1000)) 
         {
             jinit_counter += jdt;   
@@ -849,6 +858,11 @@ void Plane::update_flight_mode(void)
         Ju_Joystick_CMD(); // 各操纵杆对应的下沉率、滚转角、偏航角速度、速度指令
         Ju_HdotV_Ctrl();   // 纵向控制器 ,输出de[rad] dthr[%]
         Ju_Phi_Ctrl();     // 横航向控制器，输出da[rad],dr[rad]
+
+        Ju_log_daelc = Ju_dec - Ju_dac; // 这并不是在用的的混空指令，只是记录用
+        Ju_log_daerc = Ju_dec + Ju_dac;
+        Ju_log_daelc = constrain_float(Ju_log_daelc,-g.JU_DEF_de_Max/57.3f,g.JU_DEF_de_Max/57.3f);
+        Ju_log_daerc = constrain_float(Ju_log_daerc,-g.JU_DEF_de_Max/57.3f,g.JU_DEF_de_Max/57.3f);
 
         if (jinit_counter <= (g.JU_Init_Transtime*1000)) 
         {
@@ -1284,6 +1298,13 @@ void Plane::Ju_HdotV_Ctrl()
     Ju_Thrc_Trim = linear_interpolate(g.JU_Trim_dthr_Low , g.JU_Trim_dthr_High, Ju_V_A_MEAS, g.JU_Trim_V_Low , g.JU_Trim_V_High);
     Ju_Thrc      = Ju_Thrc_FB + Ju_Thrc_Trim;
     Ju_Thrc      = constrain_float(Ju_Thrc, g.JU_Lim_Thr_Min , g.JU_Lim_Thr_Max); // [%] 0-100
+
+    if (control_mode==JUGround) {
+        Ju_Thrc  = channel_throttle->get_control_in();
+        Ju_Joystick_Vc = 0;
+        Ju_Ref_V       = 0;
+        Ju_Ref_Vdot    = 0;
+    }
 }
 
 void Plane::Ju_Phi_Ctrl()

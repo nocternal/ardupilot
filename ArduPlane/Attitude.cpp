@@ -1024,9 +1024,6 @@ void Plane::set_servos(void)
         control_mode == JUGround) 
     {
         Ju_set_servos();
-        // 挪用NTUN记录自己的变量
-        if (should_log(MASK_LOG_NTUN))
-        Log_Write_Nav_Tuning();
     } 
     else 
     {
@@ -1458,6 +1455,12 @@ void Plane::set_servos(void)
         channel_rudder->output();
         RC_Channel_aux::output_ch_all();
     }
+    
+    // 挪用NTUN和CTUN记录自己的变量
+    if (should_log(MASK_LOG_NTUN))
+    Log_Write_Nav_Tuning();
+    if (should_log(MASK_LOG_CTUN))
+    Log_Write_Control_Tuning();
 }
 
 bool Plane::allow_reverse_thrust(void)

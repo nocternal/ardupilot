@@ -704,6 +704,8 @@ private:
     float Ju_drc;
     float Ju_rc;
     float Ju_rc_Coordinate;
+    float Ju_log_daelc; // 做升降副翼的指令，只是记录用，实际不是用的这个变量
+    float Ju_log_daerc;
     int16_t Ju_da_servo_out;  // [-4500 4500]
     int16_t Ju_de_servo_out;  // [-4500 4500]
     int16_t Ju_dthr_servo_out;// [0 100]
