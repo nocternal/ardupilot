@@ -302,7 +302,16 @@ struct PACKED log_Nav_Tuning {
     LOG_PACKET_HEADER;
     uint64_t time_us;
     float jdt;
-    float Hdot; 
+    float Hdot;
+    float V;
+    float phi;
+    float theta;
+    float psi;
+    float p;
+    float q;
+    float r;
+
+
     //float Hdotc_Stick;
     //float Hdot_Ref;
     //float qJu;
@@ -330,9 +339,16 @@ void Plane::Log_Write_Nav_Tuning()
 {
     struct log_Nav_Tuning pkt = {
         LOG_PACKET_HEADER_INIT(LOG_NTUN_MSG),
-        time_us             : AP_HAL::micros64(),
-        jdt                 : jdelta_time*50.0f,
-        Hdot                : Ju_Hdot_MEAS
+        time_us    : AP_HAL::micros64(),
+        jdt        : jdelta_time*50.0f,
+        Hdot       : Ju_Hdot_MEAS,
+        V          : Ju_V_A_MEAS,
+        phi        : Ju_Phi_MEAS*57.3f,
+        theta      : Ju_Theta_MEAS*57.3f,
+        psi        : Ju_Psi_MEAS*57.3f,
+        p          : Ju_p_MEAS*57.3f,
+        q          : Ju_q_MEAS*57.3f,
+        r          : Ju_r_MEAS*57.3f
         //Hdotc_Stick         : Ju_Joystick_Hdotc,
         //Hdot_Ref            : Ju_Ref_Hdot,
         //qJu                 : Ju_q_MEAS * 57.3f,
@@ -552,7 +568,7 @@ const struct LogStructure Plane::log_structure[] = {
     { LOG_NTUN_MSG, sizeof(log_Nav_Tuning),         
       //"NTUN", "Qfcccfff",  "TimeUS,WpDist,TargBrg,NavBrg,AltErr,XT,XTi,ArspdErr" },
       //"NTUN", "Qfffffffffffff",  "T,Hd,Hdc,HdR,q,qc,V,Vc,VR,Phi,Phic,PhiR,p,pc"},
-      "NTUN", "Qff",  "T,jdt,Hdot"},
+      "NTUN", "Qfffffffff",  "T,jdt,Hdot,V,Phi,Thta,Psi,p,q,r"},
     { LOG_SONAR_MSG, sizeof(log_Sonar),             
       "SONR", "QffBf",   "TimeUS,Dist,Volt,Cnt,Corr" },
     { LOG_ARM_DISARM_MSG, sizeof(log_Arm_Disarm),
