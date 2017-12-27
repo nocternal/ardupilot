@@ -38,7 +38,7 @@ const AP_Scheduler::Task Plane::scheduler_tasks[] = {
     SCHED_TASK(read_radio,             50,    100),
     SCHED_TASK(check_short_failsafe,   50,    100),
     SCHED_TASK(update_speed_height,    50,    200),
-    SCHED_TASK(update_flight_mode,    400,    100),
+    SCHED_TASK(update_flight_mode,    400,    200),
     SCHED_TASK(stabilize,             400,    100),
     SCHED_TASK(set_servos,            400,    100),
     SCHED_TASK(read_control_switch,     7,    100),
@@ -270,9 +270,6 @@ void Plane::update_logging2(void)
 {
     if (should_log(MASK_LOG_CTUN))
         Log_Write_Control_Tuning();
-    
-    if (should_log(MASK_LOG_NTUN))
-        Log_Write_Nav_Tuning();
 
     if (should_log(MASK_LOG_RC))
         Log_Write_RC();

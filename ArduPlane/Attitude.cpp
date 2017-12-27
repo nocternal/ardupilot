@@ -1024,6 +1024,9 @@ void Plane::set_servos(void)
         control_mode == JUGround) 
     {
         Ju_set_servos();
+        // 挪用NTUN记录自己的变量
+        if (should_log(MASK_LOG_NTUN))
+        Log_Write_Nav_Tuning();
     } 
     else 
     {
