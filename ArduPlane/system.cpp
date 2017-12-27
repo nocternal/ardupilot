@@ -392,6 +392,8 @@ void Plane::set_mode(enum FlightMode mode, mode_reason_t reason)
     case MANUAL:
     case STABILIZE:
     case TRAINING:
+    case JUGround:
+    case JUHdotVPhi:
     case FLY_BY_WIRE_A:
         auto_throttle_mode = false;
         auto_navigation_mode = false;
@@ -474,8 +476,6 @@ void Plane::set_mode(enum FlightMode mode, mode_reason_t reason)
     case QHOVER:
     case QLOITER:
     case QLAND:
-    case JUHdotVPhi:
-    case JUGround:
     case QRTL:
         auto_navigation_mode = false;
         if (!quadplane.init_mode()) {

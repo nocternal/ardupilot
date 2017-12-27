@@ -16,6 +16,8 @@ void Plane::failsafe_short_on_event(enum failsafe_state fstype, mode_reason_t re
     case FLY_BY_WIRE_A:
     case AUTOTUNE:
     case FLY_BY_WIRE_B:
+    case JUHdotVPhi:
+    case JUGround:
     case CRUISE:
     case TRAINING:
         failsafe.saved_mode = control_mode;
@@ -54,8 +56,6 @@ void Plane::failsafe_short_on_event(enum failsafe_state fstype, mode_reason_t re
     case RTL:
     case QLAND:
     case QRTL:
-    case JUHdotVPhi:
-    case JUGround:
     default:
         break;
     }
@@ -77,6 +77,8 @@ void Plane::failsafe_long_on_event(enum failsafe_state fstype, mode_reason_t rea
     case FLY_BY_WIRE_A:
     case AUTOTUNE:
     case FLY_BY_WIRE_B:
+    case JUHdotVPhi:
+    case JUGround:
     case CRUISE:
     case TRAINING:
     case CIRCLE:
@@ -115,8 +117,6 @@ void Plane::failsafe_long_on_event(enum failsafe_state fstype, mode_reason_t rea
     case RTL:
     case QLAND:
     case QRTL:
-    case JUHdotVPhi:
-    case JUGround:
     default:
         break;
     }

@@ -42,6 +42,8 @@ void Plane::send_heartbeat(mavlink_channel_t chan)
     case FLY_BY_WIRE_A:
     case AUTOTUNE:
     case FLY_BY_WIRE_B:
+    case JUHdotVPhi:
+    case JUGround:
     case QSTABILIZE:
     case QHOVER:
     case QLOITER:
@@ -62,8 +64,6 @@ void Plane::send_heartbeat(mavlink_channel_t chan)
         // APM does in any mode, as that is defined as "system finds its own goal
         // positions", which APM does not currently do
         break;
-    case JUHdotVPhi:
-    case JUGround:
     case INITIALISING:
         system_status = MAV_STATE_CALIBRATING;
         break;
@@ -197,6 +197,8 @@ void Plane::send_extended_status1(mavlink_channel_t chan)
         break;
 
     case FLY_BY_WIRE_B:
+    case JUHdotVPhi:
+    case JUGround:
     case CRUISE:
         control_sensors_enabled |= MAV_SYS_STATUS_SENSOR_ANGULAR_RATE_CONTROL; // 3D angular rate control
         control_sensors_enabled |= MAV_SYS_STATUS_SENSOR_ATTITUDE_STABILIZATION; // attitude stabilisation
@@ -222,8 +224,6 @@ void Plane::send_extended_status1(mavlink_channel_t chan)
         control_sensors_enabled |= MAV_SYS_STATUS_SENSOR_Z_ALTITUDE_CONTROL; // altitude control
         control_sensors_enabled |= MAV_SYS_STATUS_SENSOR_XY_POSITION_CONTROL; // X/Y position control
         break;
-    case JUHdotVPhi:
-    case JUGround:
     case INITIALISING:
         break;
     }
