@@ -568,7 +568,7 @@ const struct LogStructure Plane::log_structure[] = {
     { LOG_NTUN_MSG, sizeof(log_Nav_Tuning),         
       //"NTUN", "Qfcccfff",  "TimeUS,WpDist,TargBrg,NavBrg,AltErr,XT,XTi,ArspdErr" },
       //"NTUN", "Qfffffffffffff",  "T,Hd,Hdc,HdR,q,qc,V,Vc,VR,Phi,Phic,PhiR,p,pc"},
-      "NTUN", "Qfffffffff",  "T,jdt,Hdot,V,Phi,Thta,Psi,p,q,r"},
+      "NTUN", "Qfffffffff",  "TimeUS,jdt,Hdot,V,Phi,Thta,Psi,p,q,r"},
     { LOG_SONAR_MSG, sizeof(log_Sonar),             
       "SONR", "QffBf",   "TimeUS,Dist,Volt,Cnt,Corr" },
     { LOG_ARM_DISARM_MSG, sizeof(log_Arm_Disarm),
