@@ -301,19 +301,20 @@ struct PACKED log_Nav_Tuning {
     // 最多记录13个变量！！！！！
     LOG_PACKET_HEADER;
     uint64_t time_us;
-    float Hdot; 
-    float Hdotc_Stick;
-    float Hdot_Ref;
-    float qJu;
-    float qcJu;
-    float VJu;
-    float Vc_Stick;
-    float V_Ref;
-    float PhiJu;
-    float Phic_Stick;
-    float Phi_Ref;
-    float pJu;
-    float pcJu;   
+    float jdt;
+    //float Hdot; 
+    //float Hdotc_Stick;
+    //float Hdot_Ref;
+    //float qJu;
+    //float qcJu;
+    //float VJu;
+    //float Vc_Stick;
+    //float V_Ref;
+    //float PhiJu;
+    //float Phic_Stick;
+    //float Phi_Ref;
+    //float pJu;
+    //float pcJu;   
 
     /*float wp_distance;
     int16_t target_bearing_cd;
@@ -330,21 +331,23 @@ void Plane::Log_Write_Nav_Tuning()
     struct log_Nav_Tuning pkt = {
         LOG_PACKET_HEADER_INIT(LOG_NTUN_MSG),
         time_us             : AP_HAL::micros64(),
-        Hdot                : Ju_Hdot_MEAS,
-        Hdotc_Stick         : Ju_Joystick_Hdotc,
-        Hdot_Ref            : Ju_Ref_Hdot,
-        qJu                 : Ju_q_MEAS * 57.3f,
-        qcJu                : Ju_qc * 57.3f,
+        jdt                 : jdelta_time*50.0f
+        //Hdot                : Ju_Hdot_MEAS,
+        //Hdotc_Stick         : Ju_Joystick_Hdotc,
+        //Hdot_Ref            : Ju_Ref_Hdot,
+        //qJu                 : Ju_q_MEAS * 57.3f,
+        //qcJu                : Ju_qc * 57.3f,
         //decJu               : Ju_dec * 57.3f,
-        VJu                 : Ju_V_A_MEAS,
-        Vc_Stick            : Ju_Joystick_Vc,
-        V_Ref               : Ju_Ref_V,
+        //VJu                 : Ju_V_A_MEAS,
+        //Vc_Stick            : Ju_Joystick_Vc,
+        //V_Ref               : Ju_Ref_V,
         //ThrcJu              : Ju_Thrc,
-        PhiJu               : Ju_Phi_MEAS*57.3f,
-        Phic_Stick          : Ju_Joystick_Phic*57.3f,
-        Phi_Ref             : Ju_Ref_Phi*57.3f,
-        pJu                 : Ju_p_MEAS*57.3f,
-        pcJu                : Ju_pc*57.3f
+        //PhiJu               : Ju_Phi_MEAS*57.3f,
+        //Phic_Stick          : Ju_Joystick_Phic*57.3f,
+        //Phi_Ref             : Ju_Ref_Phi*57.3f,
+        //pJu                 : Ju_p_MEAS*57.3f,
+        //pcJu                : Ju_pc*57.3f
+        
  //       dacJu               : Ju_dac*57.3f,
         //rJu                 : Ju_r_MEAS*57.3f,
         //rcCoord             : Ju_rc_Coordinate*57.3f,
@@ -547,7 +550,8 @@ const struct LogStructure Plane::log_structure[] = {
       "CTUN", "Q",    "T,Ptch,Ptchc,r,rc,rMan,dac,dec,thrc,drc,daelc,daerc"},
     { LOG_NTUN_MSG, sizeof(log_Nav_Tuning),         
       //"NTUN", "Qfcccfff",  "TimeUS,WpDist,TargBrg,NavBrg,AltErr,XT,XTi,ArspdErr" },
-      "NTUN", "Qfffffffffffff",  "T,Hd,Hdc,HdR,q,qc,V,Vc,VR,Phi,Phic,PhiR,p,pc"},
+      //"NTUN", "Qfffffffffffff",  "T,Hd,Hdc,HdR,q,qc,V,Vc,VR,Phi,Phic,PhiR,p,pc"},
+      "NTUN", "Qf",  "T,jdt"},
     { LOG_SONAR_MSG, sizeof(log_Sonar),             
       "SONR", "QffBf",   "TimeUS,Dist,Volt,Cnt,Corr" },
     { LOG_ARM_DISARM_MSG, sizeof(log_Arm_Disarm),
