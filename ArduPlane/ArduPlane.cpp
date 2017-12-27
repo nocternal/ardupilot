@@ -1322,6 +1322,7 @@ void Plane::Ju_HdotV_Ctrl()
     }
     Ju_Hdot2Vdot = Ju_Hdot2Vdot_LeadFilter();
     Ju_Vdotc     = Ju_V_P + Ju_V_I + Ju_Ref_Vdot + Ju_Hdot2Vdot;
+    Ju_Vdotc     = constrain_float(Ju_Vdotc, - g.JU_Lim_Vdot_Max , g.JU_Lim_Vdot_Max);
     Ju_Thrc_FB   = Ju_Vdotc * g.JU_Gain_P_ThrPerVdot;//[%]
     Ju_Thrc_Trim = linear_interpolate(g.JU_Trim_dthr_Low , g.JU_Trim_dthr_High, Ju_V_A_MEAS, g.JU_Trim_V_Low , g.JU_Trim_V_High);
     Ju_Thrc      = Ju_Thrc_FB + Ju_Thrc_Trim;

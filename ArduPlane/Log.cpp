@@ -246,6 +246,7 @@ void Plane::Log_Write_Startup(uint8_t type)
 struct PACKED log_Control_Tuning {
     LOG_PACKET_HEADER;
     uint64_t time_us;
+    /* Tune Hdot dataset
     float decJ;
     float de_servo_outJ;
     float de_servo_out;
@@ -253,7 +254,9 @@ struct PACKED log_Control_Tuning {
     float de_pwm;
     float de_I;
     float de_Ref;
-    float q_Ref;
+    float q_Ref;*/
+
+
     //float ThetacJu;
     //float rJu;
     //float rcJu;
@@ -281,6 +284,7 @@ void Plane::Log_Write_Control_Tuning()
     struct log_Control_Tuning pkt = {
         LOG_PACKET_HEADER_INIT(LOG_CTUN_MSG),
         time_us         : AP_HAL::micros64(),
+        /* Tune Hdot dataset
         decJ           : Ju_dec*57.3,
         de_servo_outJ  : Ju_de_servo_out,
         de_servo_out    : channel_pitch->get_servo_out(),
@@ -288,7 +292,8 @@ void Plane::Log_Write_Control_Tuning()
         de_pwm   : channel_pitch->get_radio_out(),
         de_I : Ju_de_I*57.3f,
         de_Ref: Ju_Ref_de*57.3f,
-        q_Ref:Ju_Ref_q*57.3f
+        q_Ref:Ju_Ref_q*57.3f*/
+
 
         //ThetacJu        : Ju_Thetac*57.3f,
         //rJu             : Ju_r_MEAS*57.3f,
@@ -313,9 +318,9 @@ void Plane::Log_Write_Control_Tuning()
 }
 
 struct PACKED log_Nav_Tuning {
-    // 最多记录13个变量！！！！！
     LOG_PACKET_HEADER;
     uint64_t time_us;
+    /* // Tune Hdot Dataset
     float Hdot;
     float Hdotc;
     float HdotR;
@@ -323,7 +328,20 @@ struct PACKED log_Nav_Tuning {
     float Thetac;
     float q;
     float qc;
-    float dec;
+    float dec;*/
+    // Tune V Dataset
+    float V;
+    float Vc;
+    float VR;
+    float VdotR;
+    float Vdotc;
+    float T_servoJ;
+    float T_servo;
+    float T_pwmJ;
+    float T_pwm;
+    float V_I;
+    float V_P;
+    float Vd_FromHdot;
     //float VJu;
     //float Vc_Stick;
     //float V_Ref;
@@ -348,6 +366,7 @@ void Plane::Log_Write_Nav_Tuning()
     struct log_Nav_Tuning pkt = {
         LOG_PACKET_HEADER_INIT(LOG_NTUN_MSG),
         time_us    : AP_HAL::micros64(),
+        /* // Tune Hdot Dataset
         Hdot:Ju_Hdot_MEAS,
         Hdotc:Ju_Joystick_Hdotc,
         HdotR:Ju_Ref_Hdot,
@@ -355,7 +374,21 @@ void Plane::Log_Write_Nav_Tuning()
         Thetac:Ju_Thetac*57.3f, 
         q:Ju_q_MEAS*57.3f,
         qc:Ju_qc*57.3f,
-        dec:Ju_dec*57.3f
+        dec:Ju_dec*57.3f*/
+
+        // Tune V Dataset
+        V:Ju_V_A_MEAS,
+        Vc:Ju_Joystick_Vc,
+        VR:Ju_Ref_V,
+        VdotR:Ju_Ref_Vdot,
+        Vdotc:Ju_Vdotc,
+        T_servoJ: Ju_dthr_servo_out,
+        T_servo:channel_throttle->get_servo_out(),
+        T_pwmJ: Ju_dthr_radio_out,
+        T_pwm:channel_throttle->get_radio_out(),
+        V_I:Ju_V_I,
+        V_P:Ju_V_P,
+        Vd_FromHdot:Ju_Hdot2Vdot
 
         //Hdotc_Stick         : Ju_Joystick_Hdotc,
         //Hdot_Ref            : Ju_Ref_Hdot,
@@ -371,11 +404,6 @@ void Plane::Log_Write_Nav_Tuning()
         //Phi_Ref             : Ju_Ref_Phi*57.3f,
         //pJu                 : Ju_p_MEAS*57.3f,
         //pcJu                : Ju_pc*57.3f
-        
- //       dacJu               : Ju_dac*57.3f,
-        //rJu                 : Ju_r_MEAS*57.3f,
-        //rcCoord             : Ju_rc_Coordinate*57.3f,
-        //rc_Stick            : Ju_Joystick_rc*57.3f
 
 
  //       drcJu               : Ju_drc*57.3f
@@ -569,14 +597,17 @@ const struct LogStructure Plane::log_structure[] = {
       "PM",  "QHHIII",  "TimeUS,NLon,NLoop,MaxT,MinT,LogDrop" },
     { LOG_STARTUP_MSG, sizeof(log_Startup),         
       "STRT", "QBH",         "TimeUS,SType,CTot" },
-    { LOG_CTUN_MSG, sizeof(log_Control_Tuning),     
+    { LOG_CTUN_MSG, sizeof(log_Control_Tuning), 
+//////// 字符串允许长度有限，尽量简洁着写，但是不要把TimeUS省略成更短的！    
       //"CTUN", "Qcccchhh",    "TimeUS,NavRoll,Roll,NavPitch,Pitch,ThrOut,RdrOut,ThrDem" },
       //"CTUN", "Qfffffffffff",    "T,Ptch,Ptchc,r,rc,rMan,dac,dec,thrc,drc,daelc,daerc"},  
-      "CTUN", "Qffffffff",    "TimeUS,deJ,deservoJ,deservo,dePWMJ,dePWM,eI,eR,qR"}, // 字符串允许长度有限，尽量简洁着写，但是不要把TimeUS省略成更短的！
+      //"CTUN", "Qffffffff",    "TimeUS,deJ,deservoJ,deservo,dePWMJ,dePWM,eI,eR,qR"}, // Tune Hdot Dataset
+        "CTUN", "Q", "TimeUS"}, 
     { LOG_NTUN_MSG, sizeof(log_Nav_Tuning),         
       //"NTUN", "Qfcccfff",  "TimeUS,WpDist,TargBrg,NavBrg,AltErr,XT,XTi,ArspdErr" },
       //"NTUN", "Qfffffffffffff",  "T,Hd,Hdc,HdR,q,qc,V,Vc,VR,Phi,Phic,PhiR,p,pc"},
-      "NTUN", "Qffffffff",  "TimeUS,Hd,Hdc,HdR,Ptch,Ptchc,q,qc,dec"},
+      //"NTUN", "Qffffffff",  "TimeUS,Hd,Hdc,HdR,Ptch,Ptchc,q,qc,dec"},// Tune Hdot Dataset
+      "NTUN", "Qffffffffffff",  "TimeUS,V,Vc,VR,VdR,Vdc,TservoJ,Tservo,TpwmJ,Tpwm,VI,VP,Vd4H"},// Tune Hdot Dataset
     { LOG_SONAR_MSG, sizeof(log_Sonar),             
       "SONR", "QffBf",   "TimeUS,Dist,Volt,Cnt,Corr" },
     { LOG_ARM_DISARM_MSG, sizeof(log_Arm_Disarm),
