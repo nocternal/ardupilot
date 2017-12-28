@@ -1182,8 +1182,8 @@ void Plane::Ju_Joystick_CMD()
     } else {
         Ju_Joystick_Hdotc = channel_pitch_norm_input * ( - g.JU_Lim_Hdot_Min);   
     }
+    Ju_Joystick_Hdotc = Ju_Joystick_Hdotc + g.JU_Offset_Hdotc;
     Ju_Joystick_Hdotc = constrain_float(Ju_Joystick_Hdotc,g.JU_Lim_Hdot_Min,g.JU_Lim_Hdot_Max);
-
          
     // Vc [m/s]
     float channel_throttle_norm_input = channel_throttle->get_control_in()/100.0f; // [0 1]

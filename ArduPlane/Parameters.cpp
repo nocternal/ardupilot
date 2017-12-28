@@ -1200,42 +1200,42 @@ const AP_Param::Info Plane::var_info[] = {
     // @Description: damp gain of roll rate ctrl                   
     // @Values: 0 20
     // @User: Advanced
-    GSCALAR(JU_Gain_RY_Pp,         "JU_RY_Pp",   0.235),
+    GSCALAR(JU_Gain_RY_Pp,         "JU_KRY_Pp",   0.235),
 
     // @Param: JU_Gain_RY_Ip
     // @DisplayName: JU_RY_Ip
     // @Description: integrator gain of roll rate ctrl                   
     // @Values: 0 20
     // @User: Advanced
-    GSCALAR(JU_Gain_RY_Ip,         "JU_RY_Ip",   1.053),
+    GSCALAR(JU_Gain_RY_Ip,         "JU_KRY_Ip",   1.053),
 
     // @Param: JU_Gain_RY_Fp
     // @DisplayName: JU_RY_Fp
     // @Description: Feedforward gain of roll rate ctrl                   
     // @Values: 0 20
     // @User: Advanced
-    GSCALAR(JU_Gain_RY_Fp,         "JU_RY_Fp",   0.529),
+    GSCALAR(JU_Gain_RY_Fp,         "JU_KRY_Fp",   0.529),
 
     // @Param: JU_Gain_RY_Pr
     // @DisplayName: JU_RY_Pr
     // @Description: proportional gain of yaw rate ctrl,               
     // @Values: 0 20
     // @User: Advanced
-    GSCALAR(JU_Gain_RY_Pr,         "JU_RY_Pr",   1.63),
+    GSCALAR(JU_Gain_RY_Pr,         "JU_KRY_Pr",   1.63),
 
     // @Param: JU_Gain_RY_ARI
     // @DisplayName: JU_RY_ARI 
     // @Description: interconnect gain of da and dr,  dr = KARI * da, under normal condition Nda>0 then KARI > 0              
     // @Values: -2 2
     // @User: Advanced
-    GSCALAR(JU_Gain_RY_ARI,         "JU_RY_ARI",   0),
+    GSCALAR(JU_Gain_RY_ARI,         "JU_KRY_ARI",   0),
 
     // @Param: JU_Gain_RY_rWashTau
     // @DisplayName: JU_RY_rWashTau
     // @Description: r wash filter, used for phi sensor bias problem , wash(s) = Tau*s / (Tau*s + 1) , if set this value to 0, then do no wash      
     // @Values: 0.5 20
     // @User: Advanced
-    GSCALAR(JU_Gain_RY_rWashTau,         "JU_RY_rWashTau",   5),
+    GSCALAR(JU_Gain_RY_rWashTau,         "JU_KRY_rWashTau",   5),
 
     // @Param: JU_Trim_V_Low
     // @DisplayName: JU_Trim_V_Low
@@ -1306,6 +1306,13 @@ const AP_Param::Info Plane::var_info[] = {
     // @Values: -1, 1
     // @User: Advanced
     GSCALAR(JU_Rev_Gain_rc,         "JU_Rev_K_rc",   1),
+
+    // @Param: JU_Offset_Hdotc
+    // @DisplayName: JU_Offset_Hdotc
+    // @Description: 杆位于中立位时的Hdotc值[m/s]
+    // @Values: -2 2
+    // @User: Advanced
+    GSCALAR(JU_Offset_Hdotc,         "JU_Offset_Hdotc",   0),    
 
     // @Param: JU_Lim_Hdot_Max
     // @DisplayName: JU_Lim_Hdot_Max

@@ -255,6 +255,15 @@ struct PACKED log_Control_Tuning {
     float de_I;
     float de_Ref;
     float q_Ref;*/
+    // Tune Phi dataset
+    float da_servo_outJ;
+    float da_servo_out;
+    float da_pwmJ;
+    float da_pwm;
+    float dr_servo_outJ;
+    float dr_servo_out;
+    float dr_pwmJ;
+    float dr_pwm;
 
 
     //float ThetacJu;
@@ -294,6 +303,16 @@ void Plane::Log_Write_Control_Tuning()
         de_Ref: Ju_Ref_de*57.3f,
         q_Ref:Ju_Ref_q*57.3f*/
 
+        // Tune Phi dataset
+        da_servo_outJ:(float)Ju_da_servo_out,
+        da_servo_out:(float)channel_roll->get_servo_out(),
+        da_pwmJ:(float)Ju_da_radio_out,
+        da_pwm:(float)channel_roll->get_radio_out(),
+        dr_servo_outJ:(float)Ju_dr_servo_out,
+        dr_servo_out:(float)channel_rudder->get_servo_out(),
+        dr_pwmJ:(float)Ju_dr_radio_out,
+        dr_pwm:(float)channel_rudder->get_radio_out()
+
 
         //ThetacJu        : Ju_Thetac*57.3f,
         //rJu             : Ju_r_MEAS*57.3f,
@@ -329,7 +348,8 @@ struct PACKED log_Nav_Tuning {
     float q;
     float qc;
     float dec;*/
-    // Tune V Dataset
+
+    /*// Tune V Dataset
     float V;
     float Vc;
     float VR;
@@ -341,7 +361,20 @@ struct PACKED log_Nav_Tuning {
     float T_pwm;
     float V_I;
     float V_P;
-    float Vd_FromHdot;
+    float Vd_FromHdot;*/
+
+    // Tune Phi Dataset
+    float phi;
+    float phic;
+    float phiref;
+    float phidotc;
+    float pc;
+    float p;
+    float daref;
+    float rc;
+    float rpilot;
+    float r;
+
     //float VJu;
     //float Vc_Stick;
     //float V_Ref;
@@ -376,7 +409,7 @@ void Plane::Log_Write_Nav_Tuning()
         qc:Ju_qc*57.3f,
         dec:Ju_dec*57.3f*/
 
-        // Tune V Dataset
+        /*// Tune V Dataset
         V:Ju_V_A_MEAS,
         Vc:Ju_Joystick_Vc,
         VR:Ju_Ref_V,
@@ -388,8 +421,20 @@ void Plane::Log_Write_Nav_Tuning()
         T_pwm:channel_throttle->get_radio_out(),
         V_I:Ju_V_I,
         V_P:Ju_V_P,
-        Vd_FromHdot:Ju_Hdot2Vdot
+        Vd_FromHdot:Ju_Hdot2Vdot*/
 
+        // Tune Phi Dataset
+        phi: Ju_Phi_MEAS*57.3f,
+        phic:Ju_Joystick_Phic*57.3f,
+        phiref:Ju_Ref_Phi*57.3f,
+        phidotc:Ju_Phidotc*57.3f,
+        pc:Ju_pc*57.3f,
+        p:Ju_p_MEAS*57.3f,
+        daref:Ju_Ref_da*57.3f,
+        rc:Ju_rc_Coordinate*57.3f,
+        rpilot:Ju_Joystick_rc*57.3f,
+        r:Ju_r_MEAS*57.3f,
+ 
         //Hdotc_Stick         : Ju_Joystick_Hdotc,
         //Hdot_Ref            : Ju_Ref_Hdot,
         //qJu                 : Ju_q_MEAS * 57.3f,
@@ -602,12 +647,13 @@ const struct LogStructure Plane::log_structure[] = {
       //"CTUN", "Qcccchhh",    "TimeUS,NavRoll,Roll,NavPitch,Pitch,ThrOut,RdrOut,ThrDem" },
       //"CTUN", "Qfffffffffff",    "T,Ptch,Ptchc,r,rc,rMan,dac,dec,thrc,drc,daelc,daerc"},  
       //"CTUN", "Qffffffff",    "TimeUS,deJ,deservoJ,deservo,dePWMJ,dePWM,eI,eR,qR"}, // Tune Hdot Dataset
-        "CTUN", "Q", "TimeUS"}, 
+        "CTUN", "Qffffffff", "TimeUS,asJ,as,apJ,ap,rsJ,rs,rpJ,rp"}, 
     { LOG_NTUN_MSG, sizeof(log_Nav_Tuning),         
       //"NTUN", "Qfcccfff",  "TimeUS,WpDist,TargBrg,NavBrg,AltErr,XT,XTi,ArspdErr" },
       //"NTUN", "Qfffffffffffff",  "T,Hd,Hdc,HdR,q,qc,V,Vc,VR,Phi,Phic,PhiR,p,pc"},
       //"NTUN", "Qffffffff",  "TimeUS,Hd,Hdc,HdR,Ptch,Ptchc,q,qc,dec"},// Tune Hdot Dataset
-      "NTUN", "Qffffffffffff",  "TimeUS,V,Vc,VR,VdR,Vdc,TservoJ,Tservo,TpwmJ,Tpwm,VI,VP,Vd4H"},// Tune Hdot Dataset
+      //"NTUN", "Qffffffffffff",  "TimeUS,V,Vc,VR,VdR,Vdc,TservoJ,Tservo,TpwmJ,Tpwm,VI,VP,Vd4H"},// Tune V Dataset
+        "NTUN", "Qffffffffff",  "TimeUS,phi,phic,phiR,phidc,pc,p,daR,rc,rMan,r"},// Tune Phi Dataset
     { LOG_SONAR_MSG, sizeof(log_Sonar),             
       "SONR", "QffBf",   "TimeUS,Dist,Volt,Cnt,Corr" },
     { LOG_ARM_DISARM_MSG, sizeof(log_Arm_Disarm),

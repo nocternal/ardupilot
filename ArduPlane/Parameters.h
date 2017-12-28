@@ -379,6 +379,7 @@ public:
         k_param_JU_Rev_Gain_Phic,
         k_param_JU_Rev_Gain_rc,
 
+        k_param_JU_Offset_Hdotc,
         k_param_JU_Init_Transtime,
 
         k_param_JU_Ref_T_Hdot,
@@ -614,6 +615,7 @@ public:
     AP_Float JU_DEF_da_Max;        // [deg] 副翼偏转限制,要与实际舵面的偏转范围一致！！
     AP_Float JU_DEF_dr_Max;        // [deg] 方向舵偏转限制,要与实际舵面的偏转范围一致！！
 
+    AP_Float JU_Offset_Hdotc;       // [m/s] 杆位于中立位时的Hdotc值
     AP_Float JU_Init_Transtime;    // [s]
 
     AP_Float JU_Ref_T_Hdot;
@@ -671,7 +673,7 @@ public:
     AP_Int16 JU_RCout_Dthr_MIN;
     AP_Int16 JU_RCout_Dthr_TRIM;
     AP_Int16 JU_RCout_Dthr_MAX;
-    AP_Int8  JU_RCout_Dthr_REV;
+    AP_Int8 JU_RCout_Dthr_REV;
     AP_Int16 JU_RCout_Dthr_DZ;
 
 #if HIL_SUPPORT
