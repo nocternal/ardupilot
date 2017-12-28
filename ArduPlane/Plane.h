@@ -652,12 +652,18 @@ private:
     float Ju_Theta_Use;
 
     float Ju_Ref_Hdot;         // [m/s]
+    float Ju_Ref_Hdot_Last;    
     float Ju_Ref_Hdotdot;      // [m/s^2]
+    float Ju_Ref_Hdotdot_Last;
     float Ju_Ref_Hdotdotdot;   // [m/s^3]
     float Ju_Ref_q;            // [rad/s]
+    float Ju_Ref_q_Last;
     float Ju_Ref_de;           // [rad]
+    float Ju_Ref_de_Last;
     float Ju_Ref_V;            // [m/s]
+    float Ju_Ref_V_Last;
     float Ju_Ref_Vdot;         // [m/s^2]
+    float Ju_Ref_Vdot_Last;    // [m/s^2]
     float Ju_Ref_Phi;          // [rad]
     float Ju_Ref_Phidot;       // [rad/s]
     float Ju_Ref_Phidotdot;    // [rad/s^2]

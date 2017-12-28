@@ -314,9 +314,16 @@ void Plane::one_second_loop()
         gcs_send_text_fmt(MAV_SEVERITY_INFO, "HdR=%.1f Hd=%.1f VR=%.1f V=%.1f",
                                               (float)Ju_Ref_Hdot, (float)Ju_Hdot_MEAS,
                                               (float)Ju_Ref_V,(float)Ju_V_A_MEAS);
-       gcs_send_text_fmt(MAV_SEVERITY_INFO,  "PhiR=%.1f,Phi=%.1f rc=%.1f r=%.1f",
-                                              (float)(Ju_Ref_Phi*57.3f), (float)(Ju_Phi_MEAS*57.3f),
-                                              (float)Ju_rc*57.3f,(float)Ju_r_MEAS*57.3f);
+        gcs_send_text_fmt(MAV_SEVERITY_INFO, " PhiR=%.1f,Phi=%.1f rc=%.1f r=%.1f",
+                                               (float)(Ju_Ref_Phi*57.3f), (float)(Ju_Phi_MEAS*57.3f),
+                                               (float)Ju_rc*57.3f,(float)Ju_r_MEAS*57.3f);
+    }
+    if (control_mode==JUGround) {
+        gcs_send_text_fmt(MAV_SEVERITY_INFO, "HdR=%.1f Hd=%.1f Thr=%.1f",
+                                              (float)Ju_Ref_Hdot, (float)Ju_Hdot_MEAS,
+                                              (float)(1.0f*channel_throttle->get_servo_out()));
+        gcs_send_text_fmt(MAV_SEVERITY_INFO, " PhiR=%.1f,Phi=%.1f",
+                                               (float)(Ju_Ref_Phi*57.3f), (float)(Ju_Phi_MEAS*57.3f));
     }
     
     /////////
@@ -1370,6 +1377,13 @@ void Plane::Ju_Ref_Hdot_Mdl()
         Ju_Ref_Hdotdot = 0; // 这个加速度就不跟着一块初始为当前时刻的加速度了，因为当前时刻的加速度计示数可能不太准
         Ju_Ref_q       = 0;
         Ju_Ref_de      = 0;
+        if (get_previous_mode()==JUGround)
+        {
+            Ju_Ref_Hdot    = Ju_Ref_Hdot_Last;
+            Ju_Ref_Hdotdot = Ju_Ref_Hdotdot_Last; // 这个加速度就不跟着一块初始为当前时刻的加速度了，因为当前时刻的加速度计示数可能不太准
+            Ju_Ref_q       = Ju_Ref_q_Last;
+            Ju_Ref_de      = Ju_Ref_de_Last;
+        }
     }
     else
     {   
@@ -1383,6 +1397,11 @@ void Plane::Ju_Ref_Hdot_Mdl()
         Ju_Ref_Hdotdot       = Ju_Ref_Hdotdot * cosf(Ju_Phi_Use);
         Ju_Ref_Hdot          = Ju_Ref_Hdot + Ju_Ref_Hdotdot * jdelta_time;
         Ju_Ref_Hdot          = constrain_float(Ju_Ref_Hdot , - g.JU_Lim_Hdot_Max , g.JU_Lim_Hdot_Max);
+
+        Ju_Ref_Hdot_Last     = Ju_Ref_Hdot;
+        Ju_Ref_Hdotdot_Last  = Ju_Ref_Hdotdot;
+        Ju_Ref_q_Last        = Ju_Ref_q;
+        Ju_Ref_de_Last       = Ju_Ref_de;  
     }
 }
 
@@ -1391,13 +1410,15 @@ void Plane::Ju_Ref_V_Mdl()
     //  计算 Ju_Ref_V Ju_Ref_Vdot
     if (jinit_counter == 0) {
         Ju_Ref_V      = Ju_V_A_MEAS;
-        Ju_Ref_Vdot   = 0;
+        Ju_Ref_Vdot   = 0;   
     }
     else {
         Ju_Ref_Vdot   = (Ju_Joystick_Vc - Ju_Ref_V) / g.JU_Ref_T_V * g.JU_Gain_Ref_FF_Vdot;
         Ju_Ref_Vdot   = constrain_float(Ju_Ref_Vdot , - g.JU_Lim_Vdot_Max , g.JU_Lim_Vdot_Max);
         Ju_Ref_V      = Ju_Ref_V + Ju_Ref_Vdot * jdelta_time;
         Ju_Ref_V      = constrain_float(Ju_Ref_V , -g.JU_Lim_V_Air_Max,g.JU_Lim_V_Air_Max); //注意，此处其实并不对最小值作约束，因为切换的时候可能低于空中模式所设定的最小值
+        Ju_Ref_V_Last = Ju_Ref_V;
+        Ju_Ref_Vdot_Last = Ju_Ref_Vdot; 
     }
 
 }
