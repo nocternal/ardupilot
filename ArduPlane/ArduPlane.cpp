@@ -311,7 +311,7 @@ void Plane::one_second_loop()
     //gcs_send_text_fmt(MAV_SEVERITY_INFO, "dtime=%.6f s",(float)jdelta_time);
         gcs_send_text_fmt(MAV_SEVERITY_INFO, "Flight mode = %u", (unsigned)control_mode);
     if (control_mode==JUHdotVPhi) {
-        gcs_send_text_fmt(MAV_SEVERITY_INFO, "HdotRef=%.1fm/s Hdot=%.1fm/s \n PhiRef=%.1fdeg","Phi=%.1fdeg",
+        gcs_send_text_fmt(MAV_SEVERITY_INFO, "HdotRef=%.1fm/s Hdot=%.1fm/s \n PhiRef=%.1fdeg,Phi=%.1fdeg",
                                               (float)Ju_Ref_Hdot, (float)Ju_Hdot_MEAS,
                                               (float)(Ju_Ref_Phi*57.3f), (float)(Ju_Phi_MEAS*57.3f));
     }
