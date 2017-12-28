@@ -309,11 +309,14 @@ void Plane::one_second_loop()
                               (float)Ju_Joystick_Hdotc,
                               (float)Ju_Ref_Hdot);*/
     //gcs_send_text_fmt(MAV_SEVERITY_INFO, "dtime=%.6f s",(float)jdelta_time);
-        gcs_send_text_fmt(MAV_SEVERITY_INFO, "Flight mode = %u", (unsigned)control_mode);
+    //gcs_send_text_fmt(MAV_SEVERITY_INFO, "Flight mode = %u", (unsigned)control_mode);
     if (control_mode==JUHdotVPhi) {
-        gcs_send_text_fmt(MAV_SEVERITY_INFO, "HdotRef=%.1fm/s Hdot=%.1fm/s \n PhiRef=%.1fdeg,Phi=%.1fdeg",
+        gcs_send_text_fmt(MAV_SEVERITY_INFO, "HdR=%.1f Hd=%.1f VR=%.1f V=%.1f",
                                               (float)Ju_Ref_Hdot, (float)Ju_Hdot_MEAS,
-                                              (float)(Ju_Ref_Phi*57.3f), (float)(Ju_Phi_MEAS*57.3f));
+                                              (float)Ju_Ref_V,(float)Ju_V_A_MEAS);
+       gcs_send_text_fmt(MAV_SEVERITY_INFO,  "PhiR=%.1f,Phi=%.1f rc=%.1f r=%.1f",
+                                              (float)(Ju_Ref_Phi*57.3f), (float)(Ju_Phi_MEAS*57.3f),
+                                              (float)Ju_rc*57.3f,(float)Ju_r_MEAS*57.3f);
     }
     
     /////////
@@ -1350,9 +1353,10 @@ void Plane::Ju_Phi_Ctrl()
 
     // r Ctrl
     Ju_rc_Coordinate   = Ju_Calc_r_Coordinate();
-    float delta_rc     = Ju_rc_Coordinate - Ju_r_MEAS;
-    float delta_rcWash = Ju_Calc_rWashFilter(delta_rc); 
-    Ju_drc             = - (delta_rcWash + Ju_Joystick_rc) * g.JU_Gain_RY_Pr;
+    Ju_rc              = Ju_rc_Coordinate + Ju_Joystick_rc;// 这个只是拿来显示的，不用这个变量直接进行下一步计算，因为不希望杆指令被低通掉
+    Ju_delta_rc        = Ju_rc_Coordinate - Ju_r_MEAS;
+    Ju_delta_rcWash    = Ju_Calc_rWashFilter(Ju_delta_rc); 
+    Ju_drc             = - (Ju_delta_rcWash + Ju_Joystick_rc) * g.JU_Gain_RY_Pr;
     Ju_drc             = Ju_drc + Ju_dac * g.JU_Gain_RY_ARI;
     Ju_drc             = constrain_float(Ju_drc , - g.JU_DEF_dr_Max/57.3f , g.JU_DEF_dr_Max/57.3f); // [rad] )
 }

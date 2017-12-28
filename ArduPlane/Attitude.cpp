@@ -1010,7 +1010,7 @@ void Plane::Ju_set_servos()
 
 
     // Final Output
-    channel_pitch->output();
+    channel_roll->output();
     channel_pitch->output();
     channel_throttle->output();
     channel_rudder->output();
