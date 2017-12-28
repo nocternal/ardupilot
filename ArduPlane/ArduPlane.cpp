@@ -1338,7 +1338,7 @@ void Plane::Ju_HdotV_Ctrl()
         }
     }
     Ju_Hdot2Vdot = Ju_Hdot2Vdot_LeadFilter();
-    Ju_Vdotc     = Ju_V_P + Ju_V_I + Ju_Ref_Vdot + Ju_Hdot2Vdot;
+    Ju_Vdotc     = Ju_V_P + Ju_V_I + Ju_Ref_Vdot * g.JU_Gain_Ref_FF_Vdot + Ju_Hdot2Vdot;
     Ju_Thrc_FB   = Ju_Vdotc * g.JU_Gain_P_ThrPerVdot;//[%]
     Ju_Thrc_Trim = linear_interpolate(g.JU_Trim_dthr_Low , g.JU_Trim_dthr_High, Ju_V_A_MEAS, g.JU_Trim_V_Low , g.JU_Trim_V_High);
     Ju_Thrc      = Ju_Thrc_FB + Ju_Thrc_Trim;
@@ -1420,7 +1420,7 @@ void Plane::Ju_Ref_V_Mdl()
         //Ju_Ref_Vdot   = 0;   
     }
     else {
-        Ju_Ref_Vdot   = (Ju_Joystick_Vc - Ju_Ref_V) / g.JU_Ref_T_V * g.JU_Gain_Ref_FF_Vdot;
+        Ju_Ref_Vdot   = (Ju_Joystick_Vc - Ju_Ref_V) / g.JU_Ref_T_V;
         Ju_Ref_Vdot   = constrain_float(Ju_Ref_Vdot , - g.JU_Lim_Vdot_Max , g.JU_Lim_Vdot_Max);
         Ju_Ref_V      = Ju_Ref_V + Ju_Ref_Vdot * jdelta_time;
         Ju_Ref_V      = constrain_float(Ju_Ref_V , -g.JU_Lim_V_Air_Max,g.JU_Lim_V_Air_Max); //注意，此处其实并不对最小值作约束，因为切换的时候可能低于空中模式所设定的最小值
