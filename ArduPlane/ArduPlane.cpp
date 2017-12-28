@@ -1359,7 +1359,7 @@ void Plane::Ju_Phi_Ctrl()
     // Phi Ctrl
     float delta_Phic   = Ju_Ref_Phi - Ju_Phi_MEAS;
     Ju_Phidotc_FB      = delta_Phic * g.JU_Gain_RY_Pphi;
-    Ju_Phidotc         = Ju_Phidotc_FB + Ju_Ref_Phidot;
+    Ju_Phidotc         = Ju_Phidotc_FB + Ju_Ref_PhidotCtrl;
     Ju_pc              = Ju_Calc_Phidot2p();
     Ju_dac_FB          = Ju_p_Ctrl();
     Ju_dac             = Ju_dac_FB + Ju_Ref_da;
@@ -1433,14 +1433,14 @@ void Plane::Ju_Ref_V_Mdl()
 void Plane::Ju_Ref_Phi_Mdl()
 {   //  计算 Ju_Ref_V Ju_Ref_Vdot
     if (jinit_counter == 0) {
-        Ju_Ref_Phi    = Ju_Phi_MEAS;
-        Ju_Ref_Phidot = 0;
-        Ju_Ref_da     = 0;
+        Ju_Ref_Phi        = Ju_Phi_MEAS;
+        Ju_Ref_PhidotCtrl = 0;
+        Ju_Ref_da         = 0;
         if (get_previous_mode()==JUGround)
         {
-            Ju_Ref_Phi    = Ju_Ref_Phi_Last;
-            Ju_Ref_Phidot = Ju_Ref_Phidot_Last; 
-            Ju_Ref_da     = Ju_Ref_da_Last;
+            Ju_Ref_Phi        = Ju_Ref_Phi_Last;
+            Ju_Ref_PhidotCtrl = Ju_Ref_PhidotCtrl_Last; 
+            Ju_Ref_da         = Ju_Ref_da_Last;
         }   
     }
     else {
@@ -1448,13 +1448,15 @@ void Plane::Ju_Ref_Phi_Mdl()
         Ju_Ref_Phidotdot = (Ju_Joystick_Phic - Ju_Ref_Phi) * w0square - 2 * g.JU_Ref_w0_Phi * g.JU_Ref_Ksi_Phi * Ju_Ref_Phidot;
         Ju_Ref_Phidotdot = constrain_float(Ju_Ref_Phidotdot , - g.JU_Lim_Phidotdot_Max/57.3f, g.JU_Lim_Phidotdot_Max/57.3f);
         Ju_Ref_da        = Ju_Ref_Phidotdot  * g.JU_Gain_Ref_FF_da / ( Ju_V_Use * Ju_V_Use ); // [rad] 注意，这里是V平方
-        Ju_Ref_Phidot    = Ju_Ref_Phidot + Ju_Ref_Phidotdot * jdelta_time * g.JU_Gain_Ref_FF_Phidot;
+        Ju_Ref_Phidot    = Ju_Ref_Phidot + Ju_Ref_Phidotdot * jdelta_time;
+        Ju_Ref_PhidotCtrl= Ju_Ref_Phidot + Ju_Ref_Phidotdot * jdelta_time * g.JU_Gain_Ref_FF_Phidot;
         Ju_Ref_Phidot    = constrain_float(Ju_Ref_Phidot , - g.JU_Lim_Phidot_Max/57.3f, g.JU_Lim_Phidot_Max/57.3f);
+        Ju_Ref_PhidotCtrl= constrain_float(Ju_Ref_PhidotCtrl , - g.JU_Lim_Phidot_Max/57.3f, g.JU_Lim_Phidot_Max/57.3f);
         Ju_Ref_Phi       = Ju_Ref_Phi + Ju_Ref_Phidot * jdelta_time;
         Ju_Ref_Phi       = constrain_float(Ju_Ref_Phi , - g.JU_Lim_Phi_Max/57.3f, g.JU_Lim_Phi_Max/57.3f);
-        Ju_Ref_Phi_Last   = Ju_Ref_Phi;
-        Ju_Ref_Phidot_Last=Ju_Ref_Phidot; 
-        Ju_Ref_da_Last    =Ju_Ref_da;
+        Ju_Ref_Phi_Last        = Ju_Ref_Phi;
+        Ju_Ref_PhidotCtrl_Last = Ju_Ref_PhidotCtrl; 
+        Ju_Ref_da_Last         = Ju_Ref_da;
     }
 }
 
