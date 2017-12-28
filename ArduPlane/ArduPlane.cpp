@@ -1218,9 +1218,9 @@ void Plane::Ju_Sensor_MEAS()
         // 下沉率估计 从自带的TECS控制处摘过来的代码
         Vector3f vel;
         if(ahrs.get_velocity_NED(vel)) {
-        Ju_Hdot_MEAS = vel.z;
+        Ju_Hdot_MEAS = - vel.z;
         } else if (gps.status() >= AP_GPS::GPS_OK_FIX_3D && gps.have_vertical_velocity()) {
-        Ju_Hdot_MEAS = gps.velocity().z;
+        Ju_Hdot_MEAS = - gps.velocity().z;
         } else 
         {
             /*
@@ -1239,7 +1239,7 @@ void Plane::Ju_Sensor_MEAS()
             _height_filter_dd_height += integ1_input * jdelta_time ;
             float integ2_input = _height_filter_dd_height + hgt_ddot_mea + hgt_err * omega2 * 3.0f;
             _jclimb_rate_temp += integ2_input * jdelta_time ;
-            Ju_Hdot_MEAS = - _jclimb_rate_temp;
+            Ju_Hdot_MEAS = _jclimb_rate_temp;
             float integ3_input = _jclimb_rate_temp + hgt_err * _hgtCompFiltOmega * 3.0f;
             // If more than 1 second has elapsed since last update then reset the integrator state
             // to the measured height
