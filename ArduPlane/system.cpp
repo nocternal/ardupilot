@@ -390,6 +390,7 @@ void Plane::set_mode(enum FlightMode mode, mode_reason_t reason)
         break;
 
     case MANUAL:
+    case JUMANUAL:
     case STABILIZE:
     case TRAINING:
     case JUGround:
@@ -511,6 +512,7 @@ bool Plane::mavlink_set_mode(uint8_t mode)
 {
     switch (mode) {
     case MANUAL:
+    case JUMANUAL:
     case CIRCLE:
     case STABILIZE:
     case TRAINING:
@@ -687,6 +689,9 @@ void Plane::print_flight_mode(AP_HAL::BetterStream *port, uint8_t mode)
     switch (mode) {
     case MANUAL:
         port->print("Manual");
+        break;
+    case JUMANUAL:
+        port->print("JUManual");
         break;
     case CIRCLE:
         port->print("Circle");

@@ -379,7 +379,8 @@ void Plane::stabilize()
     }
     else 
     {
-        if (control_mode == MANUAL) {
+        if (control_mode == MANUAL ||
+            control_mode == JUMANUAL) {
         // nothing to do
         return;
         }
@@ -973,48 +974,125 @@ void Plane::Ju_Calc_Channel_Radio_out()
 
 void Plane::Ju_set_servos()
 {
-    // Out1-4 主通道 Channel 
-    Ju_Calc_Channel_Radio_out();
+    if (control_mode==JUMANUAL)
+    {
+        // 副翼
+        int32_t da_servo_out   = channel_roll->get_servo_out();
+        int8_t  da_reverse_mul = (g.JU_RCout_Da_REV==-1?-1:1);
+        int32_t da_radio_max   = g.JU_RCout_Da_MAX;
+        int32_t da_radio_min   = g.JU_RCout_Da_MIN;
+        int32_t da_radio_trim  = g.JU_RCout_Da_TRIM;
+        int32_t da_pwm_out     = 1500;
+        int32_t da_high_out    = 4500;
 
-    // Out5+  其他输出通道 Channel_aux
+        if((da_servo_out * da_reverse_mul) > 0) {
+            da_pwm_out = da_reverse_mul * ((int32_t)da_servo_out * (int32_t)(da_radio_max - da_radio_trim)) / (int32_t)da_high_out;
+        } else {
+            da_pwm_out = da_reverse_mul * ((int32_t)da_servo_out * (int32_t)(da_radio_trim - da_radio_min)) / (int32_t)da_high_out;
+        }
+        Ju_da_radio_out   = da_pwm_out + da_radio_trim;
+        Ju_da_radio_out   = constrain_int16(Ju_da_radio_out, da_radio_min, da_radio_max);
 
-    // 除了前四个主通道Channel。 剩下的Channel_aux通道也需指定输出信号
-    // both types of secondary elevator are slaved to the pitch servo out
+        // 升降舵
+        int32_t de_servo_out   = channel_pitch->get_servo_out();
+        int8_t  de_reverse_mul = (g.JU_RCout_De_REV==-1?-1:1);
+        int32_t de_radio_max   = g.JU_RCout_De_MAX;
+        int32_t de_radio_min   = g.JU_RCout_De_MIN;
+        int32_t de_radio_trim  = g.JU_RCout_De_TRIM;
+        int32_t de_pwm_out     = 1500;
+        int32_t de_high_out    = 4500;
+
+        if((de_servo_out * de_reverse_mul) > 0) {
+            de_pwm_out = de_reverse_mul * ((int32_t)de_servo_out * (int32_t)(de_radio_max - de_radio_trim)) / (int32_t)de_high_out;
+        } else {
+            de_pwm_out = de_reverse_mul * ((int32_t)de_servo_out * (int32_t)(de_radio_trim - de_radio_min)) / (int32_t)de_high_out;
+        }
+        Ju_de_radio_out   = de_pwm_out + de_radio_trim;
+        Ju_de_radio_out   = constrain_int16(Ju_de_radio_out, de_radio_min, de_radio_max);
+
+
+        // Set Radio Out
+        channel_roll->set_radio_out(Ju_da_radio_out);
+        channel_pitch->set_radio_out(Ju_de_radio_out);
+        if (g.elevon_output != MIXING_DISABLED)
+        {
+            channel_output_mixer(g.elevon_output, channel_pitch, channel_roll);
+        }
+        channel_throttle->set_radio_out(channel_throttle->get_radio_in());
+        channel_rudder->set_radio_out(channel_rudder->get_radio_in());
+
+        // Chnannel Aux
+        RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_aileron, channel_roll->get_servo_out());
+        RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_aileron_with_input, channel_roll->get_servo_out());
+        RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_elevator, channel_pitch->get_servo_out());
+        RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_elevator_with_input, channel_pitch->get_servo_out());
+        RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_throttle, channel_throttle->get_servo_out());
+        RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_rudder, channel_rudder->get_servo_out());
+        RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_steering, steering_control.steering);  
+
+        #if HIL_SUPPORT
+            if (g.hil_mode == 1) {
+                // get the servos to the GCS immediately for HIL
+                if (HAVE_PAYLOAD_SPACE(MAVLINK_COMM_0, RC_CHANNELS_SCALED)) {
+                    send_servo_out(MAVLINK_COMM_0);
+                }
+                if (!g.hil_servos) {
+                    return;
+                }
+            }
+        #endif
+        // Final Output
+        channel_roll->output();
+        channel_pitch->output();
+        channel_throttle->output();
+        channel_rudder->output();
+        RC_Channel_aux::output_ch_all();
+    }
+    else 
+    { 
+        // Out1-4 主通道 Channel 
+        Ju_Calc_Channel_Radio_out();
+
+        // Out5+  其他输出通道 Channel_aux
+
+        // 除了前四个主通道Channel。 剩下的Channel_aux通道也需指定输出信号
+        // both types of secondary elevator are slaved to the pitch servo out
     
 
-    RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_aileron, channel_roll->get_servo_out());
-    RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_aileron_with_input, channel_roll->get_servo_out());
-    RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_elevator, channel_pitch->get_servo_out());
-    RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_elevator_with_input, channel_pitch->get_servo_out());
-    RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_throttle, channel_throttle->get_servo_out());
-    RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_rudder, channel_rudder->get_servo_out());
-    RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_steering, steering_control.steering);
-
-    if (control_mode == JUGround) {
-        channel_throttle->set_radio_out(channel_throttle->get_radio_in());
-        channel_throttle->set_servo_out(channel_throttle->get_control_in());
+        RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_aileron, channel_roll->get_servo_out());
+        RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_aileron_with_input, channel_roll->get_servo_out());
+        RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_elevator, channel_pitch->get_servo_out());
+        RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_elevator_with_input, channel_pitch->get_servo_out());
         RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_throttle, channel_throttle->get_servo_out());
-    }
+        RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_rudder, channel_rudder->get_servo_out());
+        RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_steering, steering_control.steering);
 
-    #if HIL_SUPPORT
-        if (g.hil_mode == 1) {
-            // get the servos to the GCS immediately for HIL
-            if (HAVE_PAYLOAD_SPACE(MAVLINK_COMM_0, RC_CHANNELS_SCALED)) {
-                send_servo_out(MAVLINK_COMM_0);
-            }
-            if (!g.hil_servos) {
-                return;
-            }
+        if (control_mode == JUGround) {
+            channel_throttle->set_radio_out(channel_throttle->get_radio_in());
+            channel_throttle->set_servo_out(channel_throttle->get_control_in());
+            RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_throttle, channel_throttle->get_servo_out());
         }
-    #endif
+
+        #if HIL_SUPPORT
+            if (g.hil_mode == 1) {
+                // get the servos to the GCS immediately for HIL
+                if (HAVE_PAYLOAD_SPACE(MAVLINK_COMM_0, RC_CHANNELS_SCALED)) {
+                    send_servo_out(MAVLINK_COMM_0);
+                }
+                if (!g.hil_servos) {
+                    return;
+                }
+            }
+        #endif
 
 
-    // Final Output
-    channel_roll->output();
-    channel_pitch->output();
-    channel_throttle->output();
-    channel_rudder->output();
-    RC_Channel_aux::output_ch_all();
+        // Final Output
+        channel_roll->output();
+        channel_pitch->output();
+        channel_throttle->output();
+        channel_rudder->output();
+        RC_Channel_aux::output_ch_all();
+    }
 }
 
 /*****************************************
@@ -1023,7 +1101,8 @@ void Plane::Ju_set_servos()
 void Plane::set_servos(void)
 {
     if (control_mode == JUHdotVPhi ||
-        control_mode == JUGround) 
+        control_mode == JUGround ||
+        control_mode == JUMANUAL) 
     {
         Ju_set_servos();
     } 

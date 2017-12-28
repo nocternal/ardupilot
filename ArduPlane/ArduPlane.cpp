@@ -837,7 +837,12 @@ void Plane::update_flight_mode(void)
         steering_control.steering = steering_control.rudder = channel_rudder->pwm_to_angle();
         break;
         //roll: -13788.000,  pitch: -13698.000,   thr: 0.000, rud: -13742.000
-
+    case JUMANUAL:
+        channel_roll->set_servo_out(channel_roll->pwm_to_angle());
+        channel_pitch->set_servo_out(channel_pitch->pwm_to_angle());
+        channel_throttle->set_servo_out(channel_throttle->get_control_in());
+        steering_control.steering = steering_control.rudder = channel_rudder->pwm_to_angle();
+        break;
 
     case QSTABILIZE:
     case QHOVER:
@@ -973,6 +978,7 @@ void Plane::update_navigation()
         break;
 
     case MANUAL:
+    case JUMANUAL:
     case STABILIZE:
     case TRAINING:
     case INITIALISING:

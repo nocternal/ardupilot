@@ -67,7 +67,8 @@ enum FlightMode {
     QLAND         = 20,
     QRTL          = 21,
     JUHdotVPhi    = 22,
-    JUGround      = 23
+    JUGround      = 23,
+    JUMANUAL      = 24
 };
 
 enum mode_reason_t {

@@ -34,6 +34,7 @@ void Plane::send_heartbeat(mavlink_channel_t chan)
     // ArduPlane documentation
     switch (control_mode) {
     case MANUAL:
+    case JUMANUAL:
     case TRAINING:
     case ACRO:
     case JUHdotVPhi:
@@ -180,7 +181,9 @@ void Plane::send_extended_status1(mavlink_channel_t chan)
     switch (control_mode) {
     case MANUAL:
         break;
-
+    case JUMANUAL:
+        break;
+        
     case ACRO:
         control_sensors_enabled |= MAV_SYS_STATUS_SENSOR_ANGULAR_RATE_CONTROL; // 3D angular rate control
         break;
