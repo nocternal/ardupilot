@@ -611,7 +611,7 @@ void Plane::update_flight_mode(void)
     case AUTO:
         handle_auto_mode();
 
-    /////////////////////////////////////////Temp
+    /*/////////////////////////////////////////Temp
         // 计时器，用于积分、淡化等
         jtnow= AP_HAL::millis();
         jdt = jtnow - jlast_t;  // [ms]
@@ -633,7 +633,7 @@ void Plane::update_flight_mode(void)
         {
             jinit_counter += jdt;   
         }
-    ///////////////////////////////////////////////
+    ///////////////////////////////////////////////*/
 
         break;
 
@@ -743,7 +743,7 @@ void Plane::update_flight_mode(void)
         update_fbwb_speed_height();
         break;
 
-    /////////////////////////////////////////Temp
+    /*/////////////////////////////////////////Temp
         // 计时器，用于积分、淡化等
         jtnow= AP_HAL::millis();
         jdt = jtnow - jlast_t;  // [ms]
@@ -767,7 +767,7 @@ void Plane::update_flight_mode(void)
         }
     ///////////////////////////////////////////////
     ///
-    ///
+    ///*/
     case CRUISE:
         /*
           in CRUISE mode we use the navigation code to control
@@ -788,7 +788,7 @@ void Plane::update_flight_mode(void)
             calc_nav_roll();
         }
         update_fbwb_speed_height();
-        ////////////////////////Temporary!!!!!
+        /*////////////////////////Temporary!!!!!
 ///////////////////////////////////////////////////////////////////
         jtnow= AP_HAL::millis();
         jdt = jtnow - jlast_t;  // [ms]
@@ -808,7 +808,7 @@ void Plane::update_flight_mode(void)
             jinit_counter += jdt;   
         }
 ////////////////////////////////////////////////////////////////////////
-/////////////////////////////////
+/////////////////////////////////*/
 
         break;
         
@@ -1342,7 +1342,7 @@ void Plane::Ju_HdotV_Ctrl()
         Ju_Thrc  = channel_throttle->get_control_in();
         Ju_Joystick_Vc = 0;
         Ju_Ref_V       = 0;
-        Ju_Ref_Vdot    = 0;
+      //Ju_Ref_Vdot    = 0;
     }
 }
 
@@ -1411,7 +1411,7 @@ void Plane::Ju_Ref_V_Mdl()
     //  计算 Ju_Ref_V Ju_Ref_Vdot
     if (jinit_counter == 0) {
         Ju_Ref_V      = Ju_V_A_MEAS;
-        Ju_Ref_Vdot   = 0;   
+        //Ju_Ref_Vdot   = 0;   
     }
     else {
         Ju_Ref_Vdot   = (Ju_Joystick_Vc - Ju_Ref_V) / g.JU_Ref_T_V * g.JU_Gain_Ref_FF_Vdot;
@@ -1421,7 +1421,7 @@ void Plane::Ju_Ref_V_Mdl()
         Ju_Ref_V_Last = Ju_Ref_V;
         Ju_Ref_Vdot_Last = Ju_Ref_Vdot; 
     }
-
+        Ju_Ref_Vdot   = Ju_Ref_Vdot_Last;
 }
 
 void Plane::Ju_Ref_Phi_Mdl()
@@ -1430,6 +1430,12 @@ void Plane::Ju_Ref_Phi_Mdl()
         Ju_Ref_Phi    = Ju_Phi_MEAS;
         Ju_Ref_Phidot = 0;
         Ju_Ref_da     = 0;
+        if (get_previous_mode()==JUGround)
+        {
+            Ju_Ref_Phi    = Ju_Ref_Phi_Last;
+            Ju_Ref_Phidot = Ju_Ref_Phidot_Last; 
+            Ju_Ref_da     = Ju_Ref_da_Last;
+        }   
     }
     else {
         float w0square = g.JU_Ref_w0_Phi * g.JU_Ref_w0_Phi;
@@ -1440,6 +1446,9 @@ void Plane::Ju_Ref_Phi_Mdl()
         Ju_Ref_Phidot    = constrain_float(Ju_Ref_Phidot , - g.JU_Lim_Phidot_Max/57.3f, g.JU_Lim_Phidot_Max/57.3f);
         Ju_Ref_Phi       = Ju_Ref_Phi + Ju_Ref_Phidot * jdelta_time;
         Ju_Ref_Phi       = constrain_float(Ju_Ref_Phi , - g.JU_Lim_Phi_Max/57.3f, g.JU_Lim_Phi_Max/57.3f);
+        Ju_Ref_Phi_Last   = Ju_Ref_Phi;
+        Ju_Ref_Phidot_Last=Ju_Ref_Phidot; 
+        Ju_Ref_da_Last    =Ju_Ref_da;
     }
 }
 

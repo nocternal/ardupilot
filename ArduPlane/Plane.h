@@ -665,9 +665,12 @@ private:
     float Ju_Ref_Vdot;         // [m/s^2]
     float Ju_Ref_Vdot_Last;    // [m/s^2]
     float Ju_Ref_Phi;          // [rad]
+    float Ju_Ref_Phi_Last;
     float Ju_Ref_Phidot;       // [rad/s]
+    float Ju_Ref_Phidot_Last;
     float Ju_Ref_Phidotdot;    // [rad/s^2]
     float Ju_Ref_da;           // [rad]
+    float Ju_Ref_da_Last;
 
     float Ju_Hdot_MEAS;        // [m/s]
     float Ju_V_A_MEAS;         // [m/s] 空速测量值
