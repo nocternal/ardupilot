@@ -319,9 +319,10 @@ void Plane::one_second_loop()
                                                (float)Ju_rc*57.3f,(float)Ju_r_MEAS*57.3f);
     }
     if (control_mode==JUGround) {
-        gcs_send_text_fmt(MAV_SEVERITY_INFO, "HdR=%.1f Hd=%.1f Thr=%.1f",
+        gcs_send_text_fmt(MAV_SEVERITY_INFO, "HdR=%.1f Hd=%.1f Thr=%.1f V=%.1f",
                                               (float)Ju_Ref_Hdot, (float)Ju_Hdot_MEAS,
-                                              (float)(1.0f*channel_throttle->get_servo_out()));
+                                              (float)(1.0f*channel_throttle->get_servo_out()),
+                                              (float)Ju_V_A_MEAS);
         gcs_send_text_fmt(MAV_SEVERITY_INFO, " PhiR=%.1f,Phi=%.1f",
                                                (float)(Ju_Ref_Phi*57.3f), (float)(Ju_Phi_MEAS*57.3f));
     }
@@ -1183,9 +1184,9 @@ void Plane::Ju_Joystick_CMD()
     // 各操纵杆对应的下沉率、滚转角、偏航角速度、速度指令
          
     // Hdotc [m/s]
-    float channel_pitch_norm_input = channel_pitch->norm_input();   // [-1 1]
+    float channel_pitch_norm_input = channel_pitch->norm_input_dz();   // [-1 1]
     if (g.JU_Rev_Gain_Hdotc==-1) {
-    channel_pitch_norm_input = -channel_pitch->norm_input();
+    channel_pitch_norm_input = -channel_pitch->norm_input_dz();
     }
     if (channel_pitch_norm_input>=0) {
         Ju_Joystick_Hdotc = channel_pitch_norm_input * g.JU_Lim_Hdot_Max;   
@@ -1204,17 +1205,17 @@ void Plane::Ju_Joystick_CMD()
     Ju_Joystick_Vc    = constrain_float(Ju_Joystick_Vc,g.JU_Lim_V_Air_Min,g.JU_Lim_V_Air_Max);
 
     // Phic [rad]
-    float channel_roll_norm_input = channel_roll->norm_input(); // [-1 1]
+    float channel_roll_norm_input = channel_roll->norm_input_dz(); // [-1 1]
     if (g.JU_Rev_Gain_Phic==-1) {
-        channel_roll_norm_input = - channel_roll->norm_input();
+        channel_roll_norm_input = - channel_roll->norm_input_dz();
     }
     Ju_Joystick_Phic  = channel_roll_norm_input * g.JU_Lim_Phi_Max/57.3f;   
     Ju_Joystick_Phic  = constrain_float(Ju_Joystick_Phic, - g.JU_Lim_Phi_Max/57.3f,g.JU_Lim_Phi_Max/57.3f);
          
     // rc [rad/s]
-    float channel_rudder_norm_input = channel_rudder->norm_input(); // [-1 1]
+    float channel_rudder_norm_input = channel_rudder->norm_input_dz(); // [-1 1]
     if (g.JU_Rev_Gain_rc==-1) {
-        channel_rudder_norm_input = - channel_rudder->norm_input();
+        channel_rudder_norm_input = - channel_rudder->norm_input_dz();
     }        
     Ju_Joystick_rc    = channel_rudder_norm_input * g.JU_Lim_r_Air_Max/57.3f;
     Ju_Joystick_rc    = constrain_float(Ju_Joystick_rc, - g.JU_Lim_r_Air_Max/57.3f,g.JU_Lim_r_Air_Max/57.3f);
