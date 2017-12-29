@@ -438,6 +438,11 @@ void Plane::Ju_set_servo_out()
 {   //  计算 channel_pitch、roll、throttle、rudder以及steer的servo_out
     Ju_da_servo_out   = Ju_dac / (g.JU_DEF_da_Max/57.3f) * 4500 ; // [-4500 4500]
     Ju_de_servo_out   = Ju_dec / (g.JU_DEF_de_Max/57.3f) * 4500 ; // [-4500 4500]
+
+    if (control_mode == JUGround) {
+    Ju_Thrc = channel_throttle->get_control_in();
+    }
+
     Ju_dthr_servo_out = Ju_Thrc;                                  // [-100  100]                                 
     Ju_dr_servo_out   = Ju_drc / (g.JU_DEF_dr_Max/57.3f) * 4500 ; // [-4500 4500]
 
@@ -445,6 +450,8 @@ void Plane::Ju_set_servo_out()
     Ju_de_servo_out   = constrain_int16(Ju_de_servo_out , -4500 , 4500);
     Ju_dthr_servo_out = constrain_int16(Ju_dthr_servo_out, 0    , 100 );
     Ju_dr_servo_out   = constrain_int16(Ju_dr_servo_out , -4500 , 4500);
+
+
 
     channel_roll->set_servo_out(Ju_da_servo_out);
     channel_pitch->set_servo_out(Ju_de_servo_out);

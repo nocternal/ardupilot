@@ -1348,7 +1348,7 @@ void Plane::Ju_HdotV_Ctrl()
         Ju_Thrc  = channel_throttle->get_control_in();
         Ju_Joystick_Vc = 0;
         Ju_Ref_V       = 0;
-      //Ju_Ref_Vdot    = 0;
+        Ju_Ref_Vdot    = 0;
     }
 }
 
@@ -1417,7 +1417,7 @@ void Plane::Ju_Ref_V_Mdl()
     //  计算 Ju_Ref_V Ju_Ref_Vdot
     if (jinit_counter == 0) {
         Ju_Ref_V      = Ju_V_A_MEAS;
-        //Ju_Ref_Vdot   = 0;   
+        Ju_Ref_Vdot   = 0;   
     }
     else {
         Ju_Ref_Vdot   = (Ju_Joystick_Vc - Ju_Ref_V) / g.JU_Ref_T_V;
@@ -1427,7 +1427,6 @@ void Plane::Ju_Ref_V_Mdl()
         Ju_Ref_V_Last = Ju_Ref_V;
         Ju_Ref_Vdot_Last = Ju_Ref_Vdot; 
     }
-        Ju_Ref_Vdot   = Ju_Ref_Vdot_Last;
 }
 
 void Plane::Ju_Ref_Phi_Mdl()
