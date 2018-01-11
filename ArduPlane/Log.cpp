@@ -273,8 +273,9 @@ struct PACKED log_Control_Tuning {
     int16_t dec_servo_out;
     int16_t dthrc_servo_out;
     int16_t drc_servo_out;
-    int16_t elevon_left_servo_out;
-    int16_t elevon_right_servo_out;
+    float   Ioutp;
+    float   Ioutq;
+    float   IoutV;
 
     /*int16_t nav_roll_cd;
     int16_t roll;
@@ -315,12 +316,13 @@ void Plane::Log_Write_Control_Tuning()
         dlrcW:Ju_delta_rcWash*57.3f,*/
 
         // Onboard Flight Dataset
-        dac_servo_out         : Ju_da_servo_out,
-        dec_servo_out         : Ju_de_servo_out,
-        dthrc_servo_out       : Ju_dthr_servo_out,
-        drc_servo_out         : Ju_dr_servo_out,
-        elevon_left_servo_out : channel_roll->get_servo_out(),
-        elevon_right_servo_out: channel_pitch->get_servo_out()
+        dac_servo_out       : Ju_da_servo_out,
+        dec_servo_out       : Ju_de_servo_out,
+        dthrc_servo_out     : Ju_dthr_servo_out,
+        drc_servo_out       : Ju_dr_servo_out,
+        Ioutp               : Ju_da_I,
+        Ioutq               : Ju_de_I,
+        IoutV               : Ju_V_I
 
         /*nav_roll_cd     : (int16_t)nav_roll_cd,
         roll            : (int16_t)ahrs.roll_sensor,
@@ -651,7 +653,7 @@ const struct LogStructure Plane::log_structure[] = {
       //"CTUN", "Qffffffff",    "TimeUS,deJ,deservoJ,deservo,dePWMJ,dePWM,eI,eR,qR"}, // Tune Hdot Dataset
       //"CTUN","Q","TimeUS"},
       //"CTUN", "Qffffffffff", "TimeUS,asJ,as,apJ,ap,rsJ,rs,rpJ,rp,dlrc,dlrcW"}, // Tune Hdot Dataset
-        "CTUN", "Qhhhhhh", "TimeUS,daserv,deserv,dthrserv,drserv,elevonlserv,elevonrserv"}, // Onboard Flight Dataset
+        "CTUN", "Qhhhhhhfff", "TimeUS,daserv,deserv,dthrserv,drserv,Ip,Iq,IV"}, // Onboard Flight Dataset
     { LOG_NTUN_MSG, sizeof(log_Nav_Tuning),         
       //"NTUN", "Qfcccfff",  "TimeUS,WpDist,TargBrg,NavBrg,AltErr,XT,XTi,ArspdErr" },
       //"NTUN", "Qfffffffffffff",  "T,Hd,Hdc,HdR,q,qc,V,Vc,VR,Phi,Phic,PhiR,p,pc"},

@@ -419,11 +419,12 @@ void Plane::stabilize()
         rollController.reset_I();
         pitchController.reset_I();
         yawController.reset_I();
-        
+
+        if (Ju_V_A_MEAS<g.JU_VAR_Ion_Vmin) {
         Ju_V_I  = 0;
         Ju_de_I = 0;
         Ju_da_I = 0;
-
+        }
         // if moving very slowly also zero the steering integrator
         if (gps.ground_speed() < 1) {
             steerController.reset_I();            

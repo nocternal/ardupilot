@@ -1337,6 +1337,9 @@ void Plane::Ju_HdotV_Ctrl()
             Ju_V_I = 0;
         }
     }
+    if (Ju_V_A_MEAS<g.JU_VAR_Ion_Vmin) {
+    	Ju_V_I = 0;
+    }
     Ju_Hdot2Vdot = Ju_Hdot2Vdot_LeadFilter();
     Ju_Vdotc     = Ju_V_P + Ju_V_I + Ju_Ref_Vdot * g.JU_Gain_Ref_FF_Vdot + Ju_Hdot2Vdot;
     Ju_Thrc_FB   = Ju_Vdotc * g.JU_Gain_P_ThrPerVdot;//[%]
@@ -1403,7 +1406,7 @@ void Plane::Ju_Ref_Hdot_Mdl()
         Ju_Ref_q             = Ju_Ref_Hdotdot / Ju_V_Use * g.JU_Gain_Ref_FF_q;
         Ju_Ref_Hdotdot       = Ju_Ref_Hdotdot * cosf(Ju_Phi_Use);
         Ju_Ref_Hdot          = Ju_Ref_Hdot + Ju_Ref_Hdotdot * jdelta_time;
-        Ju_Ref_Hdot          = constrain_float(Ju_Ref_Hdot , - g.JU_Lim_Hdot_Max , g.JU_Lim_Hdot_Max);
+        Ju_Ref_Hdot          = constrain_float(Ju_Ref_Hdot , - 2.0f * g.JU_Lim_Hdot_Max , 2.0f * g.JU_Lim_Hdot_Max); // 这就相当于没有限制RefHdot，因为从别的模式切换过来的时候可能当时的爬升率超出该限制
 
         Ju_Ref_Hdot_Last     = Ju_Ref_Hdot;
         Ju_Ref_Hdotdot_Last  = Ju_Ref_Hdotdot;
@@ -1484,6 +1487,9 @@ float Plane::Ju_q_Ctrl(void)
             Ju_de_I = 0;
         }
     }
+    if (Ju_V_A_MEAS<g.JU_VAR_Ion_Vmin) {
+    	Ju_de_I = 0;
+    }
     if (control_mode==JUGround) {
         Ju_de_I = 0;
     }
@@ -1509,6 +1515,9 @@ float Plane::Ju_p_Ctrl(void)
         {
             Ju_da_I = 0;
         }
+    }
+    if (Ju_V_A_MEAS<g.JU_VAR_Ion_Vmin) {
+    	Ju_da_I = 0;
     }
     if (control_mode==JUGround) {
         Ju_da_I = 0;

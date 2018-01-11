@@ -1539,6 +1539,13 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(JU_VAR_Phidot2p,         "JU_VAR_Phidot2p",   1),
 
+    // @Param: JU_VAR_Ion_Vmin
+    // @DisplayName: JU_VAR_Ion_Vmin
+    // @Description: 开始启用JUHdotVPhi模式的积分器的速度[m/s]
+    // @Values: 0  100
+    // @User: Advanced
+    GSCALAR(JU_VAR_Ion_Vmin,         "JU_VAR_Ion_Vmin",   10),
+
     // @Param: JU_RCout_Da_MIN
     // @DisplayName: JU_RC_Da_MIN
     // @Description: 副翼输出通道的最小值，之所以不用APM自带的，是因为其主通道输入输出共用一套参数，有问题

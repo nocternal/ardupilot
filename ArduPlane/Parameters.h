@@ -390,6 +390,7 @@ public:
 
         k_param_JU_VAR_V_Smooth,
         k_param_JU_VAR_Phidot2p,
+        k_param_JU_VAR_Ion_Vmin,
 
         k_param_JU_Gain_Ref_FF_q,
         k_param_JU_Gain_Ref_FF_Vdot,
@@ -582,13 +583,14 @@ public:
 
     // JU Param
     //
-    AP_Int8 JU_VAR_V_Smooth; 
-    AP_Int8 JU_VAR_Phidot2p;
+    AP_Int8  JU_VAR_V_Smooth; 
+    AP_Int8  JU_VAR_Phidot2p;
+    AP_Float JU_VAR_Ion_Vmin;
 
-    AP_Int8 JU_Rev_Gain_Hdotc;
-    AP_Int8 JU_Rev_Gain_Vc;
-    AP_Int8 JU_Rev_Gain_Phic;
-    AP_Int8 JU_Rev_Gain_rc;
+    AP_Int8  JU_Rev_Gain_Hdotc;
+    AP_Int8  JU_Rev_Gain_Vc;
+    AP_Int8  JU_Rev_Gain_Phic;
+    AP_Int8  JU_Rev_Gain_rc;
     
     AP_Float JU_Lim_Hdot_Max;      // [m/s]
     AP_Float JU_Lim_Hdot_Min;
@@ -673,7 +675,7 @@ public:
     AP_Int16 JU_RCout_Dthr_MIN;
     AP_Int16 JU_RCout_Dthr_TRIM;
     AP_Int16 JU_RCout_Dthr_MAX;
-    AP_Int8 JU_RCout_Dthr_REV;
+    AP_Int8  JU_RCout_Dthr_REV;
     AP_Int16 JU_RCout_Dthr_DZ;
 
 #if HIL_SUPPORT
