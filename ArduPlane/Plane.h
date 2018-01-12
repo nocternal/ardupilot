@@ -726,9 +726,24 @@ private:
     int16_t Ju_de_radio_out;
     int16_t Ju_dthr_radio_out;
     int16_t Ju_dr_radio_out;
-
-
-
+    int16_t Ju_roll_servo_out_last;     
+    int16_t Ju_pitch_servo_out_last;  
+    int16_t Ju_throttle_servo_out_last;
+    int16_t Ju_rudder_servo_out_last; 
+    int16_t Ju_roll_radio_out_last;
+    int16_t Ju_pitch_radio_out_last;   
+    int16_t Ju_throttle_radio_out_last; 
+    int16_t Ju_rudder_radio_out_last;  
+    int16_t Ju_steer_servo_out_last;
+    int16_t Ju_roll_servo_out_init;     
+    int16_t Ju_pitch_servo_out_init;  
+    int16_t Ju_throttle_servo_out_init;
+    int16_t Ju_rudder_servo_out_init; 
+    int16_t Ju_roll_radio_out_init;
+    int16_t Ju_pitch_radio_out_init;   
+    int16_t Ju_throttle_radio_out_init; 
+    int16_t Ju_rudder_radio_out_init;  
+    int16_t Ju_steer_servo_out_init;   
 
     uint32_t jinit_counter;    // [ms] 空中模式切入淡化相关参数
     uint32_t jtnow;
@@ -1177,6 +1192,7 @@ private:
     void Ju_set_servo_out(); //  计算 channel_pitch、roll、throttle、rudder以及steer的servo_out
     void Ju_set_servos();
     void Ju_Calc_Channel_Radio_out(); // 计算主通道channel_pitch、roll、throttle、rudder的radio_out
+    void Ju_mode_fadeout(); // 飞行模式切换淡化器
 
 
     void update_navigation();

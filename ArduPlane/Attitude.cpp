@@ -1041,73 +1041,126 @@ void Plane::Ju_set_servos()
 
         // 除了前四个主通道Channel。 剩下的Channel_aux通道也需指定输出信号
         // both types of secondary elevator are slaved to the pitch servo out
-    
+            
+    if (control_mode == JUGround) {
+        channel_throttle->set_radio_out(channel_throttle->get_radio_in());
+        channel_throttle->set_servo_out(channel_throttle->get_control_in());
+    }
 
-        RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_aileron, channel_roll->get_servo_out());
-        RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_aileron_with_input, channel_roll->get_servo_out());
-        RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_elevator, channel_pitch->get_servo_out());
-        RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_elevator_with_input, channel_pitch->get_servo_out());
-        RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_rudder, channel_rudder->get_servo_out());
-        RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_steering, steering_control.steering);
+    Ju_mode_fadeout();
 
-        if (control_mode == JUGround) {
-            channel_throttle->set_radio_out(channel_throttle->get_radio_in());
-            channel_throttle->set_servo_out(channel_throttle->get_control_in());
+    RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_aileron, channel_roll->get_servo_out());
+    RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_aileron_with_input, channel_roll->get_servo_out());
+    RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_elevator, channel_pitch->get_servo_out());
+    RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_elevator_with_input, channel_pitch->get_servo_out());
+    RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_rudder, channel_rudder->get_servo_out());
+    RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_steering, steering_control.steering);
+
+    #if HIL_SUPPORT
+        if (g.hil_mode == 1) {
+            // get the servos to the GCS immediately for HIL
+            if (HAVE_PAYLOAD_SPACE(MAVLINK_COMM_0, RC_CHANNELS_SCALED)) {
+                send_servo_out(MAVLINK_COMM_0);
+            }
+            if (!g.hil_servos) {
+                return;
+            }
         }
+    #endif
 
-
-        #if HIL_SUPPORT
-            if (g.hil_mode == 1) {
-                // get the servos to the GCS immediately for HIL
-                if (HAVE_PAYLOAD_SPACE(MAVLINK_COMM_0, RC_CHANNELS_SCALED)) {
-                    send_servo_out(MAVLINK_COMM_0);
-                }
-                if (!g.hil_servos) {
-                    return;
-                }
-            }
-        #endif
-
-        #if THROTTLE_OUT == 0
+    #if THROTTLE_OUT == 0
+        channel_throttle->set_servo_out(0);
+    #else
+        // Disarm的时候油门强行不启动
+        if (!hal.util->get_soft_armed()) {
             channel_throttle->set_servo_out(0);
-        #else
-            // Disarm的时候油门强行不启动
-            if (!hal.util->get_soft_armed()) {
-                channel_throttle->set_servo_out(0);
-                channel_throttle->calc_pwm();                
-            }
-        #endif
+            channel_throttle->calc_pwm();                
+        }
+    #endif
 
         if (!arming.is_armed()) {
-            //Some ESCs get noisy (beep error msgs) if PWM == 0.
-            //This little segment aims to avoid this.
-            switch (arming.arming_required()) { 
-                case AP_Arming::NO:
-                    //keep existing behavior: do nothing to radio_out
-                    //(don't disarm throttle channel even if AP_Arming class is)
-                    break;
+        //Some ESCs get noisy (beep error msgs) if PWM == 0.
+        //This little segment aims to avoid this.
+        switch (arming.arming_required()) { 
+            case AP_Arming::NO:
+                //keep existing behavior: do nothing to radio_out
+                //(don't disarm throttle channel even if AP_Arming class is)
+                break;
 
-                case AP_Arming::YES_ZERO_PWM:
-                    channel_throttle->set_servo_out(0);
-                    channel_throttle->set_radio_out(0);
-                    break;
+            case AP_Arming::YES_ZERO_PWM:
+                channel_throttle->set_servo_out(0);
+                channel_throttle->set_radio_out(0);
+                break;
 
-                case AP_Arming::YES_MIN_PWM:
-                default:
-                    channel_throttle->set_servo_out(0);
-                    channel_throttle->set_radio_out(throttle_min());
-                    break;
-            }
+            case AP_Arming::YES_MIN_PWM:
+            default:
+                channel_throttle->set_servo_out(0);
+                channel_throttle->set_radio_out(throttle_min());
+                break;
         }
+    }
 
-        // Final Output
-        channel_roll->output();
-        channel_pitch->output();
-        channel_throttle->output();
-        channel_rudder->output();
-        RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_throttle, channel_throttle->get_servo_out());
-        RC_Channel_aux::output_ch_all();
+    // Final Output
+    channel_roll->output();
+    channel_pitch->output();
+    channel_throttle->output();
+    channel_rudder->output();
+    RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_throttle, channel_throttle->get_servo_out());
+    RC_Channel_aux::output_ch_all();
     
+}
+
+void Plane::Ju_mode_fadeout(void)
+{   // 飞行模式切换淡化器
+    if (jinit_counter >= (g.JU_Init_Transtime*1000))
+    {
+            return;   
+    }
+    else if (jinit_counter == 0)
+    {
+        Ju_roll_servo_out_init     = Ju_roll_servo_out_last;
+        Ju_pitch_servo_out_init    = Ju_pitch_servo_out_last;
+        Ju_throttle_servo_out_init = Ju_throttle_servo_out_last;
+        Ju_rudder_servo_out_init   = Ju_rudder_servo_out_last;
+        Ju_steer_servo_out_init    = Ju_steer_servo_out_last;
+        Ju_roll_radio_out_init     = Ju_roll_radio_out_last;
+        Ju_pitch_radio_out_init    = Ju_pitch_radio_out_last;
+        Ju_throttle_radio_out_init = Ju_throttle_radio_out_last;
+        Ju_rudder_radio_out_init   = Ju_rudder_radio_out_last;
+
+
+        channel_roll->set_servo_out(Ju_roll_servo_out_init);
+        channel_pitch->set_servo_out(Ju_pitch_servo_out_init);
+        channel_throttle->set_servo_out(Ju_throttle_servo_out_init);
+        channel_rudder->set_servo_out(Ju_rudder_servo_out_init);
+        steering_control.steering = Ju_steer_servo_out_init;
+        channel_roll->set_radio_out(Ju_roll_radio_out_init);
+        channel_pitch->set_radio_out(Ju_pitch_radio_out_init);
+        channel_throttle->set_radio_out(Ju_throttle_radio_out_init);
+        channel_rudder->set_radio_out(Ju_rudder_radio_out_init);
+    }
+    else if (jinit_counter < (g.JU_Init_Transtime*1000))
+    {
+        int16_t roll_servo_out_fade     = (1 - jinit_counter/g.JU_Init_Transtime/1000) * Ju_roll_servo_out_init + (jinit_counter/g.JU_Init_Transtime/1000)*channel_roll->get_servo_out();
+        int16_t pitch_servo_out_fade    = (1 - jinit_counter/g.JU_Init_Transtime/1000) * Ju_pitch_servo_out_init + (jinit_counter/g.JU_Init_Transtime/1000)*channel_pitch->get_servo_out();
+        int16_t throttle_servo_out_fade = (1 - jinit_counter/g.JU_Init_Transtime/1000) * Ju_throttle_servo_out_init + (jinit_counter/g.JU_Init_Transtime/1000)*channel_throttle->get_servo_out();
+        int16_t rudder_servo_out_fade   = (1 - jinit_counter/g.JU_Init_Transtime/1000) * Ju_rudder_servo_out_init + (jinit_counter/g.JU_Init_Transtime/1000)*channel_rudder->get_servo_out();
+        int16_t steer_servo_out_fade    = (1 - jinit_counter/g.JU_Init_Transtime/1000) * Ju_steer_servo_out_init + (jinit_counter/g.JU_Init_Transtime/1000)*steering_control.steering;
+        int16_t roll_radio_out_fade     = (1 - jinit_counter/g.JU_Init_Transtime/1000) * Ju_roll_radio_out_init + (jinit_counter/g.JU_Init_Transtime/1000)*channel_roll->get_radio_out();
+        int16_t pitch_radio_out_fade    = (1 - jinit_counter/g.JU_Init_Transtime/1000) * Ju_pitch_radio_out_init + (jinit_counter/g.JU_Init_Transtime/1000)*channel_pitch->get_radio_out();
+        int16_t throttle_radio_out_fade = (1 - jinit_counter/g.JU_Init_Transtime/1000) * Ju_throttle_radio_out_init + (jinit_counter/g.JU_Init_Transtime/1000)*channel_throttle->get_radio_out();
+        int16_t rudder_radio_out_fade   = (1 - jinit_counter/g.JU_Init_Transtime/1000) * Ju_rudder_radio_out_init + (jinit_counter/g.JU_Init_Transtime/1000)*channel_rudder->get_radio_out();
+
+        channel_roll->set_servo_out(roll_servo_out_fade);
+        channel_pitch->set_servo_out(pitch_servo_out_fade);
+        channel_throttle->set_servo_out(throttle_servo_out_fade);
+        channel_rudder->set_servo_out(rudder_servo_out_fade);
+        steering_control.steering = steer_servo_out_fade;
+        channel_roll->set_radio_out(roll_radio_out_fade);
+        channel_pitch->set_radio_out(pitch_radio_out_fade);
+        channel_throttle->set_radio_out(throttle_radio_out_fade);
+        channel_rudder->set_radio_out(rudder_radio_out_fade);
+    }
 }
 
 /*****************************************
@@ -1552,6 +1605,15 @@ void Plane::set_servos(void)
         RC_Channel_aux::output_ch_all();
     }
     
+    Ju_roll_servo_out_last     = channel_roll->get_servo_out();
+    Ju_pitch_servo_out_last    = channel_pitch->get_servo_out();
+    Ju_throttle_servo_out_last = channel_throttle->get_servo_out();
+    Ju_rudder_servo_out_last   = channel_rudder->get_servo_out();
+    Ju_roll_radio_out_last     = channel_roll->get_radio_out();
+    Ju_pitch_radio_out_last    = channel_pitch->get_radio_out();
+    Ju_throttle_radio_out_last = channel_throttle->get_radio_out();
+    Ju_rudder_radio_out_last   = channel_rudder->get_radio_out();
+    Ju_steer_servo_out_last    = steering_control.steering;
     // 挪用NTUN和CTUN记录自己的变量
     if (should_log(MASK_LOG_NTUN))
     Log_Write_Nav_Tuning();
