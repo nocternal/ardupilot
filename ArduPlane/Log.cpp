@@ -653,7 +653,7 @@ const struct LogStructure Plane::log_structure[] = {
       //"CTUN", "Qffffffff",    "TimeUS,deJ,deservoJ,deservo,dePWMJ,dePWM,eI,eR,qR"}, // Tune Hdot Dataset
       //"CTUN","Q","TimeUS"},
       //"CTUN", "Qffffffffff", "TimeUS,asJ,as,apJ,ap,rsJ,rs,rpJ,rp,dlrc,dlrcW"}, // Tune Hdot Dataset
-        "CTUN", "Qhhhhhhfff", "TimeUS,daserv,deserv,dthrserv,drserv,Ip,Iq,IV"}, // Onboard Flight Dataset
+        "CTUN", "Qhhhhfff", "TimeUS,daserv,deserv,dthrserv,drserv,Ip,Iq,IV"}, // Onboard Flight Dataset
     { LOG_NTUN_MSG, sizeof(log_Nav_Tuning),         
       //"NTUN", "Qfcccfff",  "TimeUS,WpDist,TargBrg,NavBrg,AltErr,XT,XTi,ArspdErr" },
       //"NTUN", "Qfffffffffffff",  "T,Hd,Hdc,HdR,q,qc,V,Vc,VR,Phi,Phic,PhiR,p,pc"},
