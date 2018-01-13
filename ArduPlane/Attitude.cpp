@@ -1605,6 +1605,11 @@ void Plane::set_servos(void)
         RC_Channel_aux::output_ch_all();
     }
     
+    if (control_mode == MANUAL) {
+        Ju_mode_fadeout();
+    }
+
+
     Ju_roll_servo_out_last     = channel_roll->get_servo_out();
     Ju_pitch_servo_out_last    = channel_pitch->get_servo_out();
     Ju_throttle_servo_out_last = channel_throttle->get_servo_out();

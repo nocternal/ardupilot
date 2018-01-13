@@ -829,13 +829,27 @@ void Plane::update_flight_mode(void)
         calc_throttle();
         break;
 
-    case MANUAL:
+    case MANUAL: {
         // servo_out is for Sim control only
         // ---------------------------------
         channel_roll->set_servo_out(channel_roll->pwm_to_angle());
         channel_pitch->set_servo_out(channel_pitch->pwm_to_angle());
         steering_control.steering = steering_control.rudder = channel_rudder->pwm_to_angle();
+        
+        // 用于指令淡化
+        jtnow= AP_HAL::millis();
+        jdt = jtnow - jlast_t;  // [ms]
+        if (jlast_t == 0 || jdt > 1000) {
+        jdt = 0;
+        }
+        jlast_t     = jtnow;  
+        jdelta_time = (float)jdt * 0.001f; // [s]
+        if (jinit_counter <= (g.JU_Init_Transtime*1000)) 
+        {
+            jinit_counter += jdt;   
+        }
         break;
+    }
         //roll: -13788.000,  pitch: -13698.000,   thr: 0.000, rud: -13742.000
     case JUMANUAL:
         channel_roll->set_servo_out(channel_roll->pwm_to_angle());
