@@ -844,10 +844,11 @@ void Plane::update_flight_mode(void)
         }
         jlast_t     = jtnow;  
         jdelta_time = (float)jdt * 0.001f; // [s]
-        if (jinit_counter <= (g.JU_Init_Transtime*1000)) 
-        {
-            jinit_counter += jdt;   
-        }
+
+        //if (jinit_counter <= (g.JU_Init_Transtime*1000)) 
+        //{
+        //    jinit_counter += jdt;   
+        //}
         break;
     }
         //roll: -13788.000,  pitch: -13698.000,   thr: 0.000, rud: -13742.000
@@ -896,10 +897,10 @@ void Plane::update_flight_mode(void)
         Ju_log_daelc = constrain_float(Ju_log_daelc,-g.JU_DEF_de_Max/57.3f,g.JU_DEF_de_Max/57.3f);
         Ju_log_daerc = constrain_float(Ju_log_daerc,-g.JU_DEF_de_Max/57.3f,g.JU_DEF_de_Max/57.3f);
 
-        if (jinit_counter <= (g.JU_Init_Transtime*1000)) 
-        {
-            jinit_counter += jdt;   
-        }
+        //if (jinit_counter <= (g.JU_Init_Transtime*1000)) 
+        //{
+        //    jinit_counter += jdt;   
+        //}
         break;
     }
     case JUGround: {   
@@ -922,10 +923,10 @@ void Plane::update_flight_mode(void)
         Ju_log_daelc = constrain_float(Ju_log_daelc,-g.JU_DEF_de_Max/57.3f,g.JU_DEF_de_Max/57.3f);
         Ju_log_daerc = constrain_float(Ju_log_daerc,-g.JU_DEF_de_Max/57.3f,g.JU_DEF_de_Max/57.3f);
 
-        if (jinit_counter <= (g.JU_Init_Transtime*1000)) 
-        {
-            jinit_counter += jdt;   
-        }
+        //if (jinit_counter <= (g.JU_Init_Transtime*1000)) 
+        //{
+        //    jinit_counter += jdt;   
+        //}
         break;
     }
 

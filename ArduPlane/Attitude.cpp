@@ -1138,6 +1138,7 @@ void Plane::Ju_mode_fadeout(void)
         channel_pitch->set_radio_out(Ju_pitch_radio_out_init);
         channel_throttle->set_radio_out(Ju_throttle_radio_out_init);
         channel_rudder->set_radio_out(Ju_rudder_radio_out_init);
+        RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_steering, steering_control.steering);
     }
     else if (jinit_counter < (g.JU_Init_Transtime*1000))
     {
@@ -1160,6 +1161,7 @@ void Plane::Ju_mode_fadeout(void)
         channel_pitch->set_radio_out(pitch_radio_out_fade);
         channel_throttle->set_radio_out(throttle_radio_out_fade);
         channel_rudder->set_radio_out(rudder_radio_out_fade);
+        RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_steering, steering_control.steering);
     }
 }
 
@@ -1591,6 +1593,10 @@ void Plane::set_servos(void)
         // allow for secondary throttle
         RC_Channel_aux::set_servo_out_for(RC_Channel_aux::k_throttle, channel_throttle->get_servo_out());
     
+
+        if (control_mode == MANUAL) {
+            Ju_mode_fadeout();
+        }
         // send values to the PWM timers for output
         // ----------------------------------------
         if (g.rudder_only == 0) {
@@ -1599,16 +1605,17 @@ void Plane::set_servos(void)
             // damper to operate.
             channel_roll->output();
         }
+
         channel_pitch->output();
         channel_throttle->output();
         channel_rudder->output();
         RC_Channel_aux::output_ch_all();
     }
-    
-    if (control_mode == MANUAL) {
-        Ju_mode_fadeout();
-    }
 
+    if (jinit_counter <= (g.JU_Init_Transtime*1000)) 
+    {
+        jinit_counter += jdt;   
+    }
 
     Ju_roll_servo_out_last     = channel_roll->get_servo_out();
     Ju_pitch_servo_out_last    = channel_pitch->get_servo_out();
@@ -1624,6 +1631,8 @@ void Plane::set_servos(void)
     Log_Write_Nav_Tuning();
     if (should_log(MASK_LOG_CTUN))
     Log_Write_Control_Tuning();
+    //if (should_log(MASK_LOG_RC))
+    //Log_Write_RC();
 }
 
 bool Plane::allow_reverse_thrust(void)

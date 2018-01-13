@@ -502,7 +502,8 @@ void Plane::set_mode(enum FlightMode mode, mode_reason_t reason)
     yawController.reset_I();    
     steerController.reset_I();  
     
-    jinit_counter = 0;  
+    jinit_counter = 0;
+    //jlast_t       = 0;  
 }
 
 /*
