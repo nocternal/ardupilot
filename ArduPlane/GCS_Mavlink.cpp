@@ -527,6 +527,21 @@ void Plane::send_pid_tuning(mavlink_channel_t chan)
     const Vector3f &gyro = ahrs.get_gyro();
     const DataFlash_Class::PID_Info *pid_info;
     if (g.gcs_pid_mask & 1) {
+    	if (plane.control_mode == JUHdotVPhi) {
+        // 输入各指令Ref及实际值
+    	// 在地面站中的显示顺序是： pidachived;pidD       ;piddesired;pidff;pidI    ;pidP
+    	// 实际地面站显示的是    ： HdotRef   ;Hdot       ;Vref      ;V    ;PhiRef  ;Phi
+    	// 在该cpp中的顺序是：      piddesired;pidachived ;pidff     ;pidP ;pidI    ;pidD
+    	mavlink_msg_pid_tuning_send(chan, PID_TUNING_ROLL,
+    								Ju_Ref_V,
+    								Ju_Ref_Hdot,
+    								Ju_V_A_MEAS,
+    								Ju_Phi_MEAS * 57.3f ,
+    								Ju_Ref_Phi * 57.3f,
+    								Ju_Hdot_MEAS);
+    	}
+		
+    	/* 原版代码，现进行改动，输出自己希望看的数
         if (quadplane.in_vtol_mode()) {
             pid_info = &quadplane.attitude_control->get_rate_roll_pid().get_pid_info();
         } else {
@@ -538,7 +553,8 @@ void Plane::send_pid_tuning(mavlink_channel_t chan)
                                     pid_info->FF,
                                     pid_info->P,
                                     pid_info->I,
-                                    pid_info->D);
+                                    pid_info->D);*/
+
         if (!HAVE_PAYLOAD_SPACE(chan, PID_TUNING)) {
             return;
         }
