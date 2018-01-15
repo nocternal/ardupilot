@@ -77,6 +77,36 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     // @Values: 0:None,1:Roll,2:Pitch,4:Yaw
     // @Bitmask: 0:Roll,1:Pitch,2:Yaw
+    // 
+    // @Param: GCS_PID_MASK
+    // @DisplayName: GCS PID tuning mask
+    // @Description: 注意该参数的作用被改动，挪用为JU模式调参,这个bitmask只能是2的整数倍，具体原理尚不明确
+    // 1 Ref跟踪
+    // 在地面站中的显示顺序是： pidachived;pidD       ;piddesired;pidff;pidI    ;pidP
+    // 实际地面站显示的是    ： HdotRef   ;Hdot       ;Vref      ;V    ;PhiRef  ;Phi
+    //                          [m/s]      [m/s]       [m/s]      [m/s] [deg]    [deg]
+    // 2 纵向Ref跟踪
+    // 在地面站中的显示顺序是： pidachived;pidD       ;piddesired;pidff;pidI    ;pidP
+    // 实际地面站显示的是    ： HdotRef   ;Hdot       ;Vref      ;V    ;qc      ;q
+    //                          [m/s]      [m/s]       [m/s]      [m/s] [deg/s]  [deg/s]
+    // 4 横航向Ref跟踪
+    // 在地面站中的显示顺序是： pidachived;pidD       ;piddesired;pidff;pidI    ;pidP
+    // 实际地面站显示的是    ： PhiRef    ;Phi        ;pc        ;p    ;rc      ;r
+    //                          [deg]      [deg]       [deg/s]    [deg/s] 
+    // 8 q跟踪
+    // 在地面站中的显示顺序是： pidachived;pidD       ;piddesired;pidff;pidI    ;pidP
+    // 实际地面站显示的是    ： q         ;de         ;qc        ;qFout;qIout   ;qPout
+    //                          [deg/s]    [deg]       [deg/s]    [deg]
+    // 16 p跟踪
+    // 在地面站中的显示顺序是： pidachived;pidD       ;piddesired;pidff;pidI    ;pidP
+    // 实际地面站显示的是    ： p         ;da         ;pc        ;pFout;pIout   ;pPout
+    //                          [deg/s]    [deg]       [deg/s]    [deg] 
+    // 32 配平
+    // 在地面站中的显示顺序是： pidachived;pidD       ;piddesired;pidff;pidI    ;pidP
+    // 实际地面站显示的是    ： HdotRef   ;Hdot       ;Vref      ;V    ;Judec   ;Judthrc
+    //                          [m/s]      [m/s]       [m/s]      [m/s] [deg]    [%]                                                  
+    // @User: Advanced
+    // @Values: 0:None,1,2,4,8,16,32
     GSCALAR(gcs_pid_mask,           "GCS_PID_MASK",     0),
 
     // @Param: KFF_RDDRMIX

@@ -524,8 +524,8 @@ void NOINLINE Plane::send_rpm(mavlink_channel_t chan)
  */
 void Plane::send_pid_tuning(mavlink_channel_t chan)
 {
-    const Vector3f &gyro = ahrs.get_gyro();
-    const DataFlash_Class::PID_Info *pid_info;
+    //const Vector3f &gyro = ahrs.get_gyro();
+    //const DataFlash_Class::PID_Info *pid_info;
     if (g.gcs_pid_mask & 1) {
     	if (plane.control_mode == JUHdotVPhi) {
         // 输入各指令Ref及实际值
@@ -560,48 +560,90 @@ void Plane::send_pid_tuning(mavlink_channel_t chan)
         }
     }
     if (g.gcs_pid_mask & 2) {
-        if (quadplane.in_vtol_mode()) {
-            pid_info = &quadplane.attitude_control->get_rate_pitch_pid().get_pid_info();
-        } else {
-            pid_info = &pitchController.get_pid_info();
+        if (plane.control_mode == JUHdotVPhi) {
+        // 在地面站中的显示顺序是： pidachived;pidD       ;piddesired;pidff;pidI    ;pidP
+        // 实际地面站显示的是    ： HdotRef   ;Hdot       ;Vref      ;V    ;qc      ;q
+        // 在该cpp中的顺序是：      piddesired;pidachived ;pidff     ;pidP ;pidI    ;pidD
+        mavlink_msg_pid_tuning_send(chan, PID_TUNING_PITCH,
+                                    Ju_Ref_V,
+                                    Ju_Ref_Hdot,
+                                    Ju_V_A_MEAS,
+                                    Ju_q_MEAS * 57.3f,
+                                    Ju_qc * 57.3f,
+                                    Ju_Hdot_MEAS);
         }
-        mavlink_msg_pid_tuning_send(chan, PID_TUNING_PITCH, 
-                                    pid_info->desired,
-                                    degrees(gyro.y),
-                                    pid_info->FF,
-                                    pid_info->P,
-                                    pid_info->I,
-                                    pid_info->D);
         if (!HAVE_PAYLOAD_SPACE(chan, PID_TUNING)) {
             return;
         }
     }
+
     if (g.gcs_pid_mask & 4) {
-        if (quadplane.in_vtol_mode()) {
-            pid_info = &quadplane.attitude_control->get_rate_yaw_pid().get_pid_info();
-        } else {
-            pid_info = &yawController.get_pid_info();
+        if (plane.control_mode == JUHdotVPhi) {
+        // PhiRef Phi qc q
+        // 在地面站中的显示顺序是： pidachived;pidD       ;piddesired;pidff;pidI    ;pidP
+        // 实际地面站显示的是    ： PhiRef    ;Phi        ;pc        ;p    ;rc      ;r
+        // 在该cpp中的顺序是：      piddesired;pidachived ;pidff     ;pidP ;pidI    ;pidD
+        mavlink_msg_pid_tuning_send(chan, PID_TUNING_ROLL,
+                                    Ju_pc * 57.3f,
+                                    Ju_Ref_Phi * 57.3f,
+                                    Ju_p_MEAS * 57.3f,
+                                    Ju_r_MEAS * 57.3f,
+                                    Ju_rc * 57.3f,
+                                    Ju_Phi_MEAS * 57.3f);
         }
-        mavlink_msg_pid_tuning_send(chan, PID_TUNING_YAW,
-                                    pid_info->desired,
-                                    degrees(gyro.z),
-                                    pid_info->FF,
-                                    pid_info->P,
-                                    pid_info->I,
-                                    pid_info->D);
         if (!HAVE_PAYLOAD_SPACE(chan, PID_TUNING)) {
             return;
         }
     }
+
     if (g.gcs_pid_mask & 8) {
-        pid_info = &steerController.get_pid_info();
-        mavlink_msg_pid_tuning_send(chan, PID_TUNING_STEER, 
-                                    pid_info->desired,
-                                    degrees(gyro.z),
-                                    pid_info->FF,
-                                    pid_info->P,
-                                    pid_info->I,
-                                    pid_info->D);
+        if (plane.control_mode == JUHdotVPhi) {
+            //q回路跟踪情况
+            mavlink_msg_pid_tuning_send(chan, PID_TUNING_PITCH, 
+                                        Ju_qc * 57.3f,
+                                        Ju_q_MEAS * 57.3f,
+                                        -Ju_de_F * 57.3f,
+                                        -Ju_de_P * 57.3f,
+                                        -Ju_de_I * 57.3f,
+                                        Ju_dec * 57.3f);
+        }
+
+        if (!HAVE_PAYLOAD_SPACE(chan, PID_TUNING)) {
+            return;
+        }
+    }
+
+    if (g.gcs_pid_mask & 16) {
+        if (plane.control_mode == JUHdotVPhi) {
+            //p回路跟踪情况
+            mavlink_msg_pid_tuning_send(chan, PID_TUNING_ROLL, 
+                                        Ju_pc * 57.3f,
+                                        Ju_p_MEAS * 57.3f,
+                                        -Ju_da_F * 57.3f,
+                                        -Ju_da_P * 57.3f,
+                                        -Ju_da_I * 57.3f,
+                                        Ju_dac * 57.3f);
+        }       
+
+        if (!HAVE_PAYLOAD_SPACE(chan, PID_TUNING)) {
+            return;
+        }
+    }
+
+    if (g.gcs_pid_mask & 32) {
+        if (plane.control_mode == JUHdotVPhi) {
+            // 观察配平量
+            // 在地面站中的显示顺序是： pidachived;pidD       ;piddesired;pidff;pidI    ;pidP
+            // 实际地面站显示的是    ： HdotRef   ;Hdot       ;Vref      ;V    ;dec     ;dthrc
+            // 在该cpp中的顺序是：      piddesired;pidachived ;pidff     ;pidP ;pidI    ;pidD
+            mavlink_msg_pid_tuning_send(chan, PID_TUNING_PITCH,
+                                        Ju_Ref_V,
+                                        Ju_Ref_Hdot,
+                                        Ju_V_A_MEAS,
+                                        Ju_Thrc, // [%]
+                                        Ju_dec * 57.3f,
+                                        Ju_Hdot_MEAS);
+        }
         if (!HAVE_PAYLOAD_SPACE(chan, PID_TUNING)) {
             return;
         }
