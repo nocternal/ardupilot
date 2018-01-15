@@ -964,6 +964,7 @@ private:
     void Log_Write_Performance();
     void Log_Write_Startup(uint8_t type);
     void Log_Write_Control_Tuning();
+    void Log_Write_Ju_Tuning_Hdot();
     void Log_Write_Nav_Tuning();
     void Log_Write_Status();
     void Log_Write_Sonar();

@@ -40,6 +40,7 @@ bool Plane::print_log_menu(void)
         PLOG(GPS);
         PLOG(PM);
         PLOG(CTUN);
+        PLOG(JTH);
         PLOG(NTUN);
         PLOG(MODE);
         PLOG(IMU);
@@ -119,6 +120,7 @@ int8_t Plane::select_logs(uint8_t argc, const Menu::arg *argv)
         TARG(GPS);
         TARG(PM);
         TARG(CTUN);
+        TARG(JTH);
         TARG(NTUN);
         TARG(MODE);
         TARG(IMU);
@@ -287,6 +289,9 @@ struct PACKED log_Control_Tuning {
 
 };
 
+
+
+
 // Write a control tuning packet. Total length : 22 bytes
 void Plane::Log_Write_Control_Tuning()
 {
@@ -331,6 +336,22 @@ void Plane::Log_Write_Control_Tuning()
         throttle_out    : (int16_t)channel_throttle->get_servo_out(),
         rudder_out      : (int16_t)channel_rudder->get_servo_out(),
         throttle_dem    : (int16_t)SpdHgt_Controller->get_throttle_demand()*/
+    };
+    DataFlash.WriteBlock(&pkt, sizeof(pkt));
+}
+
+struct PACKED log_Ju_Tuning_Hdot {
+    LOG_PACKET_HEADER; 
+    uint64_t time_us; 
+    float    Hdot;
+};
+
+void Plane::Log_Write_Ju_Tuning_Hdot()
+{
+    struct log_Ju_Tuning_Hdot pkt = {
+        LOG_PACKET_HEADER_INIT(LOG_JTH_MSG),
+        time_us         : AP_HAL::micros64(),
+        Hdot            : Ju_Hdot_MEAS
     };
     DataFlash.WriteBlock(&pkt, sizeof(pkt));
 }
@@ -654,6 +675,8 @@ const struct LogStructure Plane::log_structure[] = {
       //"CTUN","Q","TimeUS"},
       //"CTUN", "Qffffffffff", "TimeUS,asJ,as,apJ,ap,rsJ,rs,rpJ,rp,dlrc,dlrcW"}, // Tune Hdot Dataset
         "CTUN", "Qhhhhfff", "TimeUS,daserv,deserv,dthrserv,drserv,Ip,Iq,IV"}, // Onboard Flight Dataset
+    { LOG_JTH_MSG, sizeof(log_Ju_Tuning_Hdot),
+        "JTH" , "Qf","TimeUS,Hdot" },
     { LOG_NTUN_MSG, sizeof(log_Nav_Tuning),         
       //"NTUN", "Qfcccfff",  "TimeUS,WpDist,TargBrg,NavBrg,AltErr,XT,XTi,ArspdErr" },
       //"NTUN", "Qfffffffffffff",  "T,Hd,Hdc,HdR,q,qc,V,Vc,VR,Phi,Phic,PhiR,p,pc"},
@@ -748,6 +771,7 @@ void Plane::Log_Write_Attitude(void) {}
 void Plane::Log_Write_Performance() {}
 void Plane::Log_Write_Startup(uint8_t type) {}
 void Plane::Log_Write_Control_Tuning() {}
+void Plane::Log_Write_Ju_Tuning_Hdot() {}
 void Plane::Log_Write_Nav_Tuning() {}
 void Plane::Log_Write_Status() {}
 void Plane::Log_Write_Sonar() {}

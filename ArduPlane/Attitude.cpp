@@ -1630,7 +1630,11 @@ void Plane::set_servos(void)
     if (should_log(MASK_LOG_NTUN))
     Log_Write_Nav_Tuning();
     if (should_log(MASK_LOG_CTUN))
-    Log_Write_Control_Tuning();
+    {
+        Log_Write_Control_Tuning();
+        Log_Write_Ju_Tuning_Hdot();
+    }
+    
     //if (should_log(MASK_LOG_RC))
     //Log_Write_RC();
 }
