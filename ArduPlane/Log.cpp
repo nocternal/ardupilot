@@ -343,15 +343,35 @@ void Plane::Log_Write_Control_Tuning()
 struct PACKED log_Ju_Tuning_Hdot {
     LOG_PACKET_HEADER; 
     uint64_t time_us; 
-    float    Hdot;
+    float Thetac;
+    float qc_FB;
+    float qc_Rollcomp;
+    float qc_Ref;
+    float qPout;
+    float qIout;
+    float qFout;
+    float dec_FB;
+    float dec_Trim;
+    float dec_Ref;
+    float dec;  
 };
 
 void Plane::Log_Write_Ju_Tuning_Hdot()
 {
     struct log_Ju_Tuning_Hdot pkt = {
         LOG_PACKET_HEADER_INIT(LOG_JTH_MSG),
-        time_us         : AP_HAL::micros64(),
-        Hdot            : Ju_Hdot_MEAS
+        time_us     : AP_HAL::micros64(),
+        Thetac      : Ju_Thetac * 57.3f,
+        qc_FB       : Ju_qc_FB * 57.3f,
+        qc_Rollcomp : Ju_qc_RollComp * 57.3f,
+        qc_Ref      : Ju_Ref_q * 57.3f,
+        qPout       : -Ju_de_P * 57.3f,
+        qIout       : -Ju_de_I * 57.3f,
+        qFout       : -Ju_de_F * 57.3f,
+        dec_FB      : Ju_dec_FB * 57.3f,
+        dec_Trim    : Ju_dec_Trim * 57.3f,
+        dec_Ref     : Ju_Ref_de * 57.3f,
+        dec         : Ju_dec * 57.3f
     };
     DataFlash.WriteBlock(&pkt, sizeof(pkt));
 }
@@ -676,7 +696,7 @@ const struct LogStructure Plane::log_structure[] = {
       //"CTUN", "Qffffffffff", "TimeUS,asJ,as,apJ,ap,rsJ,rs,rpJ,rp,dlrc,dlrcW"}, // Tune Hdot Dataset
         "CTUN", "Qhhhhfff", "TimeUS,daserv,deserv,dthrserv,drserv,Ip,Iq,IV"}, // Onboard Flight Dataset
     { LOG_JTH_MSG, sizeof(log_Ju_Tuning_Hdot),
-        "JTH" , "Qf","TimeUS,Hdot" },
+        "JTH" , "Qfffffffffff","TimeUS,Ptchc,qFB,qRl,qRM,qP,qI,qF,deFB,deTrim,deRM,dec" },
     { LOG_NTUN_MSG, sizeof(log_Nav_Tuning),         
       //"NTUN", "Qfcccfff",  "TimeUS,WpDist,TargBrg,NavBrg,AltErr,XT,XTi,ArspdErr" },
       //"NTUN", "Qfffffffffffff",  "T,Hd,Hdc,HdR,q,qc,V,Vc,VR,Phi,Phic,PhiR,p,pc"},
