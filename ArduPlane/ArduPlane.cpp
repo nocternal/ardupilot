@@ -1388,8 +1388,9 @@ void Plane::Ju_Phi_Ctrl()
     Ju_rc              = Ju_rc_Coordinate + Ju_Joystick_rc;// 这个只是拿来显示的，不用这个变量直接进行下一步计算，因为不希望杆指令被低通掉
     Ju_delta_rc        = Ju_rc_Coordinate - Ju_r_MEAS;
     Ju_delta_rcWash    = Ju_Calc_rWashFilter(Ju_delta_rc); 
-    Ju_drc             = - (Ju_delta_rcWash + Ju_Joystick_rc) * g.JU_Gain_RY_Pr;
-    Ju_drc             = Ju_drc + Ju_dac * g.JU_Gain_RY_ARI;
+    Ju_drc_FB          = - (Ju_delta_rcWash + Ju_Joystick_rc) * g.JU_Gain_RY_Pr;
+    Ju_drc_ARI         = Ju_dac * g.JU_Gain_RY_ARI;
+    Ju_drc             = Ju_drc_FB + Ju_drc_ARI;
     Ju_drc             = constrain_float(Ju_drc , - g.JU_DEF_dr_Max/57.3f , g.JU_DEF_dr_Max/57.3f); // [rad] )
 }
 
@@ -1551,6 +1552,7 @@ float Plane::Ju_de_Trim(void)
 float Plane::Ju_Hdot2Vdot_LeadFilter(void)
 {
     float Vdotc = Ju_Ref_Hdot * g_acc / Ju_V_Use;
+    Ju_Hdot2Vdot0 = Vdotc;
     float Vdotc_Lead = Vdotc;
 
     if (g.JU_Gain_P_LeadTzVdot > 0.01)  // 进行超前的情况

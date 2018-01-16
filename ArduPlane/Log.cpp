@@ -41,6 +41,9 @@ bool Plane::print_log_menu(void)
         PLOG(PM);
         PLOG(CTUN);
         PLOG(JTH);
+        PLOG(JTV);
+        PLOG(JTR);
+        PLOG(JTY);
         PLOG(NTUN);
         PLOG(MODE);
         PLOG(IMU);
@@ -121,6 +124,9 @@ int8_t Plane::select_logs(uint8_t argc, const Menu::arg *argv)
         TARG(PM);
         TARG(CTUN);
         TARG(JTH);
+        TARG(JTV);
+        TARG(JTR);
+        TARG(JTY);
         TARG(NTUN);
         TARG(MODE);
         TARG(IMU);
@@ -375,6 +381,102 @@ void Plane::Log_Write_Ju_Tuning_Hdot()
     };
     DataFlash.WriteBlock(&pkt, sizeof(pkt));
 }
+
+struct PACKED log_Ju_Tuning_V {
+    LOG_PACKET_HEADER; 
+    uint64_t time_us;
+    float VPout; 
+    float VIout;
+    float Hdot2Vdotc0; // 经过超前滤波器前
+    float Hdot2VdotcLead; // 经超前处理之后
+    float VdotcRef;
+    float dthrc_FB;
+    float dthrc_Trim;
+    float dthrc;
+ 
+};
+
+void Plane::Log_Write_Ju_Tuning_V()
+{
+    struct log_Ju_Tuning_V pkt = {
+        LOG_PACKET_HEADER_INIT(LOG_JTV_MSG),
+        time_us     : AP_HAL::micros64(),
+        VPout       : Ju_V_P,
+        VIout       : Ju_V_I,
+        Hdot2Vdotc0 : Ju_Hdot2Vdot0,
+        Hdot2VdotcLead : Ju_Hdot2Vdot,
+        VdotcRef    : Ju_Ref_Vdot,
+        dthrc_FB    : Ju_Thrc_FB,
+        dthrc_Trim  : Ju_Thrc_Trim,
+        dthrc       : Ju_Thrc
+    };
+    DataFlash.WriteBlock(&pkt, sizeof(pkt));
+}
+
+struct PACKED log_Ju_Tuning_Roll {
+    LOG_PACKET_HEADER; 
+    uint64_t time_us;
+    float Phidotc_FB;
+    float PhidotcRef;
+    float Phidotc;
+    float pc;
+    float pPout;
+    float pIout;
+    float pFout;
+    float dac_FB;
+    float dacRef;
+    float dac;
+
+};
+
+void Plane::Log_Write_Ju_Tuning_Roll()
+{
+    struct log_Ju_Tuning_Roll pkt = {
+        LOG_PACKET_HEADER_INIT(LOG_JTR_MSG),
+        time_us     : AP_HAL::micros64(),
+        Phidotc_FB  : Ju_Phidotc_FB * 57.3f,
+        PhidotcRef  : Ju_Ref_PhidotCtrl * 57.3f,
+        Phidotc     : Ju_Phidotc * 57.3f,
+        pc          : Ju_pc * 57.3f,
+        pPout       : -Ju_da_P * 57.3f,
+        pIout       : -Ju_da_I * 57.3f,
+        pFout       : -Ju_da_F * 57.3f,
+        dac_FB      : Ju_dac_FB * 57.3f,
+        dacRef      : Ju_Ref_da * 57.3f,
+        dac         : Ju_dac * 57.3f
+    };
+    DataFlash.WriteBlock(&pkt, sizeof(pkt));
+}
+
+struct PACKED log_Ju_Tuning_Yaw {
+    LOG_PACKET_HEADER; 
+    uint64_t time_us;
+    float rcCoord;
+    float rcJoystick; 
+    float delta_rc;
+    float delta_rcWash;
+    float drc_FB;
+    float drc_ARI;
+    float drc;
+};
+
+void Plane::Log_Write_Ju_Tuning_Yaw()
+{
+    struct log_Ju_Tuning_Yaw pkt = {
+        LOG_PACKET_HEADER_INIT(LOG_JTY_MSG),
+        time_us     : AP_HAL::micros64(),
+        rcCoord     : Ju_rc_Coordinate * 57.3f,
+        rcJoystick  : Ju_Joystick_rc * 57.3f,
+        delta_rc    : Ju_delta_rc * 57.3f,
+        delta_rcWash: Ju_delta_rcWash * 57.3f,
+        drc_FB      : Ju_drc_FB * 57.3f,
+        drc_ARI     : Ju_drc_ARI * 57.3f,
+        drc         : Ju_drc * 57.3f
+    };
+    DataFlash.WriteBlock(&pkt, sizeof(pkt));
+}
+
+
 
 struct PACKED log_Nav_Tuning {
     LOG_PACKET_HEADER;
@@ -697,6 +799,12 @@ const struct LogStructure Plane::log_structure[] = {
         "CTUN", "Qhhhhfff", "TimeUS,daserv,deserv,dthrserv,drserv,Ip,Iq,IV"}, // Onboard Flight Dataset
     { LOG_JTH_MSG, sizeof(log_Ju_Tuning_Hdot),
         "JTH" , "Qfffffffffff","TimeUS,Ptchc,qFB,qRl,qRM,qP,qI,qF,deFB,deTrim,deRM,dec" },
+    { LOG_JTV_MSG, sizeof(log_Ju_Tuning_V), 
+        "JTV" , "Qffffffff","TimeUS,VP,VI,Hd2Vd0,Hd2VdLead,VdRM,dthrFB,dthrTrim,dthrc" },
+    { LOG_JTR_MSG, sizeof(log_Ju_Tuning_Roll), 
+        "JTR" , "Qffffffffff","TimeUS,PhidFB,PhidRM,Phidc,pc,pP,pI,pF,daFB,daRM,dac" },
+    { LOG_JTY_MSG, sizeof(log_Ju_Tuning_Yaw), 
+        "JTY" , "Qfffffff","TimeUS,rCoord,rStick,deltarc,deltarcWash,drFB,drARI,drc" },
     { LOG_NTUN_MSG, sizeof(log_Nav_Tuning),         
       //"NTUN", "Qfcccfff",  "TimeUS,WpDist,TargBrg,NavBrg,AltErr,XT,XTi,ArspdErr" },
       //"NTUN", "Qfffffffffffff",  "T,Hd,Hdc,HdR,q,qc,V,Vc,VR,Phi,Phic,PhiR,p,pc"},
@@ -792,6 +900,9 @@ void Plane::Log_Write_Performance() {}
 void Plane::Log_Write_Startup(uint8_t type) {}
 void Plane::Log_Write_Control_Tuning() {}
 void Plane::Log_Write_Ju_Tuning_Hdot() {}
+void Plane::Log_Write_Ju_Tuning_V() {}
+void Plane::Log_Write_Ju_Tuning_Roll() {}
+void Plane::Log_Write_Ju_Tuning_Yaw() {}
 void Plane::Log_Write_Nav_Tuning() {}
 void Plane::Log_Write_Status() {}
 void Plane::Log_Write_Sonar() {}

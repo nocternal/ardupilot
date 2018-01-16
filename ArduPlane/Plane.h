@@ -698,7 +698,8 @@ private:
     float Ju_V_P;
     float Ju_V_I;
     float Ju_Vdotc;
-    float Ju_Hdot2Vdot;
+    float Ju_Hdot2Vdot0; // 经过超前滤波器之前
+    float Ju_Hdot2Vdot;  // 经过超前滤波器后
     float Ju_Hdot2Vdotc_Last;
     float Ju_Hdot2Vdotc_Lead_Last;
     float rclast;      //用于r高通滤波
@@ -712,6 +713,8 @@ private:
     float Ju_da_F;
     float Ju_dac_FB;
     float Ju_drc;
+    float Ju_drc_FB;
+    float Ju_drc_ARI;
     float Ju_rc;
     float Ju_rc_Coordinate;
     float Ju_delta_rc;
@@ -965,6 +968,9 @@ private:
     void Log_Write_Startup(uint8_t type);
     void Log_Write_Control_Tuning();
     void Log_Write_Ju_Tuning_Hdot();
+    void Log_Write_Ju_Tuning_V();
+    void Log_Write_Ju_Tuning_Roll();
+    void Log_Write_Ju_Tuning_Yaw();
     void Log_Write_Nav_Tuning();
     void Log_Write_Status();
     void Log_Write_Sonar();

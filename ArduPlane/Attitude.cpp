@@ -1633,6 +1633,9 @@ void Plane::set_servos(void)
     {
         Log_Write_Control_Tuning();
         Log_Write_Ju_Tuning_Hdot();
+        Log_Write_Ju_Tuning_V();
+        Log_Write_Ju_Tuning_Roll();
+        Log_Write_Ju_Tuning_Yaw();
     }
     
     //if (should_log(MASK_LOG_RC))

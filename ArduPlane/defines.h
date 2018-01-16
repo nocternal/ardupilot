@@ -126,6 +126,9 @@ enum log_messages {
     LOG_CTUN_MSG,
     LOG_NTUN_MSG,
     LOG_JTH_MSG,
+    LOG_JTV_MSG,
+    LOG_JTR_MSG,
+    LOG_JTY_MSG,
     LOG_PERFORMANCE_MSG,
     LOG_STARTUP_MSG,
     TYPE_AIRSTART_MSG,
@@ -156,7 +159,10 @@ enum log_messages {
 #define MASK_LOG_SONAR                  (1<<14)
 #define MASK_LOG_ARM_DISARM             (1<<15)
 #define MASK_LOG_JTH                    (1UL<<17)
+#define MASK_LOG_JTV                    (1UL<<18)
 #define MASK_LOG_IMU_RAW                (1UL<<19)
+#define MASK_LOG_JTR                    (1UL<<20)
+#define MASK_LOG_JTY                    (1UL<<21)
 
 // Waypoint Modes
 // ----------------
