@@ -1569,6 +1569,13 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(JU_VAR_Phidot2p,         "JU_VAR_Phidot2p",   1),
 
+    // @Param: JU_VAR_SteerCtrl
+    // @DisplayName: JU_VAR_SteerCtrl
+    // @Description: 0: 前轮直连,      1: 前轮带控 
+    // @Values: 0, 1
+    // @User: Advanced
+    GSCALAR(JU_VAR_SteerCtrl,         "JU_VAR_SteerCtrl",   0),
+
     // @Param: JU_VAR_Ion_Vmin
     // @DisplayName: JU_VAR_Ion_Vmin
     // @Description: 开始启用JUHdotVPhi模式的积分器的速度[m/s]

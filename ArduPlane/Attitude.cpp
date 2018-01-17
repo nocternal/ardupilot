@@ -465,6 +465,11 @@ void Plane::Ju_set_servo_out()
     if (steering_control.ground_steering) {
         calc_nav_yaw_ground();
     }
+    if (g.JU_VAR_SteerCtrl == 0) {
+        // steering_control.steering = steering_control.rudder = channel_rudder->pwm_to_angle();
+        // 前轮直连
+        steering_control.steering = channel_rudder->pwm_to_angle();
+    }    
 }
 
 
