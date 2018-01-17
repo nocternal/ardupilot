@@ -429,9 +429,9 @@ void Plane::stabilize()
         if (gps.ground_speed() < 1) {
             steerController.reset_I();            
         }
-        if (steering_control.ground_steering) {
-        calc_nav_yaw_ground();
-        }
+        //if (steering_control.ground_steering) {
+        //calc_nav_yaw_ground();
+        //}
     }
 }
 
@@ -462,9 +462,16 @@ void Plane::Ju_set_servo_out()
     // 前轮控制 
     steering_control.ground_steering = (channel_roll->get_control_in() == 0 && 
                                         fabsf(relative_altitude()) < g.ground_steer_alt);
+
     if (steering_control.ground_steering) {
         calc_nav_yaw_ground();
     }
+
+    if (!steering_control.ground_steering) {
+        // 非地面花炮模式下前轮直连
+        steering_control.steering = channel_rudder->pwm_to_angle();
+    }
+
     if (g.JU_VAR_SteerCtrl == 0) {
         // steering_control.steering = steering_control.rudder = channel_rudder->pwm_to_angle();
         // 前轮直连

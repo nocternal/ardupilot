@@ -284,6 +284,7 @@ struct PACKED log_Control_Tuning {
     float   Ioutp;
     float   Ioutq;
     float   IoutV;
+    bool    VAR_SteeringCtrl;
 
     /*int16_t nav_roll_cd;
     int16_t roll;
@@ -333,7 +334,8 @@ void Plane::Log_Write_Control_Tuning()
         drc_servo_out       : Ju_dr_servo_out,
         Ioutp               : Ju_da_I,
         Ioutq               : Ju_de_I,
-        IoutV               : Ju_V_I
+        IoutV               : Ju_V_I,
+        VAR_SteeringCtrl    : steering_control.ground_steering
 
         /*nav_roll_cd     : (int16_t)nav_roll_cd,
         roll            : (int16_t)ahrs.roll_sensor,
@@ -796,7 +798,7 @@ const struct LogStructure Plane::log_structure[] = {
       //"CTUN", "Qffffffff",    "TimeUS,deJ,deservoJ,deservo,dePWMJ,dePWM,eI,eR,qR"}, // Tune Hdot Dataset
       //"CTUN","Q","TimeUS"},
       //"CTUN", "Qffffffffff", "TimeUS,asJ,as,apJ,ap,rsJ,rs,rpJ,rp,dlrc,dlrcW"}, // Tune Hdot Dataset
-        "CTUN", "Qhhhhfff", "TimeUS,daserv,deserv,dthrserv,drserv,Ip,Iq,IV"}, // Onboard Flight Dataset
+        "CTUN", "QhhhhfffB", "TimeUS,daserv,deserv,dthrserv,drserv,Ip,Iq,IV,SteerCtrl"}, // Onboard Flight Dataset
     { LOG_JTH_MSG, sizeof(log_Ju_Tuning_Hdot),
         "JTH" , "Qfffffffffff","TimeUS,Ptchc,qFB,qRl,qRM,qP,qI,qF,deFB,deTrim,deRM,dec" },
     { LOG_JTV_MSG, sizeof(log_Ju_Tuning_V), 
