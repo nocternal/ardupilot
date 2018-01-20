@@ -12,24 +12,24 @@
     </fileheader>
 
     <metrics>
-        <wingarea unit="M2"> 2.866 </wingarea>
-        <wingspan unit="M"> 3.2 </wingspan>
-        <chord unit="M"> 1.234 </chord>
+        <wingarea unit="FT2"> 10.57 </wingarea>
+        <wingspan unit="FT"> 9.17 </wingspan>
+        <chord unit="FT"> 1.15 </chord>
         <htailarea unit="FT2"> 1.69 </htailarea>
         <htailarm unit="FT"> 3.28 </htailarm>
         <vtailarea unit="FT2"> 1.06 </vtailarea>
         <vtailarm unit="FT"> 0 </vtailarm>
-        <location name="AERORP" unit="M">
-            <x> 1.2826 </x>
+        <location name="AERORP" unit="IN">
+            <x> 37.4 </x>
             <y> 0 </y>
             <z> 0 </z>
         </location>
-        <location name="EYEPOINT" unit="M">
-            <x> 1.2826 </x>
+        <location name="EYEPOINT" unit="IN">
+            <x> 20 </x>
             <y> 0 </y>
             <z> 5 </z>
         </location>
-        <location name="VRP" unit="M">
+        <location name="VRP" unit="IN">
             <x> 0 </x>
             <y> 0 </y>
             <z> 0 </z>
@@ -37,26 +37,26 @@
     </metrics>
 
     <mass_balance>
-        <ixx unit="KG*M2"> 6.88 </ixx>
-        <iyy unit="KG*M2"> 7.66 </iyy>
-        <izz unit="KG*M2"> 14.35 </izz>
-        <ixy unit="KG*M2"> 0 </ixy>
-        <ixz unit="KG*M2"> 0 </ixz>
-        <iyz unit="KG*M2"> 0 </iyz>
-        <emptywt unit="KG"> 25 </emptywt>
-        <location name="CG" unit="M">
-            <x> 1.332 </x>
+        <ixx unit="SLUG*FT2"> 1.95 </ixx>
+        <iyy unit="SLUG*FT2"> 1.55 </iyy>
+        <izz unit="SLUG*FT2"> 1.91 </izz>
+        <ixy unit="SLUG*FT2"> 0 </ixy>
+        <ixz unit="SLUG*FT2"> 0 </ixz>
+        <iyz unit="SLUG*FT2"> 0 </iyz>
+        <emptywt unit="LBS"> 13 </emptywt>
+        <location name="CG" unit="IN">
+            <x> 36.4 </x>
             <y> 0 </y>
-            <z> 0 </z>
+            <z> 4 </z>
         </location>
     </mass_balance>
 
     <ground_reactions>
         <contact type="BOGEY" name="LEFT_MLG">
-            <location unit="M">
-                <x> 1.4 </x>
-                <y> -0.49 </y>
-                <z> -0.32 </z>
+            <location unit="IN">
+                <x> 33.1 </x>
+                <y> -12.9 </y>
+                <z> -13.1 </z>
             </location>
             <static_friction> 0.8 </static_friction>
             <dynamic_friction> 0.5 </dynamic_friction>
@@ -68,10 +68,10 @@
             <retractable>0</retractable>
         </contact>
         <contact type="BOGEY" name="RIGHT_MLG">
-            <location unit="M">
-                <x> 1.4 </x>
-                <y> 0.49 </y>
-                <z> -0.32 </z>
+            <location unit="IN">
+                <x> 33.1 </x>
+                <y> 12.9 </y>
+                <z> -13.1 </z>
             </location>
             <static_friction> 0.8 </static_friction>
             <dynamic_friction> 0.5 </dynamic_friction>
@@ -83,10 +83,10 @@
             <retractable>0</retractable>
         </contact>
         <contact type="BOGEY" name="TAIL_LG">
-            <location unit="M">
-                <x> 0.4 </x>
+            <location unit="IN">
+                <x> 68.9 </x>
                 <y> 0 </y>
-                <z> -0.32 </z>
+                <z> -4 </z>
             </location>
             <static_friction> 8.0 </static_friction>
             <dynamic_friction> 5.0 </dynamic_friction>
@@ -101,10 +101,10 @@
 
     <propulsion>
         <engine file="Zenoah_G-26A">
-            <location unit="M">
-                <x> 1.86 </x>
+            <location unit="IN">
+                <x> 36 </x>
                 <y> 0 </y>
-                <z> 0.105 </z>
+                <z> 0 </z>
             </location>
             <orient unit="DEG">
                 <roll> 0.0 </roll>
@@ -113,8 +113,8 @@
             </orient>
             <feed>0</feed>
             <thruster file="18x8">
-                <location unit="M">
-                    <x> 0.3 </x>
+                <location unit="IN">
+                    <x> 1 </x>
                     <y> 0 </y>
                     <z> 0 </z>
                 </location>
@@ -127,10 +127,10 @@
             </thruster>
         </engine>
         <tank type="FUEL">    <!-- Tank number 0 -->
-            <location unit="M">
-                <x> 0.5 </x>
+            <location unit="IN">
+                <x> 36.36 </x>
                 <y> 0 </y>
-                <z> 0 </z>
+                <z> -1.89375 </z>
             </location>
             <capacity unit="LBS"> 1.5 </capacity>
             <contents unit="LBS"> 1.5 </contents>
