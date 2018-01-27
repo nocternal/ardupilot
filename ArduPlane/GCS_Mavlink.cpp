@@ -562,14 +562,14 @@ void Plane::send_pid_tuning(mavlink_channel_t chan)
     if (g.gcs_pid_mask & 2) {
         if (plane.control_mode == JUHdotVPhi) {
         // 在地面站中的显示顺序是： pidachived;pidD       ;piddesired;pidff;pidI    ;pidP
-        // 实际地面站显示的是    ： HdotRef   ;Hdot       ;Vref      ;V    ;qc      ;q
+        // 实际地面站显示的是    ： HdotRef   ;Hdot       ;Vref      ;V    ;qIout   ;VIout
         // 在该cpp中的顺序是：      piddesired;pidachived ;pidff     ;pidP ;pidI    ;pidD
         mavlink_msg_pid_tuning_send(chan, PID_TUNING_PITCH,
                                     Ju_Ref_V,
                                     Ju_Ref_Hdot,
                                     Ju_V_A_MEAS,
-                                    Ju_q_MEAS * 57.3f,
-                                    Ju_qc * 57.3f,
+                                    Ju_V_I,
+                                    -Ju_de_I * 57.3f,
                                     Ju_Hdot_MEAS);
         }
         if (!HAVE_PAYLOAD_SPACE(chan, PID_TUNING)) {

@@ -87,8 +87,8 @@ const AP_Param::Info Plane::var_info[] = {
     //                          [m/s]      [m/s]       [m/s]      [m/s] [deg]    [deg]
     // 2 纵向Ref跟踪
     // 在地面站中的显示顺序是： pidachived;pidD       ;piddesired;pidff;pidI    ;pidP
-    // 实际地面站显示的是    ： HdotRef   ;Hdot       ;Vref      ;V    ;qc      ;q
-    //                          [m/s]      [m/s]       [m/s]      [m/s] [deg/s]  [deg/s]
+    // 实际地面站显示的是    ： HdotRef   ;Hdot       ;Vref      ;V    ;qIout   ;VIout
+    //                          [m/s]      [m/s]       [m/s]      [m/s] [deg]   [m/s^2]
     // 4 横航向Ref跟踪
     // 在地面站中的显示顺序是： pidachived;pidD       ;piddesired;pidff;pidI    ;pidP
     // 实际地面站显示的是    ： PhiRef    ;Phi        ;pc        ;p    ;rc      ;r
@@ -1210,6 +1210,13 @@ const AP_Param::Info Plane::var_info[] = {
     // @Values: 0 10
     // @User: Advanced
     GSCALAR(JU_Gain_P_LeadTpVdot,         "JU_KP_LeadTpVdot",   0.06),
+    
+    // @Param: JU_Gain_P_Vdot4Hdot
+    // @DisplayName: JU_Gain_P_Vd4Hd
+    // @Description: 正常情况下该值为1，如果感觉爬升时油门补多了可以减小该值。当然最好其实不动该参数，更改JU_KP_ThrPerVdot，这样更符合物理意义        
+    // @Values: 0 2
+    // @User: Advanced
+    GSCALAR(JU_Gain_P_Vdot4Hdot,         "JU_KP_LeadVd4Hd",   1.0),
 
     // @Param: JU_Gain_P_ThrPerVdot
     // @DisplayName: JU_KP_LeadTzVdot

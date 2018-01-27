@@ -1355,7 +1355,7 @@ void Plane::Ju_HdotV_Ctrl()
     if (Ju_V_A_MEAS<g.JU_VAR_Ion_Vmin) {
     	Ju_V_I = 0;
     }
-    Ju_Hdot2Vdot = Ju_Hdot2Vdot_LeadFilter();
+    Ju_Hdot2Vdot = g.JU_Gain_P_Vdot4Hdot * Ju_Hdot2Vdot_LeadFilter();
     Ju_Vdotc     = Ju_V_P + Ju_V_I + Ju_Ref_Vdot * g.JU_Gain_Ref_FF_Vdot + Ju_Hdot2Vdot;
     Ju_Thrc_FB   = Ju_Vdotc * g.JU_Gain_P_ThrPerVdot;//[%]
     Ju_Thrc_Trim = linear_interpolate(g.JU_Trim_dthr_Low , g.JU_Trim_dthr_High, Ju_V_A_MEAS, g.JU_Trim_V_Low , g.JU_Trim_V_High);
