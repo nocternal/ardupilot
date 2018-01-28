@@ -388,10 +388,12 @@ public:
         k_param_JU_Ref_Ksi_Phi,
         k_param_JU_Ref_w0_Phi,
 
+        k_param_JU_SmoothT_V,
         k_param_JU_VAR_V_Smooth,
         k_param_JU_VAR_Phidot2p,
         k_param_JU_VAR_Ion_Vmin,
         k_param_JU_VAR_SteerCtrl,
+
 
         k_param_JU_Gain_Ref_FF_q,
         k_param_JU_Gain_Ref_FF_Vdot,
@@ -585,6 +587,7 @@ public:
 
     // JU Param
     //
+    AP_Float JU_SmoothT_V;
     AP_Int8  JU_VAR_V_Smooth; 
     AP_Int8  JU_VAR_Phidot2p;
     AP_Int8  JU_VAR_SteerCtrl;

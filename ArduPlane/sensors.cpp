@@ -106,7 +106,10 @@ void Plane::read_airspeed(void)
     // update smoothed airspeed estimate
     float aspeed;
     if (ahrs.airspeed_estimate(&aspeed)) {
-        smoothed_airspeed = smoothed_airspeed * 0.8f + aspeed * 0.2f;
+        // 采样频率Ts=0.1s
+        float Ts = 0.1; 
+        float q  = Ts / (Ts + g.JU_SmoothT_V);
+        smoothed_airspeed = smoothed_airspeed * (1.0f - q) + aspeed * q;
     }
 }
 

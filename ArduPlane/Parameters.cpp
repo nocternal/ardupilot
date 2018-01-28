@@ -1562,6 +1562,13 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(JU_Ref_w0_Phi,         "JU_Ref_w0_Phi",   3),  
 
+    // @Param: JU_SmoothT_V
+    // @DisplayName: JU_SmoothT_V
+    // @Description: 对空速进行低通滤波1/(Ts+1)的T，时间常数，不能过大。
+    // @Values: 0.05, 0.5
+    // @User: Advanced
+    GSCALAR(JU_SmoothT_V,         "JU_SmoothT_V",   0.1),
+
     // @Param: JU_VAR_V_Smooth
     // @DisplayName: JU_VAR_V_Smooth
     // @Description: 1: Smooth Velocity measure value , 0: No smooth
