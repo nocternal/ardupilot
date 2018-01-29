@@ -1225,6 +1225,13 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(JU_Gain_P_ThrPerVdot,         "JU_KP_ThrPerVdot",   16),
 
+    // @Param: JU_Gain_P_qRollComp
+    // @DisplayName: JU_KP_qRollComp
+    // @Description: 正常情况下设为1，如果滚转时高度上升可降低该参数，如果高度下降可适当增加该增益          
+    // @Values: 0 10
+    // @User: Advanced
+    GSCALAR(JU_Gain_P_qRollComp,         "JU_KP_qRollComp",   1),
+    
     // @Param: JU_Gain_RY_Pphi
     // @DisplayName: JU_KRY_Pphi
     // @Description: KRY means gain of roll&yaw axis; phidotc = Pphi * deltaphic                   

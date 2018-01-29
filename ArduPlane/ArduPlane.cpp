@@ -1326,7 +1326,7 @@ void Plane::Ju_HdotV_Ctrl()
     float delta_loadfactor = gammadotc * Ju_V_Use / g_acc / cosf(Ju_Phi_Use);
     delta_loadfactor   = constrain_float(delta_loadfactor , - g.JU_Lim_Delta_nz_Max , g.JU_Lim_Delta_nz_Max);
     Ju_qc_FB           = delta_loadfactor * g_acc / Ju_V_Use;
-    Ju_qc_RollComp     = Ju_Get_q_Rollcomp();
+    Ju_qc_RollComp     = g.JU_Gain_P_qRollComp * Ju_Get_q_Rollcomp();
     Ju_qc              = Ju_qc_FB + Ju_qc_RollComp + Ju_Ref_q;
     Ju_qc              = constrain_float(Ju_qc , - g.JU_Lim_q_Max/57.3f , g.JU_Lim_q_Max/57.3f);
     Ju_dec_FB          = Ju_q_Ctrl();

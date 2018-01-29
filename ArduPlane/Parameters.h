@@ -410,6 +410,7 @@ public:
         k_param_JU_Gain_P_LeadTpVdot,
         k_param_JU_Gain_P_Vdot4Hdot,
         k_param_JU_Gain_P_ThrPerVdot,
+        k_param_JU_Gain_P_qRollComp,
         k_param_JU_Gain_RY_Pphi,
         k_param_JU_Gain_RY_Pp,
         k_param_JU_Gain_RY_Ip,
@@ -651,6 +652,7 @@ public:
     AP_Float JU_Gain_P_LeadTpVdot;
     AP_Float JU_Gain_P_Vdot4Hdot;
     AP_Float JU_Gain_P_ThrPerVdot;
+    AP_Float JU_Gain_P_qRollComp;
 
     AP_Float JU_Gain_RY_Pphi;
     AP_Float JU_Gain_RY_Pp;
