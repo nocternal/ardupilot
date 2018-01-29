@@ -1279,7 +1279,14 @@ const AP_Param::Info Plane::var_info[] = {
     // @Description: Linear Trim table(2 Points) , the low velocity [m/s]     
     // @Values: 10 50
     // @User: Advanced
-    GSCALAR(JU_Trim_V_Low,         "JU_Trim_V_Low",   20),
+    GSCALAR(JU_Trim_V_Low,         "JU_Trim_V_Low",   10),
+
+    // @Param: JU_Trim_V_Middle
+    // @DisplayName: U_Trim_V_Mid
+    // @Description: Trim table , the Middle velocity [m/s]     
+    // @Values: 10 50
+    // @User: Advanced
+    GSCALAR(JU_Trim_V_Middle,         "JU_Trim_V_Mid",   20),
 
     // @Param: JU_Trim_V_High
     // @DisplayName: JU_Trim_V_High
@@ -1295,6 +1302,13 @@ const AP_Param::Info Plane::var_info[] = {
     // @User: Advanced
     GSCALAR(JU_Trim_de_Low,         "JU_Trim_de_Low",   -5),
 
+    // @Param: JU_Trim_de_Middle
+    // @DisplayName: JU_Trim_de_High
+    // @Description: Trim table , the Middle velocity's elevator (positive elevator deflection generate negative pitch moment)[deg]     
+    // @Values: -30 30
+    // @User: Advanced
+    GSCALAR(JU_Trim_de_Middle,         "JU_Trim_de_Mid",   -5),
+
     // @Param: JU_Trim_de_High
     // @DisplayName: JU_Trim_de_High
     // @Description: Trim table , the High velocity's elevator (positive elevator deflection generate negative pitch moment)[deg]     
@@ -1307,7 +1321,14 @@ const AP_Param::Info Plane::var_info[] = {
     // @Description: Trim table , the Low velocity's throttle [%]     
     // @Values: 0 100
     // @User: Advanced
-    GSCALAR(JU_Trim_dthr_Low,         "JU_Trim_Thr_Low",   29),
+    GSCALAR(JU_Trim_dthr_Low,         "JU_Trim_Thr_Low",   0),
+
+    // @Param: JU_Trim_dthr_Middle
+    // @DisplayName: JU_Trim_Thr_Mid
+    // @Description: Trim table , the Middle velocity's throttle [%]     
+    // @Values: 0 100
+    // @User: Advanced
+    GSCALAR(JU_Trim_dthr_Middle,         "JU_Trim_Thr_Mid",   30),
 
     // @Param: JU_Trim_dthr_High
     // @DisplayName: JU_Trim_Thr_High

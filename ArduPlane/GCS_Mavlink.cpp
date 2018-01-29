@@ -536,7 +536,7 @@ void Plane::send_pid_tuning(mavlink_channel_t chan)
     								Ju_Ref_V,
     								Ju_Ref_Hdot,
     								Ju_V_A_MEAS,
-    								Ju_Phi_MEAS * 57.3f ,
+    								Ju_Phi_MEAS * 57.3f,
     								Ju_Ref_Phi * 57.3f,
     								Ju_Hdot_MEAS);
     	}

@@ -1358,7 +1358,17 @@ void Plane::Ju_HdotV_Ctrl()
     Ju_Hdot2Vdot = g.JU_Gain_P_Vdot4Hdot * Ju_Hdot2Vdot_LeadFilter();
     Ju_Vdotc     = Ju_V_P + Ju_V_I + Ju_Ref_Vdot * g.JU_Gain_Ref_FF_Vdot + Ju_Hdot2Vdot;
     Ju_Thrc_FB   = Ju_Vdotc * g.JU_Gain_P_ThrPerVdot;//[%]
-    Ju_Thrc_Trim = linear_interpolate(g.JU_Trim_dthr_Low , g.JU_Trim_dthr_High, Ju_V_A_MEAS, g.JU_Trim_V_Low , g.JU_Trim_V_High);
+
+	if (Ju_V_A_MEAS<=g.JU_Trim_V_Low) {
+		Ju_Thrc_Trim = g.JU_Trim_dthr_Low;
+	}
+	else if (Ju_V_A_MEAS<=g.JU_Trim_V_Middle) {
+		Ju_Thrc_Trim = linear_interpolate(g.JU_Trim_dthr_Low , g.JU_Trim_dthr_Middle, Ju_V_A_MEAS, g.JU_Trim_V_Low , g.JU_Trim_V_Middle);
+	}
+	else {
+		Ju_Thrc_Trim = linear_interpolate(g.JU_Trim_dthr_Middle , g.JU_Trim_dthr_High, Ju_V_A_MEAS, g.JU_Trim_V_Middle , g.JU_Trim_V_High);
+	}
+
     Ju_Thrc      = Ju_Thrc_FB + Ju_Thrc_Trim;
     Ju_Thrc      = constrain_float(Ju_Thrc, g.JU_Lim_Thr_Min , g.JU_Lim_Thr_Max); // [%] 0-100
 
@@ -1544,8 +1554,22 @@ float Plane::Ju_p_Ctrl(void)
 
 float Plane::Ju_de_Trim(void)
 {
-    float  de_trimdeg = linear_interpolate(g.JU_Trim_de_Low , g.JU_Trim_de_High, Ju_V_A_MEAS, g.JU_Trim_V_Low , g.JU_Trim_V_High);
-    float  de_trim    = de_trimdeg/57.3f;
+	float de_trimdeg = 0;
+	float de_trim = 0;
+
+	if (Ju_V_A_MEAS<=g.JU_Trim_V_Low) {
+		de_trimdeg = g.JU_Trim_de_Low;
+		de_trim    = de_trimdeg/57.3f;
+	}
+	else if (Ju_V_A_MEAS<=g.JU_Trim_V_Middle) {
+		de_trimdeg = linear_interpolate(g.JU_Trim_de_Low , g.JU_Trim_de_Middle, Ju_V_A_MEAS, g.JU_Trim_V_Low , g.JU_Trim_V_Middle);
+		de_trim    = de_trimdeg/57.3f;
+	}
+	else {
+		de_trimdeg = linear_interpolate(g.JU_Trim_de_Middle , g.JU_Trim_de_High, Ju_V_A_MEAS, g.JU_Trim_V_Middle , g.JU_Trim_V_High);
+		de_trim    = de_trimdeg/57.3f;
+	}
+
     return de_trim;
 }
 

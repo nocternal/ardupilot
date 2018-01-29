@@ -419,10 +419,13 @@ public:
         k_param_JU_Gain_RY_rWashTau,
 
         k_param_JU_Trim_V_Low,     // [m/s]
+        k_param_JU_Trim_V_Middle,
         k_param_JU_Trim_V_High, 
         k_param_JU_Trim_de_Low,    // [deg]
+        k_param_JU_Trim_de_Middle,
         k_param_JU_Trim_de_High,
         k_param_JU_Trim_dthr_Low,  // [%]
+        k_param_JU_Trim_dthr_Middle,
         k_param_JU_Trim_dthr_High,
 
         k_param_JU_RCout_Da_MIN,
@@ -658,10 +661,13 @@ public:
     AP_Float JU_Gain_RY_rWashTau;
 
     AP_Float JU_Trim_V_Low;     // [m/s]
+    AP_Float JU_Trim_V_Middle;
     AP_Float JU_Trim_V_High; 
     AP_Float JU_Trim_de_Low;    // [deg]
+    AP_Float JU_Trim_de_Middle;
     AP_Float JU_Trim_de_High;
     AP_Float JU_Trim_dthr_Low;  // [%]
+    AP_Float JU_Trim_dthr_Middle;
     AP_Float JU_Trim_dthr_High; 
 
     AP_Int16 JU_RCout_Da_MIN;
