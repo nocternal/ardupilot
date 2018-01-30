@@ -332,8 +332,8 @@ void Plane::Log_Write_Control_Tuning()
         dec_servo_out       : Ju_de_servo_out,
         dthrc_servo_out     : Ju_dthr_servo_out,
         drc_servo_out       : Ju_dr_servo_out,
-        Ioutp               : Ju_da_I,
-        Ioutq               : Ju_de_I,
+        Ioutp               : Ju_da_I * 57.3f,
+        Ioutq               : Ju_de_I * 57.3f,
         IoutV               : Ju_V_I,
         VAR_SteeringCtrl    : steering_control.ground_steering
 

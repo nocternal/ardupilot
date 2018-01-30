@@ -1432,7 +1432,7 @@ void Plane::Ju_Ref_Hdot_Mdl()
         Ju_Ref_q             = Ju_Ref_Hdotdot / Ju_V_Use * g.JU_Gain_Ref_FF_q;
         Ju_Ref_Hdotdot       = Ju_Ref_Hdotdot * cosf(Ju_Phi_Use);
         Ju_Ref_Hdot          = Ju_Ref_Hdot + Ju_Ref_Hdotdot * jdelta_time;
-        Ju_Ref_Hdot          = constrain_float(Ju_Ref_Hdot , - 2.0f * g.JU_Lim_Hdot_Max , 2.0f * g.JU_Lim_Hdot_Max); // 这就相当于没有限制RefHdot，因为从别的模式切换过来的时候可能当时的爬升率超出该限制
+        //Ju_Ref_Hdot          = constrain_float(Ju_Ref_Hdot , - 2.0f * g.JU_Lim_Hdot_Max , 2.0f * g.JU_Lim_Hdot_Max); // 这就相当于没有限制RefHdot，因为从别的模式切换过来的时候可能当时的爬升率超出该限制
 
         Ju_Ref_Hdot_Last     = Ju_Ref_Hdot;
         Ju_Ref_Hdotdot_Last  = Ju_Ref_Hdotdot;
@@ -1452,7 +1452,7 @@ void Plane::Ju_Ref_V_Mdl()
         Ju_Ref_Vdot   = (Ju_Joystick_Vc - Ju_Ref_V) / g.JU_Ref_T_V;
         Ju_Ref_Vdot   = constrain_float(Ju_Ref_Vdot , - g.JU_Lim_Vdot_Max , g.JU_Lim_Vdot_Max);
         Ju_Ref_V      = Ju_Ref_V + Ju_Ref_Vdot * jdelta_time;
-        Ju_Ref_V      = constrain_float(Ju_Ref_V , -g.JU_Lim_V_Air_Max,g.JU_Lim_V_Air_Max); //注意，此处其实并不对最小值作约束，因为切换的时候可能低于空中模式所设定的最小值
+        //Ju_Ref_V      = constrain_float(Ju_Ref_V , -g.JU_Lim_V_Air_Max,g.JU_Lim_V_Air_Max); //注意，此处其实并不对最小值作约束，因为切换的时候可能低于空中模式所设定的最小值
         Ju_Ref_V_Last = Ju_Ref_V;
         Ju_Ref_Vdot_Last = Ju_Ref_Vdot; 
     }
@@ -1462,11 +1462,13 @@ void Plane::Ju_Ref_Phi_Mdl()
 {   //  计算 Ju_Ref_V Ju_Ref_Vdot
     if (jinit_counter == 0) {
         Ju_Ref_Phi        = Ju_Phi_MEAS;
+        Ju_Ref_Phidot     = 0;
         Ju_Ref_PhidotCtrl = 0;
         Ju_Ref_da         = 0;
         if (get_previous_mode()==JUGround)
         {
             Ju_Ref_Phi        = Ju_Ref_Phi_Last;
+            Ju_Ref_Phidot     = 0;
             Ju_Ref_PhidotCtrl = Ju_Ref_PhidotCtrl_Last; 
             Ju_Ref_da         = Ju_Ref_da_Last;
         }   
@@ -1481,7 +1483,7 @@ void Plane::Ju_Ref_Phi_Mdl()
         Ju_Ref_Phidot    = constrain_float(Ju_Ref_Phidot , - g.JU_Lim_Phidot_Max/57.3f, g.JU_Lim_Phidot_Max/57.3f);
         Ju_Ref_PhidotCtrl= constrain_float(Ju_Ref_PhidotCtrl , - g.JU_Lim_Phidot_Max/57.3f, g.JU_Lim_Phidot_Max/57.3f);
         Ju_Ref_Phi       = Ju_Ref_Phi + Ju_Ref_Phidot * jdelta_time;
-        Ju_Ref_Phi       = constrain_float(Ju_Ref_Phi , - g.JU_Lim_Phi_Max/57.3f, g.JU_Lim_Phi_Max/57.3f);
+        //Ju_Ref_Phi       = constrain_float(Ju_Ref_Phi , - g.JU_Lim_Phi_Max/57.3f, g.JU_Lim_Phi_Max/57.3f);
         Ju_Ref_Phi_Last        = Ju_Ref_Phi;
         Ju_Ref_PhidotCtrl_Last = Ju_Ref_PhidotCtrl; 
         Ju_Ref_da_Last         = Ju_Ref_da;
