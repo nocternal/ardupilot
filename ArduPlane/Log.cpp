@@ -395,6 +395,7 @@ struct PACKED log_Ju_Tuning_V {
     float dthrc_FB;
     float dthrc_Trim;
     float dthrc;
+    float smooth_airspeed;
  
 };
 
@@ -410,7 +411,8 @@ void Plane::Log_Write_Ju_Tuning_V()
         VdotcRef    : Ju_Ref_Vdot,
         dthrc_FB    : Ju_Thrc_FB,
         dthrc_Trim  : Ju_Thrc_Trim,
-        dthrc       : Ju_Thrc
+        dthrc       : Ju_Thrc,
+        smooth_airspeed : smoothed_airspeed
     };
     DataFlash.WriteBlock(&pkt, sizeof(pkt));
 }
@@ -802,7 +804,7 @@ const struct LogStructure Plane::log_structure[] = {
     { LOG_JTH_MSG, sizeof(log_Ju_Tuning_Hdot),
         "JTH" , "Qfffffffffff","TimeUS,Ptchc,qFB,qRl,qRM,qP,qI,qF,deFB,deTrim,deRM,dec" },
     { LOG_JTV_MSG, sizeof(log_Ju_Tuning_V), 
-        "JTV" , "Qffffffff","TimeUS,VP,VI,Hd2Vd0,Hd2VdLead,VdRM,dthrFB,dthrTrim,dthrc" },
+        "JTV" , "Qfffffffff","TimeUS,VP,VI,Hd2Vd0,Hd2VdLead,VdRM,dthrFB,dthrTrim,dthrc,Vsm" },
     { LOG_JTR_MSG, sizeof(log_Ju_Tuning_Roll), 
         "JTR" , "Qffffffffff","TimeUS,PhidFB,PhidRM,Phidc,pc,pP,pI,pF,daFB,daRM,dac" },
     { LOG_JTY_MSG, sizeof(log_Ju_Tuning_Yaw), 

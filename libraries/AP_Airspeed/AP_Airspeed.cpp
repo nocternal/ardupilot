@@ -279,7 +279,8 @@ void AP_Airspeed::read(void)
     airspeed_pressure       = MAX(airspeed_pressure, 0);
     _last_pressure          = airspeed_pressure;
     _raw_airspeed           = sqrtf(airspeed_pressure * _ratio);
-    _airspeed               = 0.7f * _airspeed  +  0.3f * _raw_airspeed;
+    //_airspeed               = 0.7f * _airspeed  +  0.3f * _raw_airspeed; // 将速度的平滑放到sensor.cpp处理
+    _airspeed               = _raw_airspeed;
     _last_update_ms         = AP_HAL::millis();
 }
 
