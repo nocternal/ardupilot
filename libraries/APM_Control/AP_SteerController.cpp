@@ -84,6 +84,33 @@ const AP_Param::GroupInfo AP_SteerController::var_info[] = {
 	// @User: User
 	AP_GROUPINFO("FF",      7, AP_SteerController, _K_FF,        0),
 
+    // @Param: DRTSPD
+    // @DisplayName: Derating speed
+    // @Description: Speed after that the maximum degree of steering will start to derate. Set this speed to a maximum speed that a plane can do controlled turn at maximum angle of steering wheel without rolling to wing. If 0 then no derating is used.
+    // @Range: 0.0 30.0
+    // @Increment: 0.1
+    // @Units: m/s
+    // @User: Advanced
+    AP_GROUPINFO("DRTSPD",  8, AP_SteerController, _deratespeed,        0),
+
+    // @Param: DRTFCT
+    // @DisplayName: Derating factor
+    // @Description: Degrees of steering wheel to derate at each additional m/s of speed above "Derating speed". Should be set so that at higher speeds the plane does not roll to the wing in turns.
+    // @Range: 0.0 50.0
+    // @Increment: 0.1
+    // @Units: deg/m/s
+    // @User: Advanced
+    AP_GROUPINFO("DRTFCT", 9, AP_SteerController, _deratefactor,        10),
+
+    // @Param: DRTMIN
+    // @DisplayName: Minimum angle of wheel
+    // @Description: The angle that limits smallest angle of steering wheel at maximum speed. Even if it should derate below, it will stop derating at this angle.
+    // @Range: 0.0 4500.0
+    // @Increment: 0.1
+    // @Units: cdeg
+    // @User: Advanced
+    AP_GROUPINFO("DRTMIN", 10, AP_SteerController, _mindegree,        4500),
+
 	AP_GROUPEND
 };
 
@@ -160,8 +187,18 @@ int32_t AP_SteerController::get_steering_out_rate(float desired_rate)
 	// Calculate the demanded control surface deflection
 	_last_out = _pid_info.D + _pid_info.FF + _pid_info.P + _pid_info.I;
 	
-	// Convert to centi-degrees and constrain
-	return constrain_float(_last_out * 100, -4500, 4500);
+	float derate_constraint = 4500;
+
+    // Calculate required constrain based on speed
+    if (!is_zero(_deratespeed) && speed > _deratespeed) {
+        derate_constraint = 4500 - (speed - _deratespeed) * _deratefactor * 100;
+        if (derate_constraint < _mindegree) {
+            derate_constraint = _mindegree;
+        }
+    }
+
+    // Convert to centi-degrees and constrain
+    return constrain_float(_last_out * 100, -derate_constraint, derate_constraint);
 }
 
 
